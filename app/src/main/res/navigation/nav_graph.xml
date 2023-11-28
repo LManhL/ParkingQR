@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/parkingFragment"
+    >
+    <fragment
+        tools:layout="@layout/fragment_parking"
+        android:id="@+id/parkingFragment"
+        android:name="com.example.parkingqr.ui.components.ParkingFragment"
+        android:label="@string/parking_fragment_name">
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_parking"
+        android:id="@+id/scanFragment"
+        android:name="com.example.parkingqr.ui.components.ScanFragment"
+        android:label="@string/scan_fragment_name">
+    </fragment>
+</navigation>
