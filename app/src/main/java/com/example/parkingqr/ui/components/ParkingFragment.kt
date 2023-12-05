@@ -5,7 +5,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.provider.MediaStore
+import android.text.InputType
 import android.view.View
+import android.view.View.OnFocusChangeListener
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -76,6 +81,7 @@ class ParkingFragment : BaseFragment() {
                         ParkingViewModel.ParkingState.ERROR -> {
                             hideLoading()
                             showError(it.errorMessage)
+                            parkingViewModel.refreshData()
                         }
                         ParkingViewModel.ParkingState.SUCCESSFUL_CREATE_PARKING_INVOICE -> {
                             hideLoading()
@@ -111,17 +117,24 @@ class ParkingFragment : BaseFragment() {
                             hideLoading()
                             showMessage("${it.errorList[it.state]}")
                         }
+                        ParkingViewModel.ParkingState.PARKED_VEHICLE ->{
+                            hideLoading()
+                            showMessage("${it.errorList[it.state]}")
+                        }
                         ParkingViewModel.ParkingState.FAIL_FOUND_VEHICLE -> {
                             hideLoading()
                             binding.tvStateMessageParking.text =
                                 "Hóa đơn gửi xe cho xe chưa đăng ký"
-                            binding.ivCarInParking.setBackgroundResource(R.drawable.car_in)
-                            binding.tvCarInParking.text = "Tạo"
-                            displayParkingInvoice(it.parkingInvoice!!)
                         }
                         ParkingViewModel.ParkingState.FAIL_SEARCH_PARKING_INVOICE -> {
                             hideLoading()
                             showMessage("${it.errorList[it.state]}")
+                            parkingViewModel.refreshData()
+                        }
+                        ParkingViewModel.ParkingState.PARKED_PARKING_INVOICE -> {
+                            hideLoading()
+                            showMessage("${it.errorList[it.state]}")
+                            parkingViewModel.refreshData()
                         }
                         ParkingViewModel.ParkingState.SUCCESSFUL_COMPLETE_PARKING_INVOICE -> {
                             hideLoading()
@@ -137,6 +150,7 @@ class ParkingFragment : BaseFragment() {
                         }
                         ParkingViewModel.ParkingState.FAIL_GET_QR_CODE ->{
                             showMessage("${it.errorList[it.state]}")
+                            parkingViewModel.refreshData()
                         }
                     }
                 }
@@ -152,17 +166,55 @@ class ParkingFragment : BaseFragment() {
     }
 
     override fun initListener() {
+        binding.edtPaymentMethodParking.inputType = InputType.TYPE_NULL
+        binding.edtInvoiceTypeParking.inputType = InputType.TYPE_NULL
+
+        binding.llPaymentMethodParking.setOnClickListener {
+            val popupMenu = PopupMenu(context, it)
+            popupMenu.menuInflater.inflate(R.menu.payment_method_menu, popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener {item ->
+                binding.edtPaymentMethodParking.setText(item.title)
+                true
+            }
+            popupMenu.show()
+        }
+
+        binding.llInvoiceTypeParking.setOnClickListener{
+            val popupMenu = PopupMenu(context, it)
+            popupMenu.menuInflater.inflate(R.menu.invoice_type_menu, popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener {item ->
+                binding.edtInvoiceTypeParking.setText(item.title)
+                true
+            }
+            popupMenu.show()
+        }
+
         binding.ivPhotoCarInParking.setOnClickListener {
-            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(cameraIntent, PIC_CODE_CAR_IN)
+            if(parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.BLANK){
+                val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                startActivityForResult(cameraIntent, PIC_CODE_CAR_IN)
+            }
+            else{
+                showMessage("Vui lòng xử lí giao dịch hiện tại trước")
+            }
         }
         binding.ivPhotoCarOutParking.setOnClickListener {
-            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(cameraIntent, PIC_CODE_CAR_OUT)
+            if(parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.BLANK){
+                val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                startActivityForResult(cameraIntent, PIC_CODE_CAR_OUT)
+            }
+            else{
+                showMessage("Vui lòng xử lí giao dịch hiện tại trước")
+            }
         }
         binding.ivLBlankCarParking.setOnClickListener {
-            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(cameraIntent, PIC_CODE_CAR_IN)
+            if(parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.BLANK){
+                val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                startActivityForResult(cameraIntent, PIC_CODE_CAR_IN)
+            }
+            else{
+                showMessage("Vui lòng xử lí giao dịch hiện tại trước")
+            }
         }
         binding.llButtonCarIn.setOnClickListener {
             handleCarIn()
@@ -205,6 +257,7 @@ class ParkingFragment : BaseFragment() {
             } else {
                 if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.SUCCESSFUL_FOUND_VEHICLE
                     || parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.FAIL_FOUND_VEHICLE
+                    || parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.PARKED_VEHICLE
                 ) {
                     parkingViewModel.addNewParkingInvoice()
                 } else {
@@ -225,15 +278,23 @@ class ParkingFragment : BaseFragment() {
         if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.SUCCESSFUL_SEARCH_PARKING_INVOICE) {
             parkingViewModel.completeParkingInvoice()
         } else {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
-                ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION_CODE)
+            if(parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.BLANK){
+                handleOpenQRScan()
             }
             else{
-                getNavController().navigate(R.id.scanFragment)
+                showMessage("Vui lòng xử lí giao dịch hiện tại trước")
             }
         }
     }
 
+    private fun handleOpenQRScan(){
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION_CODE)
+        }
+        else{
+            getNavController().navigate(R.id.scanFragment)
+        }
+    }
     private fun displayImageVehicleIn(parkingInvoice: ParkingInvoice) {
         if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.SUCCESSFUL_SEARCH_PARKING_INVOICE) {
             binding.llParkingInvoiceCarinParking.visibility = View.VISIBLE
@@ -249,7 +310,7 @@ class ParkingFragment : BaseFragment() {
         binding.llContainerParking.visibility = View.VISIBLE
 
         binding.apply {
-            edtTypeParking.setText(parkingInvoice.vehicle.type)
+            edtVehicleTypeParking.setText(parkingInvoice.vehicle.type)
             edtNoteParking.setText(parkingInvoice.note)
             edtNameParking.setText(parkingInvoice.user.name)
             edtLicensePlateParking.setText(parkingInvoice.vehicle.licensePlate)

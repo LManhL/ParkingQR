@@ -1,11 +1,12 @@
 package com.example.parkingqr.data.remote
 
-import com.example.parkingqr.data.remote.model.parking.parkinginvoice.ParkingInvoiceFirebase
 import com.example.parkingqr.data.remote.model.parking.UserResponse
 import com.example.parkingqr.data.remote.model.parking.VehicleResponse
+import com.example.parkingqr.data.remote.model.parking.parkinginvoice.ParkingInvoiceFirebase
 import com.example.parkingqr.domain.parking.ParkingInvoice
 import com.example.parkingqr.domain.parking.User
 import com.example.parkingqr.domain.parking.Vehicle
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
@@ -82,6 +83,19 @@ class RemoteDataSource : IRemoteDataSource {
         val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
         parkingInvoiceRef.document(id).update("state", "parked").await()
         emit(State.success("${parkingInvoiceRef.path}/${id}"))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun searchParkingInvoiceByLicensePlateAndStateParking(licensePlate: String): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
+        val query: Query = parkingInvoiceRef.whereEqualTo("state", "parking").whereEqualTo("vehicle.licensePlate",licensePlate)
+        val querySnapshot = query.get().await()
+        if(querySnapshot.documents.isNotEmpty()){
+            emit(State.success(true))
+        }
+        else emit(State.success(false))
     }.catch {
         emit(State.failed(it.message.toString()))
     }.flowOn(Dispatchers.IO)

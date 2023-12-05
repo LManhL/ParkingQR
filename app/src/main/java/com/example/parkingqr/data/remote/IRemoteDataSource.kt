@@ -13,4 +13,6 @@ interface IRemoteDataSource {
     fun searchParkingInvoiceById(id: String): Flow<State<MutableList<ParkingInvoice>>>
     fun getNewParkingInvoiceKey(): String
     fun completeParkingInvoice(id: String): Flow<State<String>>
+
+    fun searchParkingInvoiceByLicensePlateAndStateParking(licensePlate: String): Flow<State<Boolean>>
 }

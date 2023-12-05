@@ -2,6 +2,7 @@ package com.example.parkingqr.ui.components
 
 import android.graphics.Bitmap
 import androidx.lifecycle.viewModelScope
+import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.Repository
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.domain.parking.ParkingInvoice
@@ -16,11 +17,13 @@ import kotlinx.coroutines.flow.*
 class ParkingViewModel : BaseViewModel() {
 
     companion object {
-        const val SEARCH_LICENSE_PLATE = "searchLicensePlate"
-        const val SEARCH_USER = "searchUser"
+        const val SEARCH_LICENSE_PLATE = "SEARCH_LICENSE_PLATE"
+        const val SEARCH_USER = "SEARCH_USER"
+        const val ADD_NEW_PARKING_INVOICE = "ADD_NEW_PARKING_INVOICE"
+        const val VALIDATE_VEHICLE = "VALIDATE_VEHICLE"
     }
 
-    private val repository = Repository()
+    private var validateVehicleJob: Job? = null
     private var searchVehicleJob: Job? = null
     private var addParkingInvoiceJob: Job? = null
     private var updateParkingInvoiceJob: Job? = null
@@ -105,9 +108,21 @@ class ParkingViewModel : BaseViewModel() {
     }
 
     fun addNewParkingInvoice() {
+        var available = false
         addParkingInvoiceJob?.cancel()
         addParkingInvoiceJob = viewModelScope.launch {
-            repository.addNewParkingInvoice(_stateUi.value.parkingInvoice!!).collect { state ->
+            flowOf(VALIDATE_VEHICLE, ADD_NEW_PARKING_INVOICE).flatMapConcat {
+                when (it) {
+                    VALIDATE_VEHICLE -> repository.searchParkingInvoiceByLicensePlateAndStateParking(_stateUi.value.parkingInvoice?.vehicle?.licensePlate!!)
+                    else -> {
+                        if (!available) {
+                            repository.addNewParkingInvoice(_stateUi.value.parkingInvoice!!)
+                        } else {
+                            flowOf()
+                        }
+                    }
+                }
+            }.collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -115,8 +130,18 @@ class ParkingViewModel : BaseViewModel() {
                         }
                     }
                     is State.Success -> {
-                        _stateUi.update {
-                            it.copy(state = ParkingState.SUCCESSFUL_CREATE_PARKING_INVOICE)
+                        if(state.data is Boolean){
+                            available = state.data
+                            if(available){
+                                _stateUi.update {
+                                    it.copy(state = ParkingState.PARKED_VEHICLE)
+                                }
+                            }
+                        }
+                        else{
+                            _stateUi.update {
+                                it.copy(state = ParkingState.SUCCESSFUL_CREATE_PARKING_INVOICE)
+                            }
                         }
                     }
                     is State.Failed -> {
@@ -156,11 +181,20 @@ class ParkingViewModel : BaseViewModel() {
                     }
                     is State.Success -> {
                         if (state.data.isNotEmpty()) {
-                            _stateUi.update {
-                                it.copy(
-                                    state = ParkingState.SUCCESSFUL_SEARCH_PARKING_INVOICE,
-                                    parkingInvoice = state.data[0],
-                                )
+                            if(state.data[0].state == "parked"){
+                                _stateUi.update {
+                                    it.copy(
+                                        state = ParkingState.PARKED_PARKING_INVOICE,
+                                    )
+                                }
+                            }
+                            else{
+                                _stateUi.update {
+                                    it.copy(
+                                        state = ParkingState.SUCCESSFUL_SEARCH_PARKING_INVOICE,
+                                        parkingInvoice = state.data[0],
+                                    )
+                                }
                             }
                         } else {
                             _stateUi.update {
@@ -182,6 +216,7 @@ class ParkingViewModel : BaseViewModel() {
             }
         }
     }
+
 
     fun completeParkingInvoice() {
         updateParkingInvoiceJob?.cancel()
@@ -213,6 +248,7 @@ class ParkingViewModel : BaseViewModel() {
                 }
         }
     }
+
     fun getDataFromQRCode(result: String){
         _stateUi.update {
             it.copy(
@@ -244,6 +280,10 @@ class ParkingViewModel : BaseViewModel() {
                 "Trả hóa đơn xe không thành công"
             errorList[ParkingState.FAIL_GET_QR_CODE] =
                 "Không tìm thấy QRCODE"
+            errorList[ParkingState.PARKED_PARKING_INVOICE] =
+                "Hóa đơn không hợp lệ"
+            errorList[ParkingState.PARKED_VEHICLE] =
+                "Xe đã được gửi"
 
             messageList[ParkingState.SUCCESSFUL_FOUND_VEHICLE] =
                 "Tìm thấy phương tiện tương ứng có biển số"
@@ -253,6 +293,7 @@ class ParkingViewModel : BaseViewModel() {
                 "Tìm thấy hóa đơn xe có biển số"
             messageList[ParkingState.SUCCESSFUL_COMPLETE_PARKING_INVOICE] =
                 "Trả hóa đơn xe thành công cho xe có biển số"
+
         }
     }
 
@@ -261,12 +302,14 @@ class ParkingViewModel : BaseViewModel() {
         LOADING,
         ERROR,
         SUCCESSFUL_FOUND_VEHICLE,
+        PARKED_VEHICLE,
         FAIL_FOUND_VEHICLE,
         SUCCESSFUL_CREATE_PARKING_INVOICE,
         FAIL_CREATE_PARKING_INVOICE,
         SUCCESSFUL_SEARCH_PARKING_INVOICE,
         FAIL_SEARCH_PARKING_INVOICE,
         SUCCESSFUL_COMPLETE_PARKING_INVOICE,
+        PARKED_PARKING_INVOICE,
         FAIL_COMPLETE_PARKING_INVOICE,
         SUCCESSFUL_GET_QR_CODE,
         FAIL_GET_QR_CODE

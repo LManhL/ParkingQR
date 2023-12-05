@@ -33,4 +33,8 @@ class Repository: IRepository {
     override fun completeParkingInvoice(id: String): Flow<State<String>> {
         return remoteDataSource.completeParkingInvoice(id)
     }
+
+    override fun searchParkingInvoiceByLicensePlateAndStateParking(licensePlate: String): Flow<State<Boolean>> {
+        return remoteDataSource.searchParkingInvoiceByLicensePlateAndStateParking(licensePlate)
+    }
 }
