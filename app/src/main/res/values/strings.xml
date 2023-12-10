@@ -3,4 +3,5 @@
 
     <string name="parking_fragment_name">Gửi trả xe</string>
     <string name="scan_fragment_name">Quét QR</string>
+    <string name="home_fragment_name">Trang chủ</string>
 </resources>

@@ -20,13 +20,13 @@ data class ParkingInvoiceFirebase(
         this.id = parkingInvoice.id
         this.imageIn = parkingInvoice.imageIn
         this.state = parkingInvoice.state
-        this.imageOut = this.imageOut
+        this.imageOut = parkingInvoice.imageOut
         this.price = parkingInvoice.price
         this.paymentMethod = parkingInvoice.paymentMethod
         this.type = parkingInvoice.type
         this.note = parkingInvoice.note
         this.timeIn = parkingInvoice.timeIn
-        this.timeOut = this.timeOut
+        this.timeOut = parkingInvoice.timeOut
         this.user = UserFirebase(parkingInvoice.user)
         this.vehicle = VehicleFirebase(parkingInvoice.vehicle)
     }

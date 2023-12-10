@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/parkingFragment"
+    app:startDestination="@id/homeFragment"
     >
     <fragment
         tools:layout="@layout/fragment_parking"
@@ -12,9 +12,15 @@
         android:label="@string/parking_fragment_name">
     </fragment>
     <fragment
-        tools:layout="@layout/fragment_parking"
+        tools:layout="@layout/fragment_scan"
         android:id="@+id/scanFragment"
         android:name="com.example.parkingqr.ui.components.ScanFragment"
         android:label="@string/scan_fragment_name">
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_home"
+        android:id="@+id/homeFragment"
+        android:name="com.example.parkingqr.ui.components.HomeFragment"
+        android:label="@string/home_fragment_name">
     </fragment>
 </navigation>
