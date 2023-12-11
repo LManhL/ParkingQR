@@ -1,6 +1,6 @@
 package com.example.parkingqr.data.remote.model.parking.parkinginvoice
 
-import com.example.parkingqr.domain.parking.ParkingInvoice
+import com.example.parkingqr.domain.parking.ParkingInvoicePK
 
 data class ParkingInvoiceFirebase(
     var id: String? = null,
@@ -16,18 +16,18 @@ data class ParkingInvoiceFirebase(
     var type: String? = null,
     var note: String? = null
     ){
-    constructor(parkingInvoice: ParkingInvoice): this(){
-        this.id = parkingInvoice.id
-        this.imageIn = parkingInvoice.imageIn
-        this.state = parkingInvoice.state
-        this.imageOut = parkingInvoice.imageOut
-        this.price = parkingInvoice.price
-        this.paymentMethod = parkingInvoice.paymentMethod
-        this.type = parkingInvoice.type
-        this.note = parkingInvoice.note
-        this.timeIn = parkingInvoice.timeIn
-        this.timeOut = parkingInvoice.timeOut
-        this.user = UserFirebase(parkingInvoice.user)
-        this.vehicle = VehicleFirebase(parkingInvoice.vehicle)
+    constructor(parkingInvoicePK: ParkingInvoicePK): this(){
+        this.id = parkingInvoicePK.id
+        this.imageIn = parkingInvoicePK.imageIn
+        this.state = parkingInvoicePK.state
+        this.imageOut = parkingInvoicePK.imageOut
+        this.price = parkingInvoicePK.price
+        this.paymentMethod = parkingInvoicePK.paymentMethod
+        this.type = parkingInvoicePK.type
+        this.note = parkingInvoicePK.note
+        this.timeIn = parkingInvoicePK.timeIn
+        this.timeOut = parkingInvoicePK.timeOut
+        this.user = UserFirebase(parkingInvoicePK.user)
+        this.vehicle = VehicleFirebase(parkingInvoicePK.vehicle)
     }
 }

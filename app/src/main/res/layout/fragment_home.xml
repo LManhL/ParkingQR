@@ -7,14 +7,16 @@
 
 
     <ImageView
-        android:id="@+id/header_home"
+        android:id="@+id/iv_header_home"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/background"
+        android:background="@drawable/dark_navy_bg"
         android:layout_width="match_parent"
-        android:layout_height="150dp"/>
+        android:layout_height="250dp"/>
     <View
-        android:layout_marginTop="120dp"
+        android:id="@+id/v_container_home"
+        android:layout_marginTop="180dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/background_header"
@@ -31,8 +33,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/llSetttingHome"
         app:layout_constraintStart_toEndOf="@+id/llParkingHome"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2">
+        app:layout_constraintTop_toTopOf="@id/v_container_home"
+        app:layout_constraintVertical_bias="0.05">
 
         <ImageView
             android:id="@+id/ivInvoiceListHome"
@@ -59,8 +61,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/llSecurityCameraHome"
         app:layout_constraintStart_toEndOf="@+id/llInvoiceListHome"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2">
+        app:layout_constraintTop_toTopOf="@id/v_container_home"
+        app:layout_constraintVertical_bias="0.05">
 
         <ImageView
             android:id="@+id/ivSettingHome"
@@ -88,8 +90,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/llSetttingHome"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2">
+        app:layout_constraintTop_toTopOf="@id/v_container_home"
+        app:layout_constraintVertical_bias="0.05">
 
         <ImageView
             android:id="@+id/ivSecurityCameraHome"
@@ -117,8 +119,8 @@
         app:layout_constraintEnd_toStartOf="@+id/llInvoiceListHome"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2">
+        app:layout_constraintTop_toTopOf="@id/v_container_home"
+        app:layout_constraintVertical_bias="0.05">
 
         <ImageView
             android:id="@+id/ivParkingHome"

@@ -7,10 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import com.example.parkingqr.R
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -23,6 +26,7 @@ abstract class BaseFragment : Fragment() {
     abstract fun observeViewModel()
     abstract fun initViewBinding(): View
     abstract fun initListener()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +46,9 @@ abstract class BaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initListener()
         loadingDialog = context?.let { LoadingDialog(it) }!!
+        activity?.findViewById<ImageView>(R.id.iv_actionbar_back_main)?.setOnClickListener{
+            getNavController().popBackStack()
+        }
         mView = view
     }
 
@@ -90,6 +97,14 @@ abstract class BaseFragment : Fragment() {
         view.layoutParams = params
 
         snackbar.show()
+    }
+
+    fun showActionBar(message: String){
+        activity?.findViewById<TextView>(R.id.tv_actionbar_title_main)?.text = message
+        activity?.findViewById<LinearLayout>(R.id.ll_actionbar_container_main)?.visibility = View.VISIBLE
+    }
+    fun hideActionBar(){
+        activity?.findViewById<LinearLayout>(R.id.ll_actionbar_container_main)?.visibility = View.GONE
     }
     fun getNavController(): NavController{
         return navController

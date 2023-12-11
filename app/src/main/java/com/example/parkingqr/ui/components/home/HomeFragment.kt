@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components
+package com.example.parkingqr.ui.components.home
 
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -21,17 +21,12 @@ class HomeFragment: BaseFragment() {
     }
 
     override fun initListener() {
+        hideActionBar()
         binding.ivParkingHome.setOnClickListener{
             getNavController().navigate(R.id.parkingFragment)
         }
-    }
-    override fun onResume() {
-        super.onResume()
-//        (requireActivity() as AppCompatActivity).supportActionBar?.hide()
-    }
-
-    override fun onStop() {
-        super.onStop()
-//        (requireActivity() as AppCompatActivity).supportActionBar?.show()
+        binding.ivInvoiceListHome.setOnClickListener{
+            getNavController().navigate(R.id.invoiceListFragment)
+        }
     }
 }

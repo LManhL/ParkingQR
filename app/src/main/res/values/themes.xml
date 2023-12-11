@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.ParkingQR" parent="Theme.AppCompat.Light">
+    <style name="Theme.ParkingQR" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryVariant">@color/black</item>
@@ -10,9 +10,9 @@
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <!-- Customize your theme here. -->
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">false</item>
         <item name="android:textColor">@color/black</item>
     </style>
 </resources>

@@ -8,19 +8,25 @@
     <fragment
         tools:layout="@layout/fragment_parking"
         android:id="@+id/parkingFragment"
-        android:name="com.example.parkingqr.ui.components.ParkingFragment"
+        android:name="com.example.parkingqr.ui.components.parking.ParkingFragment"
         android:label="@string/parking_fragment_name">
     </fragment>
     <fragment
         tools:layout="@layout/fragment_scan"
         android:id="@+id/scanFragment"
-        android:name="com.example.parkingqr.ui.components.ScanFragment"
+        android:name="com.example.parkingqr.ui.components.parking.ScanFragment"
         android:label="@string/scan_fragment_name">
     </fragment>
     <fragment
         tools:layout="@layout/fragment_home"
         android:id="@+id/homeFragment"
-        android:name="com.example.parkingqr.ui.components.HomeFragment"
+        android:name="com.example.parkingqr.ui.components.home.HomeFragment"
         android:label="@string/home_fragment_name">
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_invoice_list"
+        android:id="@+id/invoiceListFragment"
+        android:name="com.example.parkingqr.ui.components.invoice.InvoiceListFragment"
+        android:label="@string/invoice_list_fragment_name">
     </fragment>
 </navigation>

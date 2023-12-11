@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components
+package com.example.parkingqr.ui.components.parking
 
 import android.app.Dialog
 import android.content.Context

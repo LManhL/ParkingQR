@@ -1,11 +1,9 @@
-package com.example.parkingqr.ui.components
+package com.example.parkingqr.ui.components.parking
 
 import android.graphics.Bitmap
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
-import com.example.parkingqr.data.Repository
 import com.example.parkingqr.data.remote.State
-import com.example.parkingqr.domain.parking.ParkingInvoice
+import com.example.parkingqr.domain.parking.ParkingInvoicePK
 import com.example.parkingqr.domain.parking.User
 import com.example.parkingqr.domain.parking.Vehicle
 import com.example.parkingqr.ui.base.BaseViewModel
@@ -61,7 +59,7 @@ class ParkingViewModel : BaseViewModel() {
                             _stateUi.update {
                                 it.copy(
                                     state = ParkingState.FAIL_FOUND_VEHICLE,
-                                    parkingInvoice = ParkingInvoice(
+                                    parkingInvoicePK = ParkingInvoicePK(
                                         ID = repository.getNewParkingInvoiceKey(),
                                         user = User(),
                                         vehicle = Vehicle(licensePlate),
@@ -82,7 +80,7 @@ class ParkingViewModel : BaseViewModel() {
                                     it.copy(
                                         state = ParkingState.SUCCESSFUL_FOUND_VEHICLE,
                                         user = value,
-                                        parkingInvoice = ParkingInvoice(
+                                        parkingInvoicePK = ParkingInvoicePK(
                                             ID = repository.getNewParkingInvoiceKey(),
                                             user = value,
                                             vehicle = it.vehicle!!,
@@ -113,10 +111,10 @@ class ParkingViewModel : BaseViewModel() {
         addParkingInvoiceJob = viewModelScope.launch {
             flowOf(VALIDATE_VEHICLE, ADD_NEW_PARKING_INVOICE).flatMapConcat {
                 when (it) {
-                    VALIDATE_VEHICLE -> repository.searchParkingInvoiceByLicensePlateAndStateParking(_stateUi.value.parkingInvoice?.vehicle?.licensePlate!!)
+                    VALIDATE_VEHICLE -> repository.searchParkingInvoiceByLicensePlateAndStateParking(_stateUi.value.parkingInvoicePK?.vehicle?.licensePlate!!)
                     else -> {
                         if (!available) {
-                            repository.addNewParkingInvoice(_stateUi.value.parkingInvoice!!)
+                            repository.addNewParkingInvoice(_stateUi.value.parkingInvoicePK!!)
                         } else {
                             flowOf()
                         }
@@ -162,7 +160,7 @@ class ParkingViewModel : BaseViewModel() {
             it.copy(
                 state = ParkingState.BLANK,
                 errorMessage = "",
-                parkingInvoice = null,
+                parkingInvoicePK = null,
                 user = null,
                 vehicle = null,
             )
@@ -192,7 +190,7 @@ class ParkingViewModel : BaseViewModel() {
                                 _stateUi.update {
                                     it.copy(
                                         state = ParkingState.SUCCESSFUL_SEARCH_PARKING_INVOICE,
-                                        parkingInvoice = state.data[0],
+                                        parkingInvoicePK = state.data[0],
                                     )
                                 }
                             }
@@ -221,7 +219,7 @@ class ParkingViewModel : BaseViewModel() {
     fun completeParkingInvoice() {
         updateParkingInvoiceJob?.cancel()
         updateParkingInvoiceJob = viewModelScope.launch {
-            repository.completeParkingInvoice(_stateUi.value.parkingInvoice?.id ?: "")
+            repository.completeParkingInvoice(_stateUi.value.parkingInvoicePK?.id ?: "")
                 .collect { state ->
                     when (state) {
                         is State.Loading -> {
@@ -263,7 +261,7 @@ class ParkingViewModel : BaseViewModel() {
         val errorMessage: String = "",
         val user: User? = null,
         val vehicle: Vehicle? = null,
-        val parkingInvoice: ParkingInvoice? = null,
+        val parkingInvoicePK: ParkingInvoicePK? = null,
         val state: ParkingState = ParkingState.BLANK,
         val errorList: MutableMap<ParkingState, String> = hashMapOf(),
         val messageList: MutableMap<ParkingState, String> = hashMapOf(),

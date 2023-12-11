@@ -2,7 +2,8 @@ package com.example.parkingqr.data
 
 import com.example.parkingqr.data.remote.RemoteDataSource
 import com.example.parkingqr.data.remote.State
-import com.example.parkingqr.domain.parking.ParkingInvoice
+import com.example.parkingqr.domain.invoice.ParkingInvoiceIV
+import com.example.parkingqr.domain.parking.ParkingInvoicePK
 import com.example.parkingqr.domain.parking.User
 import com.example.parkingqr.domain.parking.Vehicle
 import kotlinx.coroutines.flow.Flow
@@ -18,11 +19,11 @@ class Repository: IRepository {
         return remoteDataSource.searchUserById(userId)
     }
 
-    override fun addNewParkingInvoice(parkingInvoice: ParkingInvoice): Flow<State<String>> {
-        return remoteDataSource.addNewParkingInvoice(parkingInvoice)
+    override fun addNewParkingInvoice(parkingInvoicePK: ParkingInvoicePK): Flow<State<String>> {
+        return remoteDataSource.addNewParkingInvoice(parkingInvoicePK)
     }
 
-    override fun searchParkingInvoiceById(id: String): Flow<State<MutableList<ParkingInvoice>>> {
+    override fun searchParkingInvoiceById(id: String): Flow<State<MutableList<ParkingInvoicePK>>> {
         return remoteDataSource.searchParkingInvoiceById(id)
     }
 
@@ -36,5 +37,9 @@ class Repository: IRepository {
 
     override fun searchParkingInvoiceByLicensePlateAndStateParking(licensePlate: String): Flow<State<Boolean>> {
         return remoteDataSource.searchParkingInvoiceByLicensePlateAndStateParking(licensePlate)
+    }
+
+    override fun getParkingInvoiceList(id: String): Flow<State<MutableList<ParkingInvoiceIV>>> {
+        return remoteDataSource.getParkingInvoiceList(id)
     }
 }

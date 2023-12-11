@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components
+package com.example.parkingqr.ui.components.parking
 
 import android.content.pm.PackageManager
 import android.util.Log
@@ -8,7 +8,6 @@ import android.view.SurfaceView
 import android.view.View
 import android.view.animation.TranslateAnimation
 import androidx.core.app.ActivityCompat
-import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentScanBinding

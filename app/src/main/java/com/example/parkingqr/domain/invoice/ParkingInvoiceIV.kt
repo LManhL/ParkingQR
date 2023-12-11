@@ -1,9 +1,10 @@
-package com.example.parkingqr.domain.parking
+package com.example.parkingqr.domain.invoice
 
 import com.example.parkingqr.data.remote.model.parking.parkinginvoice.ParkingInvoiceFirebase
+import com.example.parkingqr.domain.parking.User
+import com.example.parkingqr.domain.parking.Vehicle
 
-
-class ParkingInvoice() {
+class ParkingInvoiceIV() {
     var id: String = ""
     var user: User = User()
     var vehicle: Vehicle = Vehicle()

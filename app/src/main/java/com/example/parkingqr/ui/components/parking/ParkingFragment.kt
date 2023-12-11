@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components
+package com.example.parkingqr.ui.components.parking
 
 import android.Manifest
 import android.content.Intent
@@ -7,9 +7,6 @@ import android.graphics.Bitmap
 import android.provider.MediaStore
 import android.text.InputType
 import android.view.View
-import android.view.View.OnFocusChangeListener
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import android.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -19,7 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.navGraphViewModels
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentParkingBinding
-import com.example.parkingqr.domain.parking.ParkingInvoice
+import com.example.parkingqr.domain.parking.ParkingInvoicePK
 import com.example.parkingqr.ui.base.BaseFragment
 import com.example.parkingqr.utils.*
 import com.google.firebase.auth.FirebaseAuth
@@ -93,23 +90,23 @@ class ParkingFragment : BaseFragment() {
                             binding.tvStateMessageParking.text = "Hóa đơn gửi xe cho xe có đăng ký"
                             binding.ivCarInParking.setBackgroundResource(R.drawable.create)
                             binding.tvCarInParking.text = "Tạo"
-                            displayParkingInvoice(it.parkingInvoice!!)
+                            displayParkingInvoice(it.parkingInvoicePK!!)
                         }
                         ParkingViewModel.ParkingState.SUCCESSFUL_SEARCH_PARKING_INVOICE -> {
                             hideLoading()
                             if (carNumberOut.isNotEmpty()) {
-                                if (carNumberOut == it.parkingInvoice?.vehicle?.licensePlate) {
-                                    showMessage("Biển số xe khớp nhau: ${it.parkingInvoice.vehicle.licensePlate}")
+                                if (carNumberOut == it.parkingInvoicePK?.vehicle?.licensePlate) {
+                                    showMessage("Biển số xe khớp nhau: ${it.parkingInvoicePK.vehicle.licensePlate}")
                                     binding.tvStateMessageParking.text = "Biển số xe khớp nhau"
                                 } else {
-                                    showMessage("Biển số xe không khớp nhau: ${it.parkingInvoice?.vehicle?.licensePlate} và $carNumberOut")
+                                    showMessage("Biển số xe không khớp nhau: ${it.parkingInvoicePK?.vehicle?.licensePlate} và $carNumberOut")
                                     binding.tvStateMessageParking.text =
-                                        "Biển số xe không khớp nhau: ${it.parkingInvoice?.vehicle?.licensePlate} và $carNumberOut"
+                                        "Biển số xe không khớp nhau: ${it.parkingInvoicePK?.vehicle?.licensePlate} và $carNumberOut"
                                 }
                             } else {
-                                showMessage("${it.messageList[it.state]}: ${it.parkingInvoice?.vehicle?.licensePlate}")
+                                showMessage("${it.messageList[it.state]}: ${it.parkingInvoicePK?.vehicle?.licensePlate}")
                             }
-                            displayParkingInvoice(it.parkingInvoice!!)
+                            displayParkingInvoice(it.parkingInvoicePK!!)
                             binding.ivCarOutParking.setBackgroundResource(R.drawable.confirm)
                             binding.tvCarOutParking.text = "Trả xe"
                         }
@@ -123,8 +120,11 @@ class ParkingFragment : BaseFragment() {
                         }
                         ParkingViewModel.ParkingState.FAIL_FOUND_VEHICLE -> {
                             hideLoading()
+                            binding.ivCarInParking.setBackgroundResource(R.drawable.create)
+                            binding.tvCarInParking.text = "Tạo"
                             binding.tvStateMessageParking.text =
                                 "Hóa đơn gửi xe cho xe chưa đăng ký"
+                            displayParkingInvoice(it.parkingInvoicePK!!)
                         }
                         ParkingViewModel.ParkingState.FAIL_SEARCH_PARKING_INVOICE -> {
                             hideLoading()
@@ -138,7 +138,7 @@ class ParkingFragment : BaseFragment() {
                         }
                         ParkingViewModel.ParkingState.SUCCESSFUL_COMPLETE_PARKING_INVOICE -> {
                             hideLoading()
-                            showMessage("${it.messageList[it.state]}: ${it.parkingInvoice?.vehicle?.licensePlate}")
+                            showMessage("${it.messageList[it.state]}: ${it.parkingInvoicePK?.vehicle?.licensePlate}")
                             parkingViewModel.refreshData()
                         }
                         ParkingViewModel.ParkingState.FAIL_COMPLETE_PARKING_INVOICE -> {
@@ -166,6 +166,7 @@ class ParkingFragment : BaseFragment() {
     }
 
     override fun initListener() {
+        showActionBar(getString(R.string.parking_fragment_name))
         binding.edtPaymentMethodParking.inputType = InputType.TYPE_NULL
         binding.edtInvoiceTypeParking.inputType = InputType.TYPE_NULL
 
@@ -223,7 +224,7 @@ class ParkingFragment : BaseFragment() {
             handleCarOut()
         }
         binding.ivQrcodeParking.setOnClickListener {
-            QRCodeDialog(context!!, QRcodeService.getQrCodeBitmap(parkingViewModel.stateUi.value.parkingInvoice?.id ?: "")).show()
+            QRCodeDialog(context!!, QRcodeService.getQrCodeBitmap(parkingViewModel.stateUi.value.parkingInvoicePK?.id ?: "")).show()
         }
         binding.llRefreshParking.setOnClickListener {
             parkingViewModel.refreshData()
@@ -295,29 +296,29 @@ class ParkingFragment : BaseFragment() {
             getNavController().navigate(R.id.scanFragment)
         }
     }
-    private fun displayImageVehicleIn(parkingInvoice: ParkingInvoice) {
+    private fun displayImageVehicleIn(parkingInvoicePK: ParkingInvoicePK) {
         if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.SUCCESSFUL_SEARCH_PARKING_INVOICE) {
             binding.llParkingInvoiceCarinParking.visibility = View.VISIBLE
-            if (parkingInvoice.imageIn.isNotEmpty()) binding.ivParkingInvoiceCarInParking.setImageBitmap(
-                ImageService.decodeImage(parkingInvoice.imageIn)
+            if (parkingInvoicePK.imageIn.isNotEmpty()) binding.ivParkingInvoiceCarInParking.setImageBitmap(
+                ImageService.decodeImage(parkingInvoicePK.imageIn)
             )
             else binding.ivParkingInvoiceCarInParking.setImageResource(R.drawable.img)
         } else binding.llParkingInvoiceCarinParking.visibility = View.GONE
     }
 
-    private fun displayParkingInvoice(parkingInvoice: ParkingInvoice) {
+    private fun displayParkingInvoice(parkingInvoicePK: ParkingInvoicePK) {
         binding.llBlankCarParking.visibility = View.GONE
         binding.llContainerParking.visibility = View.VISIBLE
 
         binding.apply {
-            edtVehicleTypeParking.setText(parkingInvoice.vehicle.type)
-            edtNoteParking.setText(parkingInvoice.note)
-            edtNameParking.setText(parkingInvoice.user.name)
-            edtLicensePlateParking.setText(parkingInvoice.vehicle.licensePlate)
-            edtTimeInParking.setText(parkingInvoice.timeIn)
-            edtVehicleTypeParking.setText(parkingInvoice.type)
-            edtPaymentMethodParking.setText(parkingInvoice.paymentMethod)
+            edtVehicleTypeParking.setText(parkingInvoicePK.vehicle.type)
+            edtNoteParking.setText(parkingInvoicePK.note)
+            edtNameParking.setText(parkingInvoicePK.user.name)
+            edtLicensePlateParking.setText(parkingInvoicePK.vehicle.licensePlate)
+            edtTimeInParking.setText(parkingInvoicePK.timeIn)
+            edtVehicleTypeParking.setText(parkingInvoicePK.type)
+            edtPaymentMethodParking.setText(parkingInvoicePK.paymentMethod)
         }
-        displayImageVehicleIn(parkingInvoice)
+        displayImageVehicleIn(parkingInvoicePK)
     }
 }
