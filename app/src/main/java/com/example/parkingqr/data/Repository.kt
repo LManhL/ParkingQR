@@ -42,4 +42,8 @@ class Repository: IRepository {
     override fun getParkingInvoiceList(id: String): Flow<State<MutableList<ParkingInvoiceIV>>> {
         return remoteDataSource.getParkingInvoiceList(id)
     }
+
+    override fun getParkingInvoiceById(id: String): Flow<State<MutableList<ParkingInvoiceIV>>> {
+        return remoteDataSource.getParkingInvoiceById(id)
+    }
 }

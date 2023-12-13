@@ -1,5 +1,6 @@
 package com.example.parkingqr.ui.components.invoice
 
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.Lifecycle
@@ -18,6 +19,10 @@ import kotlinx.coroutines.launch
 
 class InvoiceListFragment: BaseFragment() {
 
+    companion object{
+        const val INVOICE_ID_KEY = "INVOICE_ID_KEY"
+    }
+
     private lateinit var binding: FragmentInvoiceListBinding
     private lateinit var invoiceList: MutableList<ParkingInvoiceIV>
     private val invoiceViewModel: InvoiceListViewModel by navGraphViewModels(R.id.invoiceListFragment)
@@ -34,7 +39,6 @@ class InvoiceListFragment: BaseFragment() {
                         invoiceViewModel.showError()
                     }
                     invoiceList.addAll(it.invoiceList)
-                    Log.d("CHECKKKKK", it.invoiceList.size.toString())
                     invoiceListAdapter.notifyDataSetChanged()
                 }
             }
@@ -45,6 +49,9 @@ class InvoiceListFragment: BaseFragment() {
         binding = FragmentInvoiceListBinding.inflate(layoutInflater)
         invoiceList = mutableListOf()
         invoiceListAdapter = InvoiceListAdapter(invoiceList)
+        invoiceListAdapter.setEventClick {
+            handleClickItem(it)
+        }
         binding.rlvListInvoiceList.apply {
             adapter = invoiceListAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -52,6 +59,11 @@ class InvoiceListFragment: BaseFragment() {
         return binding.root
     }
 
+    private fun handleClickItem(parkingInvoiceIV: ParkingInvoiceIV){
+        val bundle = Bundle()
+        bundle.putString(INVOICE_ID_KEY, parkingInvoiceIV.id)
+        getNavController().navigate(R.id.invoiceDetailFragment, bundle)
+    }
     override fun initListener() {
 //        showActionBar(getString(R.string.invoice_list_fragment_name))
         hideActionBar()

@@ -29,4 +29,10 @@
         android:name="com.example.parkingqr.ui.components.invoice.InvoiceListFragment"
         android:label="@string/invoice_list_fragment_name">
     </fragment>
+    <fragment
+        tools:layout="@layout/fragment_invoice_detail"
+        android:id="@+id/invoiceDetailFragment"
+        android:name="com.example.parkingqr.ui.components.invoice.InvoiceDetailFragment"
+        android:label="@string/invoice_detail_fragment_name">
+    </fragment>
 </navigation>

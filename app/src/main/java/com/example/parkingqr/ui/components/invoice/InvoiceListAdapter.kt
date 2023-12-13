@@ -3,6 +3,7 @@ package com.example.parkingqr.ui.components.invoice
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -10,6 +11,8 @@ import com.example.parkingqr.R
 import com.example.parkingqr.domain.invoice.ParkingInvoiceIV
 
 class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoiceIV>): Adapter<InvoiceListAdapter.InvoiceViewHolder>() {
+
+    private var onClickItem: ((ParkingInvoiceIV)-> Unit)? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InvoiceViewHolder {
@@ -26,9 +29,13 @@ class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoiceIV>)
         holder.bind(invoiceList[position])
     }
 
+    fun setEventClick(callback : ((ParkingInvoiceIV) -> Unit)){
+        onClickItem = callback
+    }
 
     inner class InvoiceViewHolder(itemView: View): ViewHolder(itemView){
 
+        private val container: LinearLayout = itemView.findViewById(R.id.llContainerItemInvoiceList)
         private val licensePlate: TextView = itemView.findViewById(R.id.tvLicensePlateInvoiceList)
         private val price: TextView = itemView.findViewById(R.id.tvPriceInvoiceList)
         private val status: TextView = itemView.findViewById(R.id.tvStatusInvoiceList)
@@ -36,7 +43,9 @@ class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoiceIV>)
         private lateinit var curInvoice: ParkingInvoiceIV
 
         init {
-
+            container.setOnClickListener {
+                onClickItem?.invoke(curInvoice)
+            }
         }
         fun bind(invoice: ParkingInvoiceIV){
             curInvoice = invoice

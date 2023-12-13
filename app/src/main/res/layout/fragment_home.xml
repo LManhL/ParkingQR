@@ -10,7 +10,7 @@
         android:id="@+id/iv_header_home"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/dark_navy_bg"
+        android:background="@drawable/custom_action_bar"
         android:layout_width="match_parent"
         android:layout_height="250dp"/>
     <View

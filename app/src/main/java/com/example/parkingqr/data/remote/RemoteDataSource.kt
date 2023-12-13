@@ -119,4 +119,20 @@ class RemoteDataSource : IRemoteDataSource {
         emit(State.failed(it.message.toString()))
     }.flowOn(Dispatchers.IO)
 
+    override fun getParkingInvoiceById(id: String): Flow<State<MutableList<ParkingInvoiceIV>>> = flow {
+        val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
+        val query = parkingInvoiceRef.whereEqualTo("id", id)
+        emit(State.loading())
+        val querySnapshot = query.get().await()
+        val parkingInvoiceList: MutableList<ParkingInvoiceIV> = mutableListOf()
+        for (document in querySnapshot.documents) {
+            document.toObject(ParkingInvoiceFirebase::class.java)?.let { parkingInvoiceList.add(
+                ParkingInvoiceIV(it)
+            ) }
+        }
+        emit(State.success(parkingInvoiceList))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
 }
