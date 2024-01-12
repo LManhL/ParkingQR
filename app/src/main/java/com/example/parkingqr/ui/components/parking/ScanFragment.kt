@@ -8,7 +8,7 @@ import android.view.SurfaceView
 import android.view.View
 import android.view.animation.TranslateAnimation
 import androidx.core.app.ActivityCompat
-import androidx.navigation.navGraphViewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentScanBinding
 import com.example.parkingqr.ui.base.BaseFragment
@@ -28,7 +28,7 @@ class ScanFragment : BaseFragment() {
     private lateinit var surfaceHolder: SurfaceHolder
     private lateinit var barcode: BarcodeDetector
     private lateinit var scanLine: View
-    private val parkingViewModel: ParkingViewModel by navGraphViewModels(R.id.parkingFragment)
+    private val parkingViewModel: ParkingViewModel by hiltNavGraphViewModels(R.id.parkingFragment)
 
 
     override fun observeViewModel() {
@@ -41,6 +41,7 @@ class ScanFragment : BaseFragment() {
     }
 
     override fun initListener() {
+        showActionBar(getString(R.string.scan_fragment_name))
         scanLine = binding.scanLine
         startScanLineAnimation()
 

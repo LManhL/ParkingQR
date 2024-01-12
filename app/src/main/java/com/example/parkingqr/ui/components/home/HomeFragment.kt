@@ -5,9 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentHomeBinding
 import com.example.parkingqr.ui.base.BaseFragment
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 
 class HomeFragment: BaseFragment() {
+
 
     private lateinit var binding: FragmentHomeBinding
 
@@ -27,6 +31,12 @@ class HomeFragment: BaseFragment() {
         }
         binding.ivInvoiceListHome.setOnClickListener{
             getNavController().navigate(R.id.invoiceListFragment)
+        }
+        binding.ivSettingHome.setOnClickListener {
+            showMessage("Ứng dụng hiện chưa hỗ trợ tính năng này")
+        }
+        binding.ivSecurityCameraHome.setOnClickListener {
+            showMessage("Ứng dụng hiện chưa hỗ trợ tính năng này")
         }
     }
 }

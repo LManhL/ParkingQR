@@ -8,11 +8,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.parkingqr.R
-import com.example.parkingqr.domain.invoice.ParkingInvoiceIV
+import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.utils.FormatCurrencyService
+import com.example.parkingqr.utils.TimeService
 
-class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoiceIV>): Adapter<InvoiceListAdapter.InvoiceViewHolder>() {
+class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoice>): Adapter<InvoiceListAdapter.InvoiceViewHolder>() {
 
-    private var onClickItem: ((ParkingInvoiceIV)-> Unit)? = null
+    private var onClickItem: ((ParkingInvoice)-> Unit)? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InvoiceViewHolder {
@@ -29,7 +31,7 @@ class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoiceIV>)
         holder.bind(invoiceList[position])
     }
 
-    fun setEventClick(callback : ((ParkingInvoiceIV) -> Unit)){
+    fun setEventClick(callback : ((ParkingInvoice) -> Unit)){
         onClickItem = callback
     }
 
@@ -40,18 +42,18 @@ class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoiceIV>)
         private val price: TextView = itemView.findViewById(R.id.tvPriceInvoiceList)
         private val status: TextView = itemView.findViewById(R.id.tvStatusInvoiceList)
         private val timeIn: TextView = itemView.findViewById(R.id.tvTimeInInvoiceList)
-        private lateinit var curInvoice: ParkingInvoiceIV
+        private lateinit var curInvoice: ParkingInvoice
 
         init {
             container.setOnClickListener {
                 onClickItem?.invoke(curInvoice)
             }
         }
-        fun bind(invoice: ParkingInvoiceIV){
+        fun bind(invoice: ParkingInvoice){
             curInvoice = invoice
             licensePlate.text = invoice.vehicle.licensePlate
-            price.text = invoice.price.toString()
-            timeIn.text = invoice.timeIn
+            price.text = FormatCurrencyService.formatNumberCeil(invoice.calTotalPrice())
+            timeIn.text = TimeService.convertMilisecondsToDate(invoice.timeIn)
             bindState()
         }
         private fun bindState(){

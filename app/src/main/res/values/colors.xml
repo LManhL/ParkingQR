@@ -10,5 +10,7 @@
     <color name="main_color">#02075D</color>
     <color name="light_green">#3EBC3A</color>
     <color name="light_red">#C33939</color>
+    <color name="light_blue">#0D17D6</color>
     <string name="icon_color">#070FAD</string>
+    <color name="icon_color">#070FAD</color>
 </resources>

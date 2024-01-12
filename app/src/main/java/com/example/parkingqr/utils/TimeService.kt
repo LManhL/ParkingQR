@@ -15,10 +15,15 @@ object TimeService {
         return systemTime + HOUR_TO_MILISECONDS * offSet
     }
 
-    fun convertMilisecondsToDate(miliseconds: Long): String {
-        val res = Date(miliseconds)
-        val dateFormat: DateFormat = SimpleDateFormat("HH:mm dd/MM/yyyy")
-        return dateFormat.format(res)
+    fun convertMilisecondsToDate(miliseconds: String): String {
+        if(miliseconds.isEmpty()) return ""
+        try {
+            val res = Date(miliseconds.toLong())
+            val dateFormat: DateFormat = SimpleDateFormat("HH:mm dd/MM/yyyy")
+            return dateFormat.format(res)
+        }catch (e: Exception){
+            throw Exception(e)
+        }
     }
 
     fun getCurrentTime(): Long {
@@ -26,11 +31,11 @@ object TimeService {
     }
 
     fun getDateCurrentTime(): String{
-        return convertMilisecondsToDate(getCurrentTime())
+        return convertMilisecondsToDate(getCurrentTime().toString())
     }
 
-    fun convertToMilliseconds(timeString: String?): Long {
-        val format = "dd/MM/yyyy HH:mm:ss"
+    fun convertToMilliseconds(timeString: String?): String {
+        val format = "HH:mm dd/MM/yyyy"
         var milliseconds: Long = 0
         try {
             val sdf = SimpleDateFormat(format)
@@ -39,6 +44,6 @@ object TimeService {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return milliseconds
+        return milliseconds.toString()
     }
 }

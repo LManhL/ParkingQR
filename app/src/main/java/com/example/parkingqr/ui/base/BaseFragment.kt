@@ -2,6 +2,7 @@ package com.example.parkingqr.ui.base
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -14,9 +15,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.parkingqr.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 abstract class BaseFragment : Fragment() {
 
     private lateinit var loadingDialog: LoadingDialog
@@ -74,7 +78,7 @@ abstract class BaseFragment : Fragment() {
 
         val view: View = snackbar.view
         val params = view.layoutParams as FrameLayout.LayoutParams
-        params.gravity = Gravity.TOP
+        params.gravity = Gravity.BOTTOM
         view.layoutParams = params
 
         snackbar.show()
@@ -93,7 +97,7 @@ abstract class BaseFragment : Fragment() {
 
         val view: View = snackbar.view
         val params = view.layoutParams as FrameLayout.LayoutParams
-        params.gravity = Gravity.TOP
+        params.gravity = Gravity.BOTTOM
         view.layoutParams = params
 
         snackbar.show()
@@ -105,6 +109,12 @@ abstract class BaseFragment : Fragment() {
     }
     fun hideActionBar(){
         activity?.findViewById<LinearLayout>(R.id.ll_actionbar_container_main)?.visibility = View.GONE
+    }
+    fun showBottomNavigation(){
+        activity?.findViewById<BottomNavigationView>(R.id.bottomNavigationMain)?.visibility = View.VISIBLE
+    }
+    fun hideBottomNavigation(){
+        activity?.findViewById<BottomNavigationView>(R.id.bottomNavigationMain)?.visibility = View.GONE
     }
     fun getNavController(): NavController{
         return navController

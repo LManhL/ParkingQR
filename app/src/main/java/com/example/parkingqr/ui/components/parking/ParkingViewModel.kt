@@ -2,17 +2,21 @@ package com.example.parkingqr.ui.components.parking
 
 import android.graphics.Bitmap
 import androidx.lifecycle.viewModelScope
+import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
-import com.example.parkingqr.domain.parking.ParkingInvoicePK
-import com.example.parkingqr.domain.parking.User
-import com.example.parkingqr.domain.parking.Vehicle
+import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.user.UserInvoice
+import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 import com.example.parkingqr.ui.base.BaseViewModel
 import com.example.parkingqr.utils.ImageService
 import com.example.parkingqr.utils.TimeService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
-class ParkingViewModel : BaseViewModel() {
+@HiltViewModel
+class ParkingViewModel @Inject constructor(private val repository: IRepository) : BaseViewModel() {
 
     companion object {
         const val SEARCH_LICENSE_PLATE = "SEARCH_LICENSE_PLATE"
@@ -59,33 +63,33 @@ class ParkingViewModel : BaseViewModel() {
                             _stateUi.update {
                                 it.copy(
                                     state = ParkingState.FAIL_FOUND_VEHICLE,
-                                    parkingInvoicePK = ParkingInvoicePK(
+                                    parkingInvoice = ParkingInvoice(
                                         ID = repository.getNewParkingInvoiceKey(),
-                                        user = User(),
-                                        vehicle = Vehicle(licensePlate),
+                                        user = UserInvoice(),
+                                        vehicle = VehicleInvoice(licensePlate),
                                         imageIn = ImageService.encodeImage(imageCarIn),
-                                        timeIn = TimeService.getDateCurrentTime()
+                                        timeIn = TimeService.getCurrentTime().toString()
                                     ),
                                 )
                             }
                         }
 
                         for (value in state.data) {
-                            if (value is Vehicle) {
+                            if (value is VehicleInvoice) {
                                 _stateUi.update {
                                     it.copy(vehicle = value)
                                 }
-                            } else if (value is User) {
+                            } else if (value is UserInvoice) {
                                 _stateUi.update {
                                     it.copy(
                                         state = ParkingState.SUCCESSFUL_FOUND_VEHICLE,
                                         user = value,
-                                        parkingInvoicePK = ParkingInvoicePK(
+                                        parkingInvoice = ParkingInvoice(
                                             ID = repository.getNewParkingInvoiceKey(),
                                             user = value,
                                             vehicle = it.vehicle!!,
                                             imageIn = ImageService.encodeImage(imageCarIn),
-                                            timeIn = TimeService.getDateCurrentTime()
+                                            timeIn = TimeService.getCurrentTime().toString()
                                         ),
                                     )
                                 }
@@ -111,10 +115,10 @@ class ParkingViewModel : BaseViewModel() {
         addParkingInvoiceJob = viewModelScope.launch {
             flowOf(VALIDATE_VEHICLE, ADD_NEW_PARKING_INVOICE).flatMapConcat {
                 when (it) {
-                    VALIDATE_VEHICLE -> repository.searchParkingInvoiceByLicensePlateAndStateParking(_stateUi.value.parkingInvoicePK?.vehicle?.licensePlate!!)
+                    VALIDATE_VEHICLE -> repository.searchParkingInvoiceByLicensePlateAndStateParking(_stateUi.value.parkingInvoice?.vehicle?.licensePlate!!)
                     else -> {
                         if (!available) {
-                            repository.addNewParkingInvoice(_stateUi.value.parkingInvoicePK!!)
+                            repository.addNewParkingInvoice(_stateUi.value.parkingInvoice!!)
                         } else {
                             flowOf()
                         }
@@ -160,7 +164,7 @@ class ParkingViewModel : BaseViewModel() {
             it.copy(
                 state = ParkingState.BLANK,
                 errorMessage = "",
-                parkingInvoicePK = null,
+                parkingInvoice = null,
                 user = null,
                 vehicle = null,
             )
@@ -190,7 +194,7 @@ class ParkingViewModel : BaseViewModel() {
                                 _stateUi.update {
                                     it.copy(
                                         state = ParkingState.SUCCESSFUL_SEARCH_PARKING_INVOICE,
-                                        parkingInvoicePK = state.data[0],
+                                        parkingInvoice = state.data[0],
                                     )
                                 }
                             }
@@ -219,7 +223,7 @@ class ParkingViewModel : BaseViewModel() {
     fun completeParkingInvoice() {
         updateParkingInvoiceJob?.cancel()
         updateParkingInvoiceJob = viewModelScope.launch {
-            repository.completeParkingInvoice(_stateUi.value.parkingInvoicePK?.id ?: "")
+            repository.completeParkingInvoice(_stateUi.value.parkingInvoice!!)
                 .collect { state ->
                     when (state) {
                         is State.Loading -> {
@@ -247,6 +251,35 @@ class ParkingViewModel : BaseViewModel() {
         }
     }
 
+    fun updateInvoiceOut(_paymentMethod: String, _type: String, _imgOutString: String, _note: String){
+        val newParkingInvoice = _stateUi.value.parkingInvoice
+        newParkingInvoice?.apply {
+            paymentMethod = _paymentMethod
+            type = _type
+            imageOut = _imgOutString
+            note = _note
+            timeOut = TimeService.getCurrentTime().toString()
+        }
+        _stateUi.update {
+            it.copy(
+                parkingInvoice = newParkingInvoice
+            )
+        }
+    }
+    fun updateInvoiceIn(_paymentMethod: String, _type: String, _note: String){
+        val newParkingInvoice = _stateUi.value.parkingInvoice
+        newParkingInvoice?.apply {
+            paymentMethod = _paymentMethod
+            type = _type
+            note = _note
+        }
+        _stateUi.update {
+            it.copy(
+                parkingInvoice = newParkingInvoice
+            )
+        }
+    }
+
     fun getDataFromQRCode(result: String){
         _stateUi.update {
             it.copy(
@@ -259,9 +292,9 @@ class ParkingViewModel : BaseViewModel() {
 
     data class ParkingViewModelState(
         val errorMessage: String = "",
-        val user: User? = null,
-        val vehicle: Vehicle? = null,
-        val parkingInvoicePK: ParkingInvoicePK? = null,
+        val user: UserInvoice? = null,
+        val vehicle: VehicleInvoice? = null,
+        val parkingInvoice: ParkingInvoice? = null,
         val state: ParkingState = ParkingState.BLANK,
         val errorList: MutableMap<ParkingState, String> = hashMapOf(),
         val messageList: MutableMap<ParkingState, String> = hashMapOf(),
