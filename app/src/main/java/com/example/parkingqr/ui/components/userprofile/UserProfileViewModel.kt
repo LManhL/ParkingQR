@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.myprofile
+package com.example.parkingqr.ui.components.userprofile
 
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.IRepository
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MyProfileViewModel @Inject constructor(private val repository: IRepository) :
+class UserProfileViewModel @Inject constructor(private val repository: IRepository) :
     BaseViewModel() {
 
     private val _stateUi = MutableStateFlow(

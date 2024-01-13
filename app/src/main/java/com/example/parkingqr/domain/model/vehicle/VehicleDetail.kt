@@ -1,6 +1,6 @@
 package com.example.parkingqr.domain.model.vehicle
 
-import com.example.parkingqr.data.remote.dto.vehicle.VehicleResponse
+import com.example.parkingqr.data.remote.dto.vehicle.VehicleResponseFirebase
 
 class VehicleDetail() {
     var id: String? = null
@@ -57,24 +57,24 @@ class VehicleDetail() {
     }
 
     constructor(
-        vehicleResponse: VehicleResponse
+        vehicleResponseFirebase: VehicleResponseFirebase
     ) : this() {
-        this.id = vehicleResponse.id
-        this.createAt = vehicleResponse.createAt
-        this.userId = vehicleResponse.userId
-        this.licensePlate = vehicleResponse.licensePlate
-        this.state = vehicleResponse.state
-        this.brand = vehicleResponse.brand
-        this.type = vehicleResponse.type
-        this.color = vehicleResponse.color
-        this.registrationDate = vehicleResponse.registrationDate
-        this.expireDate = vehicleResponse.expireDate
-        this.chassisNumber = vehicleResponse.chassisNumber
-        this.engineNumber = vehicleResponse.engineNumber
-        this.ownerFullName = vehicleResponse.ownerFullName
-        this.address = vehicleResponse.address
-        this.certificateNumber = vehicleResponse.certificateNumber
-        vehicleResponse.images?.let { this.images.addAll(it) }
+        this.id = vehicleResponseFirebase.id
+        this.createAt = vehicleResponseFirebase.createAt
+        this.userId = vehicleResponseFirebase.userId
+        this.licensePlate = vehicleResponseFirebase.licensePlate
+        this.state = vehicleResponseFirebase.state
+        this.brand = vehicleResponseFirebase.brand
+        this.type = vehicleResponseFirebase.type
+        this.color = vehicleResponseFirebase.color
+        this.registrationDate = vehicleResponseFirebase.registrationDate
+        this.expireDate = vehicleResponseFirebase.expireDate
+        this.chassisNumber = vehicleResponseFirebase.chassisNumber
+        this.engineNumber = vehicleResponseFirebase.engineNumber
+        this.ownerFullName = vehicleResponseFirebase.ownerFullName
+        this.address = vehicleResponseFirebase.address
+        this.certificateNumber = vehicleResponseFirebase.certificateNumber
+        vehicleResponseFirebase.images?.let { this.images.addAll(it) }
     }
 
     fun getState(): VehicleState{

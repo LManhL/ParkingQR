@@ -1,6 +1,6 @@
 package com.example.parkingqr.data.remote.dto.vehicle
 
-data class VehicleResponse (
+data class VehicleResponseFirebase (
     val id: String? = null,
     val createAt: String? = null,
     val userId: String? = null,

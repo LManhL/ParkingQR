@@ -1,27 +1,33 @@
-package com.example.parkingqr.ui.components.myprofile
+package com.example.parkingqr.ui.components.userinvoice
 
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
-import com.example.parkingqr.domain.model.vehicle.VehicleDetail
+import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VehicleDetailViewModel @Inject constructor(private val repository: IRepository) :
-    BaseViewModel() {
+class UserInvoiceDetailViewModel @Inject constructor(private val repository: IRepository): BaseViewModel() {
+    private val _stateUi = MutableStateFlow(
+        InvoiceDetailViewModelState()
+    )
+    val stateUi: StateFlow<InvoiceDetailViewModelState> = _stateUi.asStateFlow()
+    private var getInvoiceJob: Job? = null
+    private var saveInVoiceJob: Job? = null
 
-    private val _stateUi = MutableStateFlow(VehicleDetailState())
-    val stateUi = _stateUi.asStateFlow()
 
-    fun getVehicleDetail(id: String) {
-        viewModelScope.launch {
-            repository.getVehicleById(id).collect { state ->
+    fun getInvoiceById(id: String) {
+        getInvoiceJob?.cancel()
+        getInvoiceJob = viewModelScope.launch {
+            repository.getParkingInvoiceById(id).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -31,8 +37,8 @@ class VehicleDetailViewModel @Inject constructor(private val repository: IReposi
                     is State.Success -> {
                         _stateUi.update {
                             it.copy(
-                                isLoading = false,
-                                vehicleDetail = state.data
+                                invoice = state.data[0],
+                                isLoading = false
                             )
                         }
                     }
@@ -40,7 +46,7 @@ class VehicleDetailViewModel @Inject constructor(private val repository: IReposi
                         _stateUi.update {
                             it.copy(
                                 isLoading = false,
-                                error = it.message
+                                error = state.message
                             )
                         }
                     }
@@ -48,10 +54,19 @@ class VehicleDetailViewModel @Inject constructor(private val repository: IReposi
             }
         }
     }
-
-    fun cancelVehicleRegistration(id: String) {
-        viewModelScope.launch {
-            repository.deleteVehicleById(id).collect { state ->
+    fun saveInvoice(_type: String, _paymentMethod: String, _note: String ) {
+        saveInVoiceJob?.cancel()
+        _stateUi.update {
+            it.copy(
+                invoice = it.invoice?.apply {
+                    type = _type
+                    paymentMethod = _paymentMethod
+                    note = _note
+                }
+            )
+        }
+        saveInVoiceJob = viewModelScope.launch {
+            repository.updateParkingInvoice(_stateUi.value.invoice!!).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -61,8 +76,8 @@ class VehicleDetailViewModel @Inject constructor(private val repository: IReposi
                     is State.Success -> {
                         _stateUi.update {
                             it.copy(
-                                isLoading = false,
-                                isDeleted = true
+                                message = "Lưu hóa đơn thành công",
+                                isLoading = false
                             )
                         }
                     }
@@ -70,7 +85,7 @@ class VehicleDetailViewModel @Inject constructor(private val repository: IReposi
                         _stateUi.update {
                             it.copy(
                                 isLoading = false,
-                                error = it.message
+                                error = state.message
                             )
                         }
                     }
@@ -86,8 +101,7 @@ class VehicleDetailViewModel @Inject constructor(private val repository: IReposi
             )
         }
     }
-
-    fun showMessage() {
+    fun showMessage(){
         _stateUi.update {
             it.copy(
                 message = ""
@@ -95,11 +109,10 @@ class VehicleDetailViewModel @Inject constructor(private val repository: IReposi
         }
     }
 
-    data class VehicleDetailState(
+    data class InvoiceDetailViewModelState(
         val isLoading: Boolean = false,
         val error: String = "",
         val message: String = "",
-        val vehicleDetail: VehicleDetail? = null,
-        val isDeleted: Boolean = false
+        val invoice: ParkingInvoice? = null
     )
 }

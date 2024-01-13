@@ -50,19 +50,19 @@
     <fragment
         tools:layout="@layout/fragment_my_debt"
         android:id="@+id/mydebtFragment"
-        android:name="com.example.parkingqr.ui.components.mydebt.MyDebtFragment"
+        android:name="com.example.parkingqr.ui.components.userdebt.UserDebtFragment"
         android:label="@string/mydebt_fragment_name">
     </fragment>
     <fragment
         tools:layout="@layout/fragment_my_invoice"
         android:id="@+id/myinvoiceFragment"
-        android:name="com.example.parkingqr.ui.components.myinvoice.MyInvoiceFragment"
+        android:name="com.example.parkingqr.ui.components.userinvoice.UserInvoiceFragment"
         android:label="@string/myinvoice_fragment_name">
     </fragment>
     <fragment
         tools:layout="@layout/fragment_my_profile"
         android:id="@+id/myprofileFragment"
-        android:name="com.example.parkingqr.ui.components.myprofile.MyProfileFragment"
+        android:name="com.example.parkingqr.ui.components.userprofile.UserProfileFragment"
         android:label="@string/myprofile_fragment_name">
         <action
             android:id="@+id/action_myprofileFragment_to_loginFragment"
@@ -74,31 +74,31 @@
     <fragment
         tools:layout="@layout/fragment_my_notification"
         android:id="@+id/mynotificationFragment"
-        android:name="com.example.parkingqr.ui.components.mynotification.MyNotification"
+        android:name="com.example.parkingqr.ui.components.usernotification.UserNotification"
         android:label="@string/mynotification_fragment_name">
     </fragment>
     <fragment
         tools:layout="@layout/fragment_register_vehicle"
         android:id="@+id/registerVehicleFragment"
-        android:name="com.example.parkingqr.ui.components.myprofile.RegisterVehicleFragment"
+        android:name="com.example.parkingqr.ui.components.registervehicle.RegisterVehicleFragment"
         android:label="@string/register_vehicle_fragment_name">
     </fragment>
     <fragment
         tools:layout="@layout/fragment_vehicle_registration_list"
         android:id="@+id/vehicleRegistrationListFragment"
-        android:name="com.example.parkingqr.ui.components.myprofile.VehicleRegistrationListFragment"
+        android:name="com.example.parkingqr.ui.components.registervehicle.VehicleRegistrationListFragment"
         android:label="@string/vehicle_registration_list_fragment_name">
     </fragment>
     <fragment
         tools:layout="@layout/fragment_vehicle_detail"
         android:id="@+id/vehicleDetailFragment"
-        android:name="com.example.parkingqr.ui.components.myprofile.VehicleDetailFragment"
+        android:name="com.example.parkingqr.ui.components.registervehicle.VehicleDetailFragment"
         android:label="@string/register_vehicle_fragment_name">
     </fragment>
     <fragment
         tools:layout="@layout/fragment_my_invoice_detail"
         android:id="@+id/myInvoiceDetailFragment"
-        android:name="com.example.parkingqr.ui.components.myinvoice.MyInvoiceDetailFragment"
+        android:name="com.example.parkingqr.ui.components.userinvoice.UserInvoiceDetailFragment"
         android:label="@string/invoice_detail_fragment_name">
     </fragment>
     <fragment

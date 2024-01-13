@@ -1,6 +1,6 @@
 package com.example.parkingqr.data.remote.dto.user
 
-data class UserResponse(
+data class UserResponseFirebase(
     val id: String? = null,
     val role: String? = null,
     val status: String? = null,

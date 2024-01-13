@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.myprofile
+package com.example.parkingqr.ui.components.registervehicle
 
 import android.view.LayoutInflater
 import android.view.View

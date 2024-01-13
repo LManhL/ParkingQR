@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.myprofile
+package com.example.parkingqr.ui.components.userprofile
 
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -11,22 +11,22 @@ import com.example.parkingqr.domain.model.user.UserProfile
 import com.example.parkingqr.ui.base.BaseFragment
 import kotlinx.coroutines.launch
 
-class MyProfileFragment: BaseFragment() {
+class UserProfileFragment: BaseFragment() {
     private lateinit var binding: FragmentMyProfileBinding
-    private val myProfileViewModel: MyProfileViewModel by viewModels()
+    private val userProfileViewModel: UserProfileViewModel by viewModels()
 
     override fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                myProfileViewModel.stateUi.collect {
+                userProfileViewModel.stateUi.collect {
                     if (it.isLoading) showLoading() else hideLoading()
                     if (it.error.isNotEmpty()) {
                         showError(it.error)
-                        myProfileViewModel.showError()
+                        userProfileViewModel.showError()
                     }
                     if (it.message.isNotEmpty()) {
                         showMessage(it.message)
-                        myProfileViewModel.showMessage()
+                        userProfileViewModel.showMessage()
                     }
                     updateUI(it.userProfile)
                     if(it.isSignedOut){
@@ -51,7 +51,7 @@ class MyProfileFragment: BaseFragment() {
             hideBottomNavigation()
         }
         binding.tvSignOutMyProfile.setOnClickListener{
-            myProfileViewModel.signOut()
+            userProfileViewModel.signOut()
             hideBottomNavigation()
         }
     }

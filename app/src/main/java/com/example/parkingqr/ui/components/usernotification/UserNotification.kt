@@ -1,11 +1,10 @@
-package com.example.parkingqr.ui.components.mynotification
+package com.example.parkingqr.ui.components.usernotification
 
 import android.view.View
 import com.example.parkingqr.databinding.FragmentMyNotificationBinding
-import com.example.parkingqr.databinding.FragmentMyProfileBinding
 import com.example.parkingqr.ui.base.BaseFragment
 
-class MyNotification: BaseFragment() {
+class UserNotification: BaseFragment() {
     private lateinit var binding: FragmentMyNotificationBinding
     override fun observeViewModel() {
 

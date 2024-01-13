@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.myprofile
+package com.example.parkingqr.ui.components.registervehicle
 
 import android.os.Bundle
 import android.view.View

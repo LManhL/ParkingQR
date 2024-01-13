@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.myprofile
+package com.example.parkingqr.ui.components.registervehicle
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
@@ -76,7 +76,9 @@ class RegisterVehicleFragment : BaseFragment() {
                     }
                     if (it.isCreated) {
                         showMessage("Tạo đơn đăng ký thành công")
-                        getNavController().previousBackStackEntry?.savedStateHandle?.set(VehicleRegistrationListFragment.ACTION_PASS_BACK, ADD_SUCCESSFULLY)
+                        getNavController().previousBackStackEntry?.savedStateHandle?.set(
+                            VehicleRegistrationListFragment.ACTION_PASS_BACK, ADD_SUCCESSFULLY
+                        )
                         getNavController().popBackStack()
                     }
                 }

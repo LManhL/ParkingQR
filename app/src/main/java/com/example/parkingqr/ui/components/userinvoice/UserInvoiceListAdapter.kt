@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.myinvoice
+package com.example.parkingqr.ui.components.userinvoice
 
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +12,7 @@ import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.utils.FormatCurrencyService
 import com.example.parkingqr.utils.TimeService
 
-class MyInvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoice>): Adapter<MyInvoiceListAdapter.InvoiceViewHolder>() {
+class UserInvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoice>): Adapter<UserInvoiceListAdapter.InvoiceViewHolder>() {
 
     private var onClickItem: ((ParkingInvoice)-> Unit)? = null
 

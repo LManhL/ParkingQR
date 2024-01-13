@@ -1,6 +1,6 @@
 package com.example.parkingqr.domain.model.vehicle
 
-import com.example.parkingqr.data.remote.dto.vehicle.VehicleResponse
+import com.example.parkingqr.data.remote.dto.vehicle.VehicleResponseFirebase
 import com.example.parkingqr.data.remote.dto.invoice.VehicleInvoiceFirebase
 
 class VehicleInvoice() {
@@ -14,15 +14,15 @@ class VehicleInvoice() {
     var color: String? = ""
     var ownerFullName: String? = ""
 
-    constructor(vehicleResponse: VehicleResponse): this(){
-       this.id = vehicleResponse.id
-       this.userId = vehicleResponse.userId
-       this.licensePlate = vehicleResponse.licensePlate
-       this.state = vehicleResponse.state
-       this.brand = vehicleResponse.brand
-       this.type = vehicleResponse.type
-       this.color = vehicleResponse.color
-       this.ownerFullName = vehicleResponse.ownerFullName
+    constructor(vehicleResponseFirebase: VehicleResponseFirebase): this(){
+       this.id = vehicleResponseFirebase.id
+       this.userId = vehicleResponseFirebase.userId
+       this.licensePlate = vehicleResponseFirebase.licensePlate
+       this.state = vehicleResponseFirebase.state
+       this.brand = vehicleResponseFirebase.brand
+       this.type = vehicleResponseFirebase.type
+       this.color = vehicleResponseFirebase.color
+       this.ownerFullName = vehicleResponseFirebase.ownerFullName
     }
     constructor(vehicleInvoiceFirebase: VehicleInvoiceFirebase): this(){
         this.id = vehicleInvoiceFirebase.id

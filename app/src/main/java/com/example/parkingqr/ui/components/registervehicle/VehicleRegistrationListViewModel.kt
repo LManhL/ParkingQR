@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.myprofile
+package com.example.parkingqr.ui.components.registervehicle
 
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.IRepository

@@ -1,6 +1,6 @@
 package com.example.parkingqr.domain.model.user
 
-import com.example.parkingqr.data.remote.dto.user.UserResponse
+import com.example.parkingqr.data.remote.dto.user.UserResponseFirebase
 
 class UserDetail() {
     var id: String? = ""
@@ -15,18 +15,18 @@ class UserDetail() {
     var email: String? = ""
     var username: String? = ""
 
-    constructor(userResponse: UserResponse): this(){
-        this.id = userResponse.id
-        this.role = userResponse.role
-        this.userId = userResponse.userId
-        this.personalCode = userResponse.personalCode
-        this.name = userResponse.name
-        this.phoneNumber = userResponse.phoneNumber
-        this.address = userResponse.address
-        this.birthday = userResponse.birthday
-        this.email = userResponse.email
-        this.username = userResponse.username
-        this.status = userResponse.status
+    constructor(userResponseFirebase: UserResponseFirebase): this(){
+        this.id = userResponseFirebase.id
+        this.role = userResponseFirebase.role
+        this.userId = userResponseFirebase.userId
+        this.personalCode = userResponseFirebase.personalCode
+        this.name = userResponseFirebase.name
+        this.phoneNumber = userResponseFirebase.phoneNumber
+        this.address = userResponseFirebase.address
+        this.birthday = userResponseFirebase.birthday
+        this.email = userResponseFirebase.email
+        this.username = userResponseFirebase.username
+        this.status = userResponseFirebase.status
     }
 
     fun getStatus(): UserStatus{

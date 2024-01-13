@@ -3,10 +3,10 @@ package com.example.parkingqr.data.remote
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.core.net.toUri
-import com.example.parkingqr.data.remote.dto.user.UserLoginRequest
-import com.example.parkingqr.data.remote.dto.vehicle.VehicleRegisterRequest
-import com.example.parkingqr.data.remote.dto.user.UserResponse
-import com.example.parkingqr.data.remote.dto.vehicle.VehicleResponse
+import com.example.parkingqr.data.remote.dto.user.UserRequestFirebase
+import com.example.parkingqr.data.remote.dto.vehicle.VehicleRequestFirebase
+import com.example.parkingqr.data.remote.dto.user.UserResponseFirebase
+import com.example.parkingqr.data.remote.dto.vehicle.VehicleResponseFirebase
 import com.example.parkingqr.data.remote.dto.invoice.ParkingInvoiceFirebase
 import com.example.parkingqr.domain.model.user.UserLogin
 import com.example.parkingqr.domain.model.user.UserProfile
@@ -44,7 +44,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
             val querySnapshot = query.get().await()
             val vehicleList: MutableList<VehicleInvoice> = mutableListOf()
             for (document in querySnapshot.documents) {
-                document.toObject(VehicleResponse::class.java)
+                document.toObject(VehicleResponseFirebase::class.java)
                     ?.let { vehicleList.add(VehicleInvoice(it)) }
             }
             emit(State.success(vehicleList))
@@ -59,7 +59,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
         val querySnapshot = query.get().await()
         val userList: MutableList<UserInvoice> = mutableListOf()
         for (document in querySnapshot.documents) {
-            document.toObject(UserResponse::class.java)?.let { userList.add(UserInvoice(it)) }
+            document.toObject(UserResponseFirebase::class.java)?.let { userList.add(UserInvoice(it)) }
         }
         emit(State.success(userList))
     }.catch {
@@ -244,7 +244,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
         val querySnapshot = query.get().await()
         val userList: MutableList<UserLogin> = mutableListOf()
         for (document in querySnapshot.documents) {
-            document.toObject(UserResponse::class.java)?.let { userList.add(UserLogin(it)) }
+            document.toObject(UserResponseFirebase::class.java)?.let { userList.add(UserLogin(it)) }
         }
         emit(State.success(userList))
     }.catch {
@@ -264,7 +264,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
         val userRef = db.collection(Params.USER_PATH_COLLECTION)
         val key = userRef.document().id
         userLogin.id = key
-        val snapshot = userRef.document(userLogin.id!!).set(UserLoginRequest(userLogin)).await()
+        val snapshot = userRef.document(userLogin.id!!).set(UserRequestFirebase(userLogin)).await()
         emit(State.success(true))
     }.catch {
         emit(State.failed(it.message.toString()))
@@ -278,7 +278,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
         val querySnapshot = query.get().await()
         val userList: MutableList<UserProfile> = mutableListOf()
         for (document in querySnapshot.documents) {
-            document.toObject(UserResponse::class.java)?.let { userList.add(UserProfile(it)) }
+            document.toObject(UserResponseFirebase::class.java)?.let { userList.add(UserProfile(it)) }
         }
         if (userList.isNotEmpty()) {
             emit(State.success(userList[0]))
@@ -322,7 +322,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
             // Set data to fire store
             val snapshot =
                 vehicleRef.document(vehicleDetail.id!!)
-                    .set(VehicleRegisterRequest(vehicleDetail)).await()
+                    .set(VehicleRequestFirebase(vehicleDetail)).await()
             emit(State.success(true))
         }.catch {
             emit(State.failed(it.message.toString()))
@@ -335,7 +335,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
         val querySnapshot = query.get().await()
         val vehicleList = mutableListOf<VehicleDetail>()
         for (document in querySnapshot.documents) {
-            document.toObject(VehicleResponse::class.java)?.let {
+            document.toObject(VehicleResponseFirebase::class.java)?.let {
                 vehicleList.add(VehicleDetail(it))
             }
         }
@@ -351,7 +351,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
         val querySnapshot = query.get().await()
         val vehicleList: MutableList<VehicleDetail> = mutableListOf()
         for (document in querySnapshot.documents) {
-            document.toObject(VehicleResponse::class.java)?.let {
+            document.toObject(VehicleResponseFirebase::class.java)?.let {
                 vehicleList.add(
                     VehicleDetail(it)
                 )
@@ -439,7 +439,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
         val querySnapshot = query.get().await()
         val userList = mutableListOf<UserDetail>()
         for (document in querySnapshot.documents) {
-            document.toObject(UserResponse::class.java)?.let {
+            document.toObject(UserResponseFirebase::class.java)?.let {
                 userList.add(UserDetail(it))
             }
         }
@@ -450,7 +450,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
         val userRef = db.collection(Params.USER_PATH_COLLECTION).document(id)
         emit(State.loading())
         val querySnapshot = userRef.get().await()
-        querySnapshot.toObject(UserResponse::class.java)?.let {
+        querySnapshot.toObject(UserResponseFirebase::class.java)?.let {
             emit(State.success(UserDetail(it)))
         }
     }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
@@ -458,7 +458,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
     override fun updateUser(userDetail: UserDetail): Flow<State<Boolean>> = flow {
         emit(State.loading())
         val userRef = db.collection(Params.USER_PATH_COLLECTION)
-        val snapshot = userRef.document(userDetail.id!!).set(UserLoginRequest(userDetail)).await()
+        val snapshot = userRef.document(userDetail.id!!).set(UserRequestFirebase(userDetail)).await()
         emit(State.success(true))
     }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
 
@@ -490,7 +490,7 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
         val querySnapshot = query.get().await()
         val vehicleList = mutableListOf<VehicleDetail>()
         for (document in querySnapshot.documents) {
-            document.toObject(VehicleResponse::class.java)?.let {
+            document.toObject(VehicleResponseFirebase::class.java)?.let {
                 vehicleList.add(VehicleDetail(it))
             }
         }

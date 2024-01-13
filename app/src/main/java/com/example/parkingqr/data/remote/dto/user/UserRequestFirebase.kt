@@ -3,7 +3,7 @@ package com.example.parkingqr.data.remote.dto.user
 import com.example.parkingqr.domain.model.user.UserDetail
 import com.example.parkingqr.domain.model.user.UserLogin
 
-data class UserLoginRequest(
+data class UserRequestFirebase(
     var id: String? = null,
     var role: String? = null,
     var status: String? = null,

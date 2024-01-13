@@ -2,7 +2,7 @@ package com.example.parkingqr.data.remote.dto.vehicle
 
 import com.example.parkingqr.domain.model.vehicle.VehicleDetail
 
-class VehicleRegisterRequest() {
+class VehicleRequestFirebase() {
     var id: String? = null
     var createAt: String? = null
     var userId: String? = null

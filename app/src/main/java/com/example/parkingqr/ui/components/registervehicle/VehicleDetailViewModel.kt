@@ -1,40 +1,27 @@
-package com.example.parkingqr.ui.components.myinvoice
+package com.example.parkingqr.ui.components.registervehicle
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
-import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.vehicle.VehicleDetail
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
-class MyInvoiceViewModel @Inject constructor(private val repository: IRepository) :
+class VehicleDetailViewModel @Inject constructor(private val repository: IRepository) :
     BaseViewModel() {
 
-    private val _stateUi = MutableStateFlow(
-        MyInvoiceState()
-    )
-    val stateUi: StateFlow<MyInvoiceState> = _stateUi.asStateFlow()
-    private var getInvoiceListJob: Job? = null
-    private var searchInvoiceListJob: Job? = null
+    private val _stateUi = MutableStateFlow(VehicleDetailState())
+    val stateUi = _stateUi.asStateFlow()
 
-    init {
-        getParkingInvoiceList()
-    }
-
-    fun getParkingInvoiceList() {
-        getInvoiceListJob?.cancel()
-        getInvoiceListJob = viewModelScope.launch {
-            repository.getUserParkingInvoiceList().collect { state ->
+    fun getVehicleDetail(id: String) {
+        viewModelScope.launch {
+            repository.getVehicleById(id).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -44,17 +31,16 @@ class MyInvoiceViewModel @Inject constructor(private val repository: IRepository
                     is State.Success -> {
                         _stateUi.update {
                             it.copy(
-                                invoiceList = state.data,
-                                isLoading = false
+                                isLoading = false,
+                                vehicleDetail = state.data
                             )
                         }
-                        Log.d("BUGGGG", state.data.size.toString())
                     }
                     is State.Failed -> {
                         _stateUi.update {
                             it.copy(
                                 isLoading = false,
-                                error = state.message
+                                error = it.message
                             )
                         }
                     }
@@ -63,23 +49,20 @@ class MyInvoiceViewModel @Inject constructor(private val repository: IRepository
         }
     }
 
-    fun searchParkingInvoice(licensePlate: String) {
-        searchInvoiceListJob?.cancel()
-        searchInvoiceListJob = viewModelScope.launch {
-            repository.searchParkingInvoiceUser(licensePlate).collect { state ->
+    fun cancelVehicleRegistration(id: String) {
+        viewModelScope.launch {
+            repository.deleteVehicleById(id).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
-                            it.copy(
-                                isLoading = true
-                            )
+                            it.copy(isLoading = true)
                         }
                     }
                     is State.Success -> {
                         _stateUi.update {
                             it.copy(
                                 isLoading = false,
-                                invoiceList = state.data,
+                                isDeleted = true
                             )
                         }
                     }
@@ -87,7 +70,7 @@ class MyInvoiceViewModel @Inject constructor(private val repository: IRepository
                         _stateUi.update {
                             it.copy(
                                 isLoading = false,
-                                error = state.message
+                                error = it.message
                             )
                         }
                     }
@@ -96,13 +79,14 @@ class MyInvoiceViewModel @Inject constructor(private val repository: IRepository
         }
     }
 
-    fun showError(){
+    fun showError() {
         _stateUi.update {
             it.copy(
                 error = ""
             )
         }
     }
+
     fun showMessage() {
         _stateUi.update {
             it.copy(
@@ -111,11 +95,11 @@ class MyInvoiceViewModel @Inject constructor(private val repository: IRepository
         }
     }
 
-
-    data class MyInvoiceState(
+    data class VehicleDetailState(
         val isLoading: Boolean = false,
         val error: String = "",
         val message: String = "",
-        val invoiceList: MutableList<ParkingInvoice> = mutableListOf()
+        val vehicleDetail: VehicleDetail? = null,
+        val isDeleted: Boolean = false
     )
 }

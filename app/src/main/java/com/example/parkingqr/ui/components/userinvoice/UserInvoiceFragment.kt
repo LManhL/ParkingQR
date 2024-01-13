@@ -1,9 +1,8 @@
-package com.example.parkingqr.ui.components.myinvoice
+package com.example.parkingqr.ui.components.userinvoice
 
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
@@ -16,7 +15,7 @@ import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseFragment
 import kotlinx.coroutines.*
 
-class MyInvoiceFragment: BaseFragment() {
+class UserInvoiceFragment: BaseFragment() {
 
     companion object{
         const val INVOICE_ID = "INVOICE_ID"
@@ -24,18 +23,18 @@ class MyInvoiceFragment: BaseFragment() {
 
     private lateinit var binding: FragmentMyInvoiceBinding
     private lateinit var invoiceList: MutableList<ParkingInvoice>
-    private val myInvoiceViewModel: MyInvoiceViewModel by hiltNavGraphViewModels(R.id.myinvoiceFragment)
-    private lateinit var invoiceListAdapter: MyInvoiceListAdapter
+    private val userInvoiceViewModel: UserInvoiceViewModel by hiltNavGraphViewModels(R.id.myinvoiceFragment)
+    private lateinit var invoiceListAdapter: UserInvoiceListAdapter
     private var searchJob: Job? = null
 
     override fun observeViewModel() {
         lifecycleScope.launch{
             repeatOnLifecycle(Lifecycle.State.STARTED){
-                myInvoiceViewModel.stateUi.collect{
+                userInvoiceViewModel.stateUi.collect{
                     if(it.isLoading) showLoading() else hideLoading()
                     if(it.error.isNotEmpty()) {
                         showError(it.error)
-                        myInvoiceViewModel.showError()
+                        userInvoiceViewModel.showError()
                     }
                     if(invoiceList.isEmpty()) invoiceList.addAll(it.invoiceList)
                     else{
@@ -51,7 +50,7 @@ class MyInvoiceFragment: BaseFragment() {
     override fun initViewBinding(): View {
         binding = FragmentMyInvoiceBinding.inflate(layoutInflater)
         invoiceList = mutableListOf()
-        invoiceListAdapter = MyInvoiceListAdapter(invoiceList)
+        invoiceListAdapter = UserInvoiceListAdapter(invoiceList)
         invoiceListAdapter.setEventClick {
             handleClickItem(it)
         }
@@ -65,7 +64,7 @@ class MyInvoiceFragment: BaseFragment() {
                 searchJob?.cancel()
                 searchJob = CoroutineScope(Dispatchers.Main).launch {
                     delay(800)
-                    myInvoiceViewModel.searchParkingInvoice(s.toString())
+                    userInvoiceViewModel.searchParkingInvoice(s.toString())
                 }
             }
             override fun afterTextChanged(s: Editable?) {}

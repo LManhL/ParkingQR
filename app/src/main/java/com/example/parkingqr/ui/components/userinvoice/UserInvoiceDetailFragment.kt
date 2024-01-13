@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.myinvoice
+package com.example.parkingqr.ui.components.userinvoice
 
 import android.os.Bundle
 import android.view.View
@@ -19,30 +19,30 @@ import com.example.parkingqr.utils.QRcodeService
 import com.example.parkingqr.utils.TimeService
 import kotlinx.coroutines.launch
 
-class MyInvoiceDetailFragment : BaseFragment() {
+class UserInvoiceDetailFragment : BaseFragment() {
     private lateinit var binding: FragmentMyInvoiceDetailBinding
     private lateinit var invoiceId: String
-    private val myInvoiceDetailViewModel: MyInvoiceDetailViewModel by viewModels()
+    private val userInvoiceDetailViewModel: UserInvoiceDetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        invoiceId = arguments?.getString(MyInvoiceFragment.INVOICE_ID) ?: "-1"
+        invoiceId = arguments?.getString(UserInvoiceFragment.INVOICE_ID) ?: "-1"
         if (invoiceId != "-1") {
-            myInvoiceDetailViewModel.getInvoiceById(invoiceId)
+            userInvoiceDetailViewModel.getInvoiceById(invoiceId)
         }
     }
     override fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                myInvoiceDetailViewModel.stateUi.collect {
+                userInvoiceDetailViewModel.stateUi.collect {
                     if (it.isLoading) showLoading() else hideLoading()
                     if (it.error.isNotEmpty()) {
                         showError(it.error)
-                        myInvoiceDetailViewModel.showError()
+                        userInvoiceDetailViewModel.showError()
                     }
                     if (it.message.isNotEmpty()) {
                         showMessage(it.message)
-                        myInvoiceDetailViewModel.showMessage()
+                        userInvoiceDetailViewModel.showMessage()
                     }
                     if (it.invoice == null) binding.llWrapAllMyInvoiceDetail.visibility = View.GONE
                     it.invoice?.let { parkingInvoice ->
@@ -83,7 +83,7 @@ class MyInvoiceDetailFragment : BaseFragment() {
             handleSaveInvoice()
         }
         binding.ivQrcodeMyInvoiceDetail.setOnClickListener {
-            QRCodeDialog(context!!, QRcodeService.getQrCodeBitmap(myInvoiceDetailViewModel.stateUi.value.invoice?.id ?: "")).show()
+            QRCodeDialog(context!!, QRcodeService.getQrCodeBitmap(userInvoiceDetailViewModel.stateUi.value.invoice?.id ?: "")).show()
         }
     }
 
@@ -154,7 +154,7 @@ class MyInvoiceDetailFragment : BaseFragment() {
     }
 
     private fun handleSaveInvoice() {
-        myInvoiceDetailViewModel.saveInvoice(
+        userInvoiceDetailViewModel.saveInvoice(
             _type = binding.edtInvoiceTypeMyInvoiceDetail.text.toString(),
             _paymentMethod = binding.edtPaymentMethodMyInvoiceDetail.text.toString(),
             _note = binding.edtNoteMyInvoiceDetail.text.toString()

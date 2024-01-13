@@ -1,6 +1,6 @@
 package com.example.parkingqr.domain.model.user
 
-import com.example.parkingqr.data.remote.dto.user.UserResponse
+import com.example.parkingqr.data.remote.dto.user.UserResponseFirebase
 import com.example.parkingqr.data.remote.dto.invoice.UserInvoiceFirebase
 
 class UserInvoice() {
@@ -9,11 +9,11 @@ class UserInvoice() {
     var name: String? = ""
     var phoneNumber: String? = ""
 
-    constructor(userResponse: UserResponse): this(){
-        this.id = userResponse.id
-        this.userId = userResponse.userId
-        this.name = userResponse.name
-        this.phoneNumber = userResponse.phoneNumber
+    constructor(userResponseFirebase: UserResponseFirebase): this(){
+        this.id = userResponseFirebase.id
+        this.userId = userResponseFirebase.userId
+        this.name = userResponseFirebase.name
+        this.phoneNumber = userResponseFirebase.phoneNumber
     }
     constructor(userInvoiceFirebase: UserInvoiceFirebase): this(){
         this.id = userInvoiceFirebase.id
