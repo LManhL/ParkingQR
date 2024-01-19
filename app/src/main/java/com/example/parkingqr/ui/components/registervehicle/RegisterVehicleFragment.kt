@@ -23,8 +23,8 @@ import com.example.parkingqr.BuildConfig
 import com.example.parkingqr.databinding.FragmentRegisterVehicleBinding
 import com.example.parkingqr.domain.model.vehicle.VehicleDetail
 import com.example.parkingqr.ui.base.BaseFragment
-import com.example.parkingqr.utils.LicensePlateService
-import com.example.parkingqr.utils.TimeService
+import com.example.parkingqr.utils.LicensePlateUtil
+import com.example.parkingqr.utils.TimeUtil
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -179,7 +179,7 @@ class RegisterVehicleFragment : BaseFragment() {
         val expireDay = binding.edtExprireDayRegisterVehicle.text.toString()
         val certificateNumber = binding.edtCetificateNumberRegisterVehicle.text.toString()
 
-        if (!LicensePlateService.checkLicensePlateValid(licensePlate)) {
+        if (!LicensePlateUtil.checkLicensePlateValid(licensePlate)) {
             binding.edtLicensePlateRegisterVehicle.error = "Biển số xe không hợp lệ"
             check = false
         }
@@ -233,7 +233,7 @@ class RegisterVehicleFragment : BaseFragment() {
         imageList.add(imageBack.toString())
         val vehicle = VehicleDetail(
             id = "-1",
-            createAt = TimeService.getCurrentTime().toString(),
+            createAt = TimeUtil.getCurrentTime().toString(),
             userId = "-1",
             licensePlate = licensePlate,
             state = "unverified",

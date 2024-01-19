@@ -4,9 +4,8 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
-import kotlin.math.floor
 
-object FormatCurrencyService {
+object FormatCurrencyUtil {
 
     private const val MAX_LENGTH_ORDER_LINE_ITEM = 5
 

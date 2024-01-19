@@ -9,7 +9,7 @@ import android.util.Base64
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
-object ImageService {
+object ImageUtil {
     fun encodeImage(bm: Bitmap): String {
         val byteArray = ByteArrayOutputStream()
         bm.compress(Bitmap.CompressFormat.JPEG, 100, byteArray)

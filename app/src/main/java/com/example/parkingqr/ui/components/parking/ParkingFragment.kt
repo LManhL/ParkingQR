@@ -51,7 +51,7 @@ class ParkingFragment : BaseFragment() {
             imageCarIn = data?.extras!!["data"] as Bitmap?
             if (imageCarIn != null) {
                 binding.ivPhotoCarInParking.setImageBitmap(imageCarIn)
-                TextRecognizer.invoke(imageCarIn!!) {
+                TextRecognizerUtil.invoke(imageCarIn!!) {
                     carNumberIn = it
                 }
             }
@@ -60,7 +60,7 @@ class ParkingFragment : BaseFragment() {
             imageCarOut = data?.extras!!["data"] as Bitmap?
             if (imageCarOut != null) {
                 binding.ivPhotoCarOutParking.setImageBitmap(imageCarOut)
-                TextRecognizer.invoke(imageCarOut!!) {
+                TextRecognizerUtil.invoke(imageCarOut!!) {
                     carNumberOut = it
                 }
             }
@@ -228,17 +228,20 @@ class ParkingFragment : BaseFragment() {
             handleCarOut()
         }
         binding.ivQrcodeParking.setOnClickListener {
-            QRCodeDialog(
-                context!!,
-                QRcodeService.getQrCodeBitmap(
-                    parkingViewModel.stateUi.value.parkingInvoice?.id ?: ""
-                )
-            ).show()
+            showInvoiceQRCode()
         }
         binding.tvRefreshParking.setOnClickListener {
             parkingViewModel.refreshData()
             handleRefresh()
         }
+    }
+    private fun showInvoiceQRCode(){
+        QRCodeDialog(
+            context!!,
+            QRcodeUtil.getQrCodeBitmap(
+                parkingViewModel.stateUi.value.parkingInvoice?.id ?: ""
+            )
+        ).show()
     }
 
     private fun handleRefresh() {
@@ -269,23 +272,30 @@ class ParkingFragment : BaseFragment() {
                     || parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.FAIL_FOUND_VEHICLE
                     || parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.PARKED_VEHICLE
                 ) {
-                    val note = binding.edtNoteParking.text.toString()
-                    val paymentMethod = binding.edtPaymentMethodParking.text.toString()
-                    val type = binding.edtInvoiceTypeParking.text.toString()
-
-                    parkingViewModel.updateInvoiceIn(paymentMethod, type, note)
-                    parkingViewModel.addNewParkingInvoice()
+                    createNewInvoice()
                 } else {
-                    if (LicensePlateService.checkLicensePlateValid(carNumberIn)) {
-                        parkingViewModel.searchVehicleAndUserByLicensePlate(
-                            licensePlate = carNumberIn,
-                            imageCarIn = imageCarIn!!
-                        )
-                    } else {
-                        showMessage("Biển số xe không hợp lệ: $carNumberIn")
-                    }
+                    searchVehicle()
                 }
             }
+        }
+    }
+    private fun createNewInvoice(){
+        val note = binding.edtNoteParking.text.toString()
+        val paymentMethod = binding.edtPaymentMethodParking.text.toString()
+        val type = binding.edtInvoiceTypeParking.text.toString()
+
+        parkingViewModel.updateInvoiceIn(paymentMethod, type, note)
+        parkingViewModel.addNewParkingInvoice()
+    }
+
+    private fun searchVehicle(){
+        if (LicensePlateUtil.checkLicensePlateValid(carNumberIn)) {
+            parkingViewModel.searchVehicleAndUserByLicensePlate(
+                licensePlate = carNumberIn,
+                imageCarIn = imageCarIn!!
+            )
+        } else {
+            showMessage("Biển số xe không hợp lệ: $carNumberIn")
         }
     }
 
@@ -297,7 +307,7 @@ class ParkingFragment : BaseFragment() {
             var imgOutString = ""
 
             imageCarOut?.let {
-                imgOutString = ImageService.encodeImage(it)
+                imgOutString = ImageUtil.encodeImage(it)
             }
             parkingViewModel.updateInvoiceOut(paymentMethod, type, imgOutString, note)
             parkingViewModel.completeParkingInvoice()
@@ -356,10 +366,10 @@ class ParkingFragment : BaseFragment() {
             edtNoteParking.setText(parkingInvoice.note)
             edtNameParking.setText(parkingInvoice.user.name)
             edtLicensePlateParking.setText(parkingInvoice.vehicle.licensePlate)
-            edtTimeInParking.setText(TimeService.convertMilisecondsToDate(parkingInvoice.timeIn))
+            edtTimeInParking.setText(TimeUtil.convertMilisecondsToDate(parkingInvoice.timeIn))
             edtVehicleTypeParking.setText(parkingInvoice.type)
             edtPaymentMethodParking.setText(parkingInvoice.paymentMethod)
-            edtPriceParking.setText("${FormatCurrencyService.formatNumberCeil(parkingInvoice.calTotalPrice())} VND")
+            edtPriceParking.setText("${FormatCurrencyUtil.formatNumberCeil(parkingInvoice.calTotalPrice())} VND")
             edtInvoiceTypeParking.setText(parkingInvoice.type)
             if (!parkingInvoice.user.name.isNullOrEmpty()) {
                 edtNameParking.setText(parkingInvoice.user.name)

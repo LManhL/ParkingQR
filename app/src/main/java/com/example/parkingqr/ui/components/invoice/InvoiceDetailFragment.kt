@@ -2,7 +2,6 @@ package com.example.parkingqr.ui.components.invoice
 
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
 import androidx.fragment.app.viewModels
@@ -16,9 +15,9 @@ import com.example.parkingqr.databinding.FragmentInvoiceDetailBinding
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseFragment
 import com.example.parkingqr.ui.components.dialog.QRCodeDialog
-import com.example.parkingqr.utils.FormatCurrencyService
-import com.example.parkingqr.utils.QRcodeService
-import com.example.parkingqr.utils.TimeService
+import com.example.parkingqr.utils.FormatCurrencyUtil
+import com.example.parkingqr.utils.QRcodeUtil
+import com.example.parkingqr.utils.TimeUtil
 import kotlinx.coroutines.launch
 
 class InvoiceDetailFragment : BaseFragment() {
@@ -96,7 +95,7 @@ class InvoiceDetailFragment : BaseFragment() {
         binding.ivQrcodeInvoiceDetail.setOnClickListener {
             QRCodeDialog(
                 context!!,
-                QRcodeService.getQrCodeBitmap(
+                QRcodeUtil.getQrCodeBitmap(
                     invoiceDetailViewModel.stateUi.value.invoice?.id ?: ""
                 )
             ).show()
@@ -115,12 +114,12 @@ class InvoiceDetailFragment : BaseFragment() {
 
     private fun showInvoice(parkingInvoice: ParkingInvoice) {
         binding.llWrapAllInvoiceDetail.visibility = View.VISIBLE
-        binding.edtTimeInInvoiceDetail.setText(TimeService.convertMilisecondsToDate(parkingInvoice.timeIn))
+        binding.edtTimeInInvoiceDetail.setText(TimeUtil.convertMilisecondsToDate(parkingInvoice.timeIn))
         binding.edtLicensePlateInvoiceDetail.setText(parkingInvoice.vehicle.licensePlate)
         binding.edtPaymentMethodInvoiceDetail.setText(parkingInvoice.paymentMethod)
         binding.edtInvoiceTypeInvoiceDetail.setText(parkingInvoice.type)
         binding.edtTimeOutInvoiceDetail.setText(
-            TimeService.convertMilisecondsToDate(
+            TimeUtil.convertMilisecondsToDate(
                 parkingInvoice.timeOut
             )
         )
@@ -158,7 +157,7 @@ class InvoiceDetailFragment : BaseFragment() {
         binding.edtNoteInvoiceDetail.setText(parkingInvoice.note)
 
         binding.tvPriceInvoiceDetail.text =
-            "Giá tiền: ${FormatCurrencyService.formatNumberCeil(parkingInvoice.calTotalPrice())} VND"
+            "Giá tiền: ${FormatCurrencyUtil.formatNumberCeil(parkingInvoice.calTotalPrice())} VND"
 
         if (!parkingInvoice.user.name.isNullOrEmpty()) {
             binding.edtIsRegisterInvoiceDetail.setText("Xe đã đăng ký")

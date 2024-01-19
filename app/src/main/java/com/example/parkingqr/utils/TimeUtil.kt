@@ -1,13 +1,10 @@
 package com.example.parkingqr.utils
 
-import android.os.Build
-import android.util.Log
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.time.*
 import java.util.*
 
-object TimeService {
+object TimeUtil {
     const val HOUR_TO_MILISECONDS: Long = 3600000
     const val MINUTE_TO_MILISECONDS: Long = 60000
 

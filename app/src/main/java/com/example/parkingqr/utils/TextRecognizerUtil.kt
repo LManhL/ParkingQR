@@ -6,7 +6,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 
-object TextRecognizer {
+object TextRecognizerUtil {
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     fun invoke(bitmap: Bitmap, onSuccess: (String) -> Unit) {

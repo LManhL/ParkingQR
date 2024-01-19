@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.parkingqr.R
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
-import com.example.parkingqr.utils.FormatCurrencyService
-import com.example.parkingqr.utils.TimeService
+import com.example.parkingqr.utils.FormatCurrencyUtil
+import com.example.parkingqr.utils.TimeUtil
 
 class UserInvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoice>): Adapter<UserInvoiceListAdapter.InvoiceViewHolder>() {
 
@@ -52,8 +52,8 @@ class UserInvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoice
         fun bind(invoice: ParkingInvoice){
             curInvoice = invoice
             licensePlate.text = invoice.vehicle.licensePlate
-            price.text = FormatCurrencyService.formatNumberCeil(invoice.calTotalPrice())
-            timeIn.text = TimeService.convertMilisecondsToDate(invoice.timeIn)
+            price.text = FormatCurrencyUtil.formatNumberCeil(invoice.calTotalPrice())
+            timeIn.text = TimeUtil.convertMilisecondsToDate(invoice.timeIn)
             bindState()
         }
         private fun bindState(){

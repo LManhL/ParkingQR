@@ -14,9 +14,9 @@ import com.example.parkingqr.databinding.FragmentMyInvoiceDetailBinding
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseFragment
 import com.example.parkingqr.ui.components.dialog.QRCodeDialog
-import com.example.parkingqr.utils.FormatCurrencyService
-import com.example.parkingqr.utils.QRcodeService
-import com.example.parkingqr.utils.TimeService
+import com.example.parkingqr.utils.FormatCurrencyUtil
+import com.example.parkingqr.utils.QRcodeUtil
+import com.example.parkingqr.utils.TimeUtil
 import kotlinx.coroutines.launch
 
 class UserInvoiceDetailFragment : BaseFragment() {
@@ -83,18 +83,18 @@ class UserInvoiceDetailFragment : BaseFragment() {
             handleSaveInvoice()
         }
         binding.ivQrcodeMyInvoiceDetail.setOnClickListener {
-            QRCodeDialog(context!!, QRcodeService.getQrCodeBitmap(userInvoiceDetailViewModel.stateUi.value.invoice?.id ?: "")).show()
+            QRCodeDialog(context!!, QRcodeUtil.getQrCodeBitmap(userInvoiceDetailViewModel.stateUi.value.invoice?.id ?: "")).show()
         }
     }
 
     private fun showInvoice(parkingInvoice: ParkingInvoice) {
         binding.llWrapAllMyInvoiceDetail.visibility = View.VISIBLE
-        binding.edtTimeInMyInvoiceDetail.setText(TimeService.convertMilisecondsToDate(parkingInvoice.timeIn))
+        binding.edtTimeInMyInvoiceDetail.setText(TimeUtil.convertMilisecondsToDate(parkingInvoice.timeIn))
         binding.edtLicensePlateMyInvoiceDetail.setText(parkingInvoice.vehicle.licensePlate)
         binding.edtPaymentMethodMyInvoiceDetail.setText(parkingInvoice.paymentMethod)
         binding.edtInvoiceTypeMyInvoiceDetail.setText(parkingInvoice.type)
         binding.edtTimeOutMyInvoiceDetail.setText(
-            TimeService.convertMilisecondsToDate(
+            TimeUtil.convertMilisecondsToDate(
                 parkingInvoice.timeOut
             )
         )
@@ -132,7 +132,7 @@ class UserInvoiceDetailFragment : BaseFragment() {
         binding.edtNoteMyInvoiceDetail.setText(parkingInvoice.note)
 
         binding.tvPriceMyInvoiceDetail.text =
-            "Giá tiền: ${FormatCurrencyService.formatNumberCeil(parkingInvoice.calTotalPrice())} VND"
+            "Giá tiền: ${FormatCurrencyUtil.formatNumberCeil(parkingInvoice.calTotalPrice())} VND"
 
         if (!parkingInvoice.user.name.isNullOrEmpty()) {
             binding.edtIsRegisterMyInvoiceDetail.setText("Xe đã đăng ký")

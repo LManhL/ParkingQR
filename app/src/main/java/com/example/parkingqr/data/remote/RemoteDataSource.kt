@@ -15,8 +15,8 @@ import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.user.UserDetail
 import com.example.parkingqr.domain.model.user.UserInvoice
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
-import com.example.parkingqr.utils.ImageService
-import com.example.parkingqr.utils.TimeService
+import com.example.parkingqr.utils.ImageUtil
+import com.example.parkingqr.utils.TimeUtil
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
@@ -73,12 +73,12 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
             emit(State.loading())
 
             val storageRef = storage.reference
-            val bitmap = ImageService.decodeImage(parkingInvoice.imageIn)
+            val bitmap = ImageUtil.decodeImage(parkingInvoice.imageIn)
             val baos = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
             val data = baos.toByteArray()
             val vehicleRegisterRef =
-                storageRef.child("${auth.currentUser?.uid}/${Params.PARKING_INVOICE_STORAGE_PATH}/${parkingInvoiceFirebase.id}/${TimeService.getCurrentTime()}")
+                storageRef.child("${auth.currentUser?.uid}/${Params.PARKING_INVOICE_STORAGE_PATH}/${parkingInvoiceFirebase.id}/${TimeUtil.getCurrentTime()}")
             var uploadTask = vehicleRegisterRef.putBytes(data).await()
             val url = vehicleRegisterRef.downloadUrl.await()
 
@@ -119,12 +119,12 @@ class RemoteDataSource @Inject constructor(val context: Context) : IRemoteDataSo
             val storageRef = storage.reference
             var url = ""
             if (parkingInvoice.imageOut.isNotEmpty()) {
-                val bitmap = ImageService.decodeImage(parkingInvoice.imageOut)
+                val bitmap = ImageUtil.decodeImage(parkingInvoice.imageOut)
                 val baos = ByteArrayOutputStream()
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
                 val data = baos.toByteArray()
                 val vehicleRegisterRef =
-                    storageRef.child("${auth.currentUser?.uid}/${Params.PARKING_INVOICE_STORAGE_PATH}/${parkingInvoice.id}/${TimeService.getCurrentTime()}")
+                    storageRef.child("${auth.currentUser?.uid}/${Params.PARKING_INVOICE_STORAGE_PATH}/${parkingInvoice.id}/${TimeUtil.getCurrentTime()}")
                 var uploadTask = vehicleRegisterRef.putBytes(data).await()
                 url = vehicleRegisterRef.downloadUrl.await().toString()
             }

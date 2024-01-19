@@ -94,17 +94,21 @@ class ScanFragment : BaseFragment() {
             override fun receiveDetections(p0: Detector.Detections<Barcode>) {
                 val barcodes: SparseArray<Barcode> = p0.detectedItems
                 if(barcodes.size() > 0){
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Log.d("QR CODE", barcodes.valueAt(0).displayValue.toString())
-                        parkingViewModel.getDataFromQRCode(barcodes.valueAt(0).displayValue)
-                        barcode.release();
-                        getNavController().popBackStack()
-                    }
+                    handleReceiveQRCode(barcodes)
                 }
             }
 
         })
     }
+    private fun handleReceiveQRCode(barcodes: SparseArray<Barcode>){
+        CoroutineScope(Dispatchers.Main).launch {
+            Log.d("QR CODE", barcodes.valueAt(0).displayValue.toString())
+            parkingViewModel.getDataFromQRCode(barcodes.valueAt(0).displayValue)
+            barcode.release();
+            getNavController().popBackStack()
+        }
+    }
+
     private fun startScanLineAnimation() {
         val screenHeight = resources.displayMetrics.heightPixels
         val animation = TranslateAnimation(0f, 0f, 0f, screenHeight.toFloat())

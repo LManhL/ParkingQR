@@ -8,8 +8,8 @@ import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.user.UserInvoice
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 import com.example.parkingqr.ui.base.BaseViewModel
-import com.example.parkingqr.utils.ImageService
-import com.example.parkingqr.utils.TimeService
+import com.example.parkingqr.utils.ImageUtil
+import com.example.parkingqr.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -63,13 +63,7 @@ class ParkingViewModel @Inject constructor(private val repository: IRepository) 
                             _stateUi.update {
                                 it.copy(
                                     state = ParkingState.FAIL_FOUND_VEHICLE,
-                                    parkingInvoice = ParkingInvoice(
-                                        ID = repository.getNewParkingInvoiceKey(),
-                                        user = UserInvoice(),
-                                        vehicle = VehicleInvoice(licensePlate),
-                                        imageIn = ImageService.encodeImage(imageCarIn),
-                                        timeIn = TimeService.getCurrentTime().toString()
-                                    ),
+                                    parkingInvoice = createParkingInvoiceForUnRegisterVehicle(licensePlate, imageCarIn)
                                 )
                             }
                         }
@@ -88,8 +82,8 @@ class ParkingViewModel @Inject constructor(private val repository: IRepository) 
                                             ID = repository.getNewParkingInvoiceKey(),
                                             user = value,
                                             vehicle = it.vehicle!!,
-                                            imageIn = ImageService.encodeImage(imageCarIn),
-                                            timeIn = TimeService.getCurrentTime().toString()
+                                            imageIn = ImageUtil.encodeImage(imageCarIn),
+                                            timeIn = TimeUtil.getCurrentTime().toString()
                                         ),
                                     )
                                 }
@@ -107,6 +101,16 @@ class ParkingViewModel @Inject constructor(private val repository: IRepository) 
                 }
             }
         }
+    }
+
+    fun createParkingInvoiceForUnRegisterVehicle(licensePlate: String, imageCarIn: Bitmap): ParkingInvoice{
+        return ParkingInvoice(
+            ID = repository.getNewParkingInvoiceKey(),
+            user = UserInvoice(),
+            vehicle = VehicleInvoice(licensePlate),
+            imageIn = ImageUtil.encodeImage(imageCarIn),
+            timeIn = TimeUtil.getCurrentTime().toString()
+        )
     }
 
     fun addNewParkingInvoice() {
@@ -258,7 +262,7 @@ class ParkingViewModel @Inject constructor(private val repository: IRepository) 
             type = _type
             imageOut = _imgOutString
             note = _note
-            timeOut = TimeService.getCurrentTime().toString()
+            timeOut = TimeUtil.getCurrentTime().toString()
         }
         _stateUi.update {
             it.copy(

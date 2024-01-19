@@ -3,7 +3,7 @@ package com.example.parkingqr.domain.model.invoice
 import com.example.parkingqr.data.remote.dto.invoice.ParkingInvoiceFirebase
 import com.example.parkingqr.domain.model.user.UserInvoice
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
-import com.example.parkingqr.utils.TimeService
+import com.example.parkingqr.utils.TimeUtil
 
 
 class ParkingInvoice() {
@@ -56,7 +56,7 @@ class ParkingInvoice() {
     fun calTotalPrice(): Double {
 
         val endTime: Long = if (getState() == ParkingState.PARKING) {
-            TimeService.getCurrentTime()
+            TimeUtil.getCurrentTime()
         } else {
             timeOut.toLong()
         }

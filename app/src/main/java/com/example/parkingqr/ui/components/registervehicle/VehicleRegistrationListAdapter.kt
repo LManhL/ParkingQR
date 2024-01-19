@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.parkingqr.R
 import com.example.parkingqr.domain.model.vehicle.VehicleDetail
-import com.example.parkingqr.utils.TimeService
+import com.example.parkingqr.utils.TimeUtil
 
 class VehicleRegistrationListAdapter(private val vehicleList: MutableList<VehicleDetail>) :
     Adapter<VehicleRegistrationListAdapter.VehicleRegistrationListViewHolder>() {
@@ -51,7 +51,7 @@ class VehicleRegistrationListAdapter(private val vehicleList: MutableList<Vehicl
 
         fun bind(vehicleDetail: VehicleDetail) {
             curVehicle = vehicleDetail
-            createAt.text = TimeService.convertMilisecondsToDate(vehicleDetail.createAt ?: "")
+            createAt.text = TimeUtil.convertMilisecondsToDate(vehicleDetail.createAt ?: "")
             if (vehicleDetail.getState() == VehicleDetail.VehicleState.VERIFIED) {
                 status.text = "Đã phê duyệt"
                 status.setTextColor(itemView.resources.getColor(R.color.light_green))
