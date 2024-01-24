@@ -67,7 +67,7 @@ Make sure you have the following tools installed on your system:
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 ### Clone the Repository
-git clone https://github.com/yourusername/parking-management.git
+git clone https://github.com/LManhL/ParkingQR.git
 
 ## App preview
-
+![Frame 38](https://github.com/LManhL/ParkingQR/assets/95266634/026d1257-b6ea-4c7e-a63a-6668ac01ede1)
