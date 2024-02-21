@@ -1,7 +1,7 @@
 package com.example.parkingqr.domain.model.vehicle
 
-import com.example.parkingqr.data.remote.dto.vehicle.VehicleResponseFirebase
 import com.example.parkingqr.data.remote.dto.invoice.VehicleInvoiceFirebase
+import com.example.parkingqr.data.remote.dto.vehicle.VehicleFirebase
 
 class VehicleInvoice() {
 
@@ -14,17 +14,18 @@ class VehicleInvoice() {
     var color: String? = ""
     var ownerFullName: String? = ""
 
-    constructor(vehicleResponseFirebase: VehicleResponseFirebase): this(){
-       this.id = vehicleResponseFirebase.id
-       this.userId = vehicleResponseFirebase.userId
-       this.licensePlate = vehicleResponseFirebase.licensePlate
-       this.state = vehicleResponseFirebase.state
-       this.brand = vehicleResponseFirebase.brand
-       this.type = vehicleResponseFirebase.type
-       this.color = vehicleResponseFirebase.color
-       this.ownerFullName = vehicleResponseFirebase.ownerFullName
+    constructor(vehicleResponseFirebase: VehicleFirebase) : this() {
+        this.id = vehicleResponseFirebase.id
+        this.userId = vehicleResponseFirebase.userId
+        this.licensePlate = vehicleResponseFirebase.licensePlate
+        this.state = vehicleResponseFirebase.state
+        this.brand = vehicleResponseFirebase.brand
+        this.type = vehicleResponseFirebase.type
+        this.color = vehicleResponseFirebase.color
+        this.ownerFullName = vehicleResponseFirebase.ownerFullName
     }
-    constructor(vehicleInvoiceFirebase: VehicleInvoiceFirebase): this(){
+
+    constructor(vehicleInvoiceFirebase: VehicleInvoiceFirebase) : this() {
         this.id = vehicleInvoiceFirebase.id
         this.userId = vehicleInvoiceFirebase.userId
         this.licensePlate = vehicleInvoiceFirebase.licensePlate
@@ -34,7 +35,29 @@ class VehicleInvoice() {
         this.color = vehicleInvoiceFirebase.color
         this.ownerFullName = vehicleInvoiceFirebase.ownerFullName
     }
-    constructor(licensePlate: String): this(){
+
+    constructor(
+        id: String,
+        userId: String,
+        licensePlate: String,
+        state: String,
+        brand: String,
+        type: String,
+        color: String,
+        ownerFullName: String
+    ) : this() {
+        this.id = id
+        this.userId = userId
+        this.licensePlate = licensePlate
+        this.state = state
+        this.brand = brand
+        this.type = type
+        this.color = color
+        this.ownerFullName = ownerFullName
+    }
+
+
+    constructor(licensePlate: String) : this() {
         this.licensePlate = licensePlate
     }
 }

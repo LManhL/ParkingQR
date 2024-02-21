@@ -1,10 +1,11 @@
 package com.example.parkingqr.ui.components.invoice
 
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.invoice.InvoiceRepository
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseViewModel
+import com.example.parkingqr.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class InvoiceDetailViewModel @Inject constructor(private val repository: IRepository): BaseViewModel() {
+class InvoiceDetailViewModel @Inject constructor(private val repository: InvoiceRepository): BaseViewModel() {
     private val _stateUi = MutableStateFlow(
         InvoiceDetailViewModelState()
     )
@@ -155,6 +156,15 @@ class InvoiceDetailViewModel @Inject constructor(private val repository: IReposi
         }
     }
 
+    fun updateInvoice(){
+        _stateUi.update {
+            it.copy(
+                invoice = it.invoice?.apply {
+                    timeOut = TimeUtil.getCurrentTime().toString()
+                }
+            )
+        }
+    }
 
     fun showError() {
         _stateUi.update {

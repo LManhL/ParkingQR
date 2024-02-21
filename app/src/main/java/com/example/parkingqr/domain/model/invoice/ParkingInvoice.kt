@@ -19,15 +19,16 @@ class ParkingInvoice() {
     var paymentMethod: String = ""
     var type: String = ""
     var note: String = ""
+    var parkingLotId: String = ""
 
     constructor(
-        ID: String,
+        id: String,
         user: UserInvoice,
         vehicle: VehicleInvoice,
         imageIn: String,
         timeIn: String
     ) : this() {
-        this.id = ID
+        this.id = id
         this.user = user
         this.vehicle = vehicle
         this.state = "parking"
@@ -36,6 +37,36 @@ class ParkingInvoice() {
         this.timeIn = timeIn
         this.paymentMethod = "Tiền mặt"
         this.type = "Theo giờ"
+    }
+
+    constructor(
+        id: String,
+        user: UserInvoice,
+        vehicle: VehicleInvoice,
+        state: String,
+        imageIn: String,
+        imageOut: String,
+        timeOut: String,
+        price: Double,
+        timeIn: String,
+        paymentMethod: String,
+        type: String,
+        note: String,
+        parkingLotId: String
+    ) : this() {
+        this.id = id
+        this.user = user
+        this.vehicle = vehicle
+        this.state = state
+        this.imageIn = imageIn
+        this.imageOut = imageOut
+        this.price = price
+        this.timeIn = timeIn
+        this.timeOut = timeOut
+        this.paymentMethod = paymentMethod
+        this.type = type
+        this.note = note
+        this.parkingLotId = parkingLotId
     }
 
     constructor(parkingInvoiceFirebase: ParkingInvoiceFirebase) : this() {
@@ -58,7 +89,8 @@ class ParkingInvoice() {
         val endTime: Long = if (getState() == ParkingState.PARKING) {
             TimeUtil.getCurrentTime()
         } else {
-            timeOut.toLong()
+            if (timeOut.isNotEmpty()) timeOut.toLong()
+            else TimeUtil.getCurrentTime()
         }
         val hoursParked = ((endTime - timeIn.toLong()) / (1000 * 60 * 60)).toInt()
         var parkingFee = 3000.0

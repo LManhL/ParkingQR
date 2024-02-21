@@ -1,7 +1,5 @@
 package com.example.parkingqr.domain.model.user
 
-import com.example.parkingqr.data.remote.dto.user.UserResponseFirebase
-
 
 class UserLogin() {
     var id: String? = ""
@@ -11,12 +9,19 @@ class UserLogin() {
     var phoneNumber: String? = ""
     var email: String? = ""
 
-    constructor(userResponseFirebase: UserResponseFirebase): this(){
-        this.id = userResponseFirebase.id
-        this.userId = userResponseFirebase.userId
-        this.name = userResponseFirebase.name
-        this.phoneNumber = userResponseFirebase.phoneNumber
-        this.role = userResponseFirebase.role
-        this.email = userResponseFirebase.email
+    constructor(
+        id: String,
+        role: String,
+        userId: String,
+        name: String,
+        phoneNumber: String,
+        email: String
+    ) : this() {
+        this.id = id
+        this.userId = userId
+        this.name = name
+        this.phoneNumber = phoneNumber
+        this.role = role
+        this.email = email
     }
 }

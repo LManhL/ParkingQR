@@ -8,11 +8,12 @@
 
     <ImageView
         android:id="@+id/iv_header_home"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/custom_action_bar"
         android:layout_width="match_parent"
-        android:layout_height="250dp"/>
+        android:layout_height="250dp"
+        android:background="@drawable/custom_action_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/llHeaderInvoiceList"
         android:layout_width="match_parent"
@@ -60,15 +61,27 @@
                 android:background="@drawable/notification" />
         </LinearLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvSignOutHome"
+        android:layout_margin="@dimen/margin_10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llHeaderInvoiceList"
+        android:fontFamily="@font/source_sans_pro"
+        android:textColor="@color/white"
+        android:text="Đăng xuất"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <View
         android:id="@+id/v_container_home"
-        android:layout_marginTop="180dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/background_header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginTop="180dp"
+        android:background="@drawable/background_header"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/llInvoiceListHome"

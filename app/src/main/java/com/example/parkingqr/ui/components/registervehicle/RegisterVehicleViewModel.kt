@@ -1,8 +1,8 @@
 package com.example.parkingqr.ui.components.registervehicle
 
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.vehicle.VehicleRepository
 import com.example.parkingqr.domain.model.vehicle.VehicleDetail
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class RegisterVehicleViewModel @Inject constructor(private val repository: IRepository): BaseViewModel() {
+class RegisterVehicleViewModel @Inject constructor(private val repository: VehicleRepository): BaseViewModel() {
     private val _stateUi = MutableStateFlow(
         RegisterVehicleStateViewModel()
     )

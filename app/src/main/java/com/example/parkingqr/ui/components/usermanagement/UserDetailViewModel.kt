@@ -1,14 +1,11 @@
 package com.example.parkingqr.ui.components.usermanagement
 
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
-import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.domain.model.user.UserDetail
 import com.example.parkingqr.ui.base.BaseViewModel
-import com.example.parkingqr.ui.components.invoice.InvoiceDetailViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserDetailViewModel @Inject constructor(private val repository: IRepository): BaseViewModel() {
+class UserDetailViewModel @Inject constructor(private val repository: UserRepository): BaseViewModel() {
 
     private val _stateUi = MutableStateFlow(
         UserDetailState()

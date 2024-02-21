@@ -2,24 +2,24 @@ package com.example.parkingqr.data.remote.dto.vehicle
 
 import com.example.parkingqr.domain.model.vehicle.VehicleDetail
 
-class VehicleRequestFirebase() {
-    var id: String? = null
-    var createAt: String? = null
-    var userId: String? = null
-    var licensePlate: String? = null
-    var state: String? = null
-    var brand: String? = null
-    var type: String? = null
-    var color: String? = null
-    var registrationDate: String? = null
-    var expireDate: String? = null
-    var chassisNumber: String? = null
-    var engineNumber: String? = null
-    var ownerFullName: String? = null
-    var address: String? = null
-    var certificateNumber: String? = null
+class VehicleFirebase(
+    var id: String? = null,
+    var createAt: String? = null,
+    var userId: String? = null,
+    var licensePlate: String? = null,
+    var state: String? = null,
+    var brand: String? = null,
+    var type: String? = null,
+    var color: String? = null,
+    var registrationDate: String? = null,
+    var expireDate: String? = null,
+    var chassisNumber: String? = null,
+    var engineNumber: String? = null,
+    var ownerFullName: String? = null,
+    var address: String? = null,
+    var certificateNumber: String? = null,
     var images: MutableList<String> = mutableListOf()
-
+) {
     constructor(
         vehicleDetail: VehicleDetail
     ) : this() {

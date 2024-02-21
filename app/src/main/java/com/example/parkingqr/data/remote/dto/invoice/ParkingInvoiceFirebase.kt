@@ -1,6 +1,8 @@
 package com.example.parkingqr.data.remote.dto.invoice
 
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.user.UserInvoice
+import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 
 data class ParkingInvoiceFirebase(
     var id: String? = null,
@@ -16,8 +18,8 @@ data class ParkingInvoiceFirebase(
     var paymentMethod: String? = null,
     var type: String? = null,
     var note: String? = null
-    ){
-    constructor(parkingInvoice: ParkingInvoice): this(){
+) {
+    constructor(parkingInvoice: ParkingInvoice) : this() {
         this.id = parkingInvoice.id
         this.imageIn = parkingInvoice.imageIn
         this.state = parkingInvoice.state
@@ -30,5 +32,35 @@ data class ParkingInvoiceFirebase(
         this.timeOut = parkingInvoice.timeOut
         this.user = UserInvoiceFirebase(parkingInvoice.user)
         this.vehicle = VehicleInvoiceFirebase(parkingInvoice.vehicle)
+    }
+
+    constructor(
+        id: String,
+        parkingLotId: String,
+        user: UserInvoice,
+        vehicle: VehicleInvoice,
+        state: String,
+        imageIn: String,
+        imageOut: String,
+        price: Double,
+        timeIn: String,
+        timeOut: String,
+        paymentMethod: String,
+        type: String,
+        note: String
+    ) : this() {
+        this.id = id
+        this.imageIn = imageIn
+        this.state = state
+        this.imageOut = imageOut
+        this.price = price
+        this.paymentMethod = paymentMethod
+        this.type = type
+        this.note = note
+        this.timeIn = timeIn
+        this.timeOut = timeOut
+        this.user = UserInvoiceFirebase(user)
+        this.vehicle = VehicleInvoiceFirebase(vehicle)
+        this.parkingLotId = parkingLotId
     }
 }

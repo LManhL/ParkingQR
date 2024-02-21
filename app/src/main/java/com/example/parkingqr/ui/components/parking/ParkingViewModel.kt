@@ -2,8 +2,9 @@ package com.example.parkingqr.ui.components.parking
 
 import android.graphics.Bitmap
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.invoice.InvoiceRepository
+import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.user.UserInvoice
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
@@ -16,7 +17,7 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
-class ParkingViewModel @Inject constructor(private val repository: IRepository) : BaseViewModel() {
+class ParkingViewModel @Inject constructor(private val invoiceRepository: InvoiceRepository, private val userRepository: UserRepository) : BaseViewModel() {
 
     companion object {
         const val SEARCH_LICENSE_PLATE = "SEARCH_LICENSE_PLATE"
@@ -40,11 +41,11 @@ class ParkingViewModel @Inject constructor(private val repository: IRepository) 
         searchVehicleJob = viewModelScope.launch {
             flowOf(SEARCH_LICENSE_PLATE, SEARCH_USER).flatMapConcat {
                 when (it) {
-                    SEARCH_LICENSE_PLATE -> repository.searchLicensePlate(licensePlate)
+                    SEARCH_LICENSE_PLATE -> invoiceRepository.searchLicensePlate(licensePlate)
                     else -> {
                         val userId = _stateUi.value.vehicle?.userId
                         if (!userId.isNullOrEmpty()) {
-                            repository.searchUserById(userId)
+                            userRepository.searchUserById(userId)
                         } else {
                             flowOf()
                         }
@@ -79,7 +80,7 @@ class ParkingViewModel @Inject constructor(private val repository: IRepository) 
                                         state = ParkingState.SUCCESSFUL_FOUND_VEHICLE,
                                         user = value,
                                         parkingInvoice = ParkingInvoice(
-                                            ID = repository.getNewParkingInvoiceKey(),
+                                            id = invoiceRepository.getNewParkingInvoiceKey(),
                                             user = value,
                                             vehicle = it.vehicle!!,
                                             imageIn = ImageUtil.encodeImage(imageCarIn),
@@ -105,7 +106,7 @@ class ParkingViewModel @Inject constructor(private val repository: IRepository) 
 
     fun createParkingInvoiceForUnRegisterVehicle(licensePlate: String, imageCarIn: Bitmap): ParkingInvoice{
         return ParkingInvoice(
-            ID = repository.getNewParkingInvoiceKey(),
+            id = invoiceRepository.getNewParkingInvoiceKey(),
             user = UserInvoice(),
             vehicle = VehicleInvoice(licensePlate),
             imageIn = ImageUtil.encodeImage(imageCarIn),
@@ -119,10 +120,10 @@ class ParkingViewModel @Inject constructor(private val repository: IRepository) 
         addParkingInvoiceJob = viewModelScope.launch {
             flowOf(VALIDATE_VEHICLE, ADD_NEW_PARKING_INVOICE).flatMapConcat {
                 when (it) {
-                    VALIDATE_VEHICLE -> repository.searchParkingInvoiceByLicensePlateAndStateParking(_stateUi.value.parkingInvoice?.vehicle?.licensePlate!!)
+                    VALIDATE_VEHICLE -> invoiceRepository.searchParkingInvoiceByLicensePlateAndStateParking(_stateUi.value.parkingInvoice?.vehicle?.licensePlate!!)
                     else -> {
                         if (!available) {
-                            repository.addNewParkingInvoice(_stateUi.value.parkingInvoice!!)
+                            invoiceRepository.addNewParkingInvoice(_stateUi.value.parkingInvoice!!)
                         } else {
                             flowOf()
                         }
@@ -178,7 +179,7 @@ class ParkingViewModel @Inject constructor(private val repository: IRepository) 
     fun searchParkingInvoiceById(id: String) {
         searchParkingInvoiceJob?.cancel()
         searchParkingInvoiceJob = viewModelScope.launch {
-            repository.searchParkingInvoiceById(id).collect { state ->
+            invoiceRepository.searchParkingInvoiceById(id).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -227,7 +228,7 @@ class ParkingViewModel @Inject constructor(private val repository: IRepository) 
     fun completeParkingInvoice() {
         updateParkingInvoiceJob?.cancel()
         updateParkingInvoiceJob = viewModelScope.launch {
-            repository.completeParkingInvoice(_stateUi.value.parkingInvoice!!)
+            invoiceRepository.completeParkingInvoice(_stateUi.value.parkingInvoice!!)
                 .collect { state ->
                     when (state) {
                         is State.Loading -> {

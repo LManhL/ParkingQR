@@ -1,8 +1,8 @@
 package com.example.parkingqr.ui.components.vehiclemanagement
 
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.vehicle.VehicleRepository
 import com.example.parkingqr.domain.model.vehicle.VehicleDetail
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VehicleDetailAdminViewModel @Inject constructor(private val repository: IRepository) :
+class VehicleDetailAdminViewModel @Inject constructor(private val repository: VehicleRepository) :
     BaseViewModel() {
 
     private val _stateUi = MutableStateFlow(VehicleDetailState())
@@ -113,7 +113,7 @@ class VehicleDetailAdminViewModel @Inject constructor(private val repository: IR
 
     fun pendingVehicle() {
         viewModelScope.launch {
-            repository.pendingVehcile(_stateUi.value.vehicleDetail!!).collect { state ->
+            repository.pendingVehicle(_stateUi.value.vehicleDetail!!).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {

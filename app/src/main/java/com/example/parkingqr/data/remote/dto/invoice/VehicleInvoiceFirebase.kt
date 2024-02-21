@@ -11,9 +11,9 @@ class VehicleInvoiceFirebase(
     var type: String? = "",
     var color: String? = "",
     var ownerFullName: String? = "",
-){
-    constructor(vehicle: VehicleInvoice): this(){
-        this.id  = vehicle.id
+) {
+    constructor(vehicle: VehicleInvoice) : this() {
+        this.id = vehicle.id
         this.userId = vehicle.userId
         this.licensePlate = vehicle.licensePlate
         this.state = vehicle.state

@@ -1,7 +1,13 @@
 package com.example.parkingqr.di
 
-import com.example.parkingqr.data.IRepository
-import com.example.parkingqr.data.Repository
+import com.example.parkingqr.data.repo.auth.AuthRepository
+import com.example.parkingqr.data.repo.auth.AuthRepositoryImpl
+import com.example.parkingqr.data.repo.invoice.InvoiceRepository
+import com.example.parkingqr.data.repo.invoice.InvoiceRepositoryImpl
+import com.example.parkingqr.data.repo.user.UserRepository
+import com.example.parkingqr.data.repo.user.UserRepositoryImpl
+import com.example.parkingqr.data.repo.vehicle.VehicleRepository
+import com.example.parkingqr.data.repo.vehicle.VehicleRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,5 +20,18 @@ import javax.inject.Singleton
 abstract class DataModule {
     @Binds
     @Singleton
-    abstract fun bindRepository(repository: Repository): IRepository
+    abstract fun bindAuthRepository(repository: AuthRepositoryImpl): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUserRepository(repository: UserRepositoryImpl): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVehicleRepository(repository: VehicleRepositoryImpl): VehicleRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindInvoiceRepository(repository: InvoiceRepositoryImpl): InvoiceRepository
+
 }

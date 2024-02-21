@@ -1,8 +1,9 @@
 package com.example.parkingqr.ui.components.vehiclemanagement
 
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.auth.AuthRepository
+import com.example.parkingqr.data.repo.vehicle.VehicleRepository
 import com.example.parkingqr.domain.model.vehicle.VehicleDetail
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VehicleManagementViewModel @Inject constructor(private val repository: IRepository) :
+class VehicleManagementViewModel @Inject constructor(private val vehicleRepository: VehicleRepository, private val authRepository: AuthRepository) :
     BaseViewModel() {
     private val _stateUi = MutableStateFlow(VehicleRegistrationListState())
     val stateUi = _stateUi.asStateFlow()
@@ -27,7 +28,7 @@ class VehicleManagementViewModel @Inject constructor(private val repository: IRe
     fun getVehicleList() {
         getListJob?.cancel()
         getListJob = viewModelScope.launch {
-            repository.getAllVehicle().collect { state ->
+            vehicleRepository.getAllVehicle().collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -57,7 +58,7 @@ class VehicleManagementViewModel @Inject constructor(private val repository: IRe
 
     fun signOut() {
         viewModelScope.launch {
-            repository.signOut().collect { state ->
+            authRepository.signOut().collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {

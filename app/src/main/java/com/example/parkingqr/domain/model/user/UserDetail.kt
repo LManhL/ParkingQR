@@ -1,7 +1,5 @@
 package com.example.parkingqr.domain.model.user
 
-import com.example.parkingqr.data.remote.dto.user.UserResponseFirebase
-
 class UserDetail() {
     var id: String? = ""
     var role: String? = ""
@@ -15,29 +13,41 @@ class UserDetail() {
     var email: String? = ""
     var username: String? = ""
 
-    constructor(userResponseFirebase: UserResponseFirebase): this(){
-        this.id = userResponseFirebase.id
-        this.role = userResponseFirebase.role
-        this.userId = userResponseFirebase.userId
-        this.personalCode = userResponseFirebase.personalCode
-        this.name = userResponseFirebase.name
-        this.phoneNumber = userResponseFirebase.phoneNumber
-        this.address = userResponseFirebase.address
-        this.birthday = userResponseFirebase.birthday
-        this.email = userResponseFirebase.email
-        this.username = userResponseFirebase.username
-        this.status = userResponseFirebase.status
+    constructor(
+        id: String,
+        role: String,
+        status: String,
+        userId: String,
+        personalCode: String,
+        name: String,
+        phoneNumber: String,
+        address: String,
+        birthday: String,
+        email: String,
+        username: String
+    ) : this() {
+        this.id = id
+        this.role = role
+        this.userId = userId
+        this.personalCode = personalCode
+        this.name = name
+        this.phoneNumber = phoneNumber
+        this.address = address
+        this.birthday = birthday
+        this.email = email
+        this.username = username
+        this.status = status
     }
 
-    fun getStatus(): UserStatus{
-        return if(status == "active"){
+    fun getStatus(): UserStatus {
+        return if (status == "active") {
             UserStatus.ACTIVE
-        } else{
+        } else {
             UserStatus.BLOCKED
         }
     }
 
-    enum class UserStatus{
+    enum class UserStatus {
         ACTIVE, BLOCKED
     }
 }

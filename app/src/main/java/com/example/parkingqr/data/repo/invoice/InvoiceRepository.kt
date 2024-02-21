@@ -1,0 +1,22 @@
+package com.example.parkingqr.data.repo.invoice
+
+import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
+import kotlinx.coroutines.flow.Flow
+
+interface InvoiceRepository {
+    fun searchLicensePlate(licensePlate: String): Flow<State<MutableList<VehicleInvoice>>>
+    fun addNewParkingInvoice(parkingInvoice: ParkingInvoice): Flow<State<String>>
+    fun searchParkingInvoiceById(id: String): Flow<State<MutableList<ParkingInvoice>>>
+    fun getNewParkingInvoiceKey(): String
+    fun completeParkingInvoice(parkingInvoice: ParkingInvoice): Flow<State<String>>
+    fun refuseParkingInvoice(id: String): Flow<State<String>>
+    fun getParkingInvoiceById(id: String): Flow<State<MutableList<ParkingInvoice>>>
+    fun updateParkingInvoice(parkingInvoice: ParkingInvoice): Flow<State<Boolean>>
+    fun getUserParkingInvoiceList(): Flow<State<MutableList<ParkingInvoice>>>
+    fun searchParkingInvoiceUser(licensePlate: String): Flow<State<MutableList<ParkingInvoice>>>
+    fun searchParkingInvoiceParkingLot(licensePlate: String): Flow<State<MutableList<ParkingInvoice>>>
+    fun getParkingLotInvoiceList(): Flow<State<MutableList<ParkingInvoice>>>
+    fun searchParkingInvoiceByLicensePlateAndStateParking(licensePlate: String): Flow<State<Boolean>>
+}

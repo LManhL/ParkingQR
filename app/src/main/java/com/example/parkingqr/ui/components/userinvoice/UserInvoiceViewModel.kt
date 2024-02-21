@@ -2,8 +2,8 @@ package com.example.parkingqr.ui.components.userinvoice
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.invoice.InvoiceRepository
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class UserInvoiceViewModel @Inject constructor(private val repository: IRepository) :
+class UserInvoiceViewModel @Inject constructor(private val repository: InvoiceRepository) :
     BaseViewModel() {
 
     private val _stateUi = MutableStateFlow(

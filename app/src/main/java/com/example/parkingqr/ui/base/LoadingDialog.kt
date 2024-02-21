@@ -10,7 +10,7 @@ class LoadingDialog(context: Context) {
 
     fun show() {
         dialog.setContentView(R.layout.loading_dialog)
-        dialog.setCancelable(false)
+        dialog.setCancelable(true)
         dialog.create()
         dialog.show()
     }

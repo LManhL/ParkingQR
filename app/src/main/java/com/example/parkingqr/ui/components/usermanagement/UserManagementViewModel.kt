@@ -1,8 +1,9 @@
 package com.example.parkingqr.ui.components.usermanagement
 
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.auth.AuthRepository
+import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.domain.model.user.UserDetail
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserManagementViewModel @Inject constructor(private val repository: IRepository): BaseViewModel() {
+class UserManagementViewModel @Inject constructor(private val userRepository: UserRepository, private val authRepository: AuthRepository): BaseViewModel() {
 
     private val _stateUi = MutableStateFlow(
         UserManagementState()
@@ -28,7 +29,7 @@ class UserManagementViewModel @Inject constructor(private val repository: IRepos
     fun getUserList() {
         getUserJob?.cancel()
         getUserJob = viewModelScope.launch {
-            repository.getAllUser().collect { state ->
+            userRepository.getAllUser().collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -58,7 +59,7 @@ class UserManagementViewModel @Inject constructor(private val repository: IRepos
 
     fun deleteUser(userDetail: UserDetail) {
         viewModelScope.launch {
-            repository.deleteUser(userDetail.id!!).collect { state ->
+            userRepository.deleteUser(userDetail.id!!).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -92,7 +93,7 @@ class UserManagementViewModel @Inject constructor(private val repository: IRepos
 
     fun blockUser(userDetail: UserDetail) {
         viewModelScope.launch {
-            repository.blockUser(userDetail.id!!).collect { state ->
+            userRepository.blockUser(userDetail.id!!).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -125,7 +126,7 @@ class UserManagementViewModel @Inject constructor(private val repository: IRepos
 
     fun activeUser(userDetail: UserDetail) {
         viewModelScope.launch {
-            repository.activeUser(userDetail.id!!).collect { state ->
+            userRepository.activeUser(userDetail.id!!).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -158,7 +159,7 @@ class UserManagementViewModel @Inject constructor(private val repository: IRepos
 
     fun signOut() {
         viewModelScope.launch {
-            repository.signOut().collect { state ->
+            authRepository.signOut().collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {

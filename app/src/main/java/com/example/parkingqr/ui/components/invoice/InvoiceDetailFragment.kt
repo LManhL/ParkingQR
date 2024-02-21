@@ -228,10 +228,12 @@ class InvoiceDetailFragment : BaseFragment() {
         )
     }
     private fun handleConfirmInvoice() {
+        invoiceDetailViewModel.updateInvoice()
         invoiceDetailViewModel.confirmInvoice()
     }
 
     private fun handleRefuseInvoice() {
+        invoiceDetailViewModel.updateInvoice()
         invoiceDetailViewModel.refuseInvoice()
     }
 

@@ -3,7 +3,7 @@ package com.example.parkingqr.data.remote.dto.user
 import com.example.parkingqr.domain.model.user.UserDetail
 import com.example.parkingqr.domain.model.user.UserLogin
 
-data class UserRequestFirebase(
+data class UserFirebase(
     var id: String? = null,
     var role: String? = null,
     var status: String? = null,
@@ -15,8 +15,8 @@ data class UserRequestFirebase(
     var birthday: String? = null,
     var email: String? = null,
     var username: String? = null
-){
-    constructor(userLogin: UserLogin): this(){
+) {
+    constructor(userLogin: UserLogin) : this() {
         this.id = userLogin.id
         this.role = userLogin.role
         this.userId = userLogin.userId
@@ -29,7 +29,8 @@ data class UserRequestFirebase(
         this.username = ""
         this.status = "active"
     }
-    constructor(userDetail: UserDetail): this(){
+
+    constructor(userDetail: UserDetail) : this() {
         id = userDetail.id
         role = userDetail.role
         status = userDetail.status
@@ -41,5 +42,26 @@ data class UserRequestFirebase(
         birthday = userDetail.birthday
         email = userDetail.email
         username = userDetail.username
+    }
+
+    constructor(
+        id: String,
+        role: String,
+        userId: String,
+        name: String,
+        phoneNumber: String,
+        email: String,
+    ) : this() {
+        this.id = id
+        this.role = role
+        this.userId = userId
+        this.name = name
+        this.email = email
+        this.phoneNumber = phoneNumber
+        this.personalCode = ""
+        this.address = ""
+        this.birthday = ""
+        this.username = ""
+        this.status = "active"
     }
 }

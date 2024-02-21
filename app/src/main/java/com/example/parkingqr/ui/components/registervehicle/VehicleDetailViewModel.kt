@@ -1,8 +1,8 @@
 package com.example.parkingqr.ui.components.registervehicle
 
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.vehicle.VehicleRepository
 import com.example.parkingqr.domain.model.vehicle.VehicleDetail
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VehicleDetailViewModel @Inject constructor(private val repository: IRepository) :
+class VehicleDetailViewModel @Inject constructor(private val repository: VehicleRepository) :
     BaseViewModel() {
 
     private val _stateUi = MutableStateFlow(VehicleDetailState())

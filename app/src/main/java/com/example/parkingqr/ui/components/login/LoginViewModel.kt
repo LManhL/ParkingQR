@@ -1,8 +1,9 @@
 package com.example.parkingqr.ui.components.login
 
 import androidx.lifecycle.viewModelScope
-import com.example.parkingqr.data.IRepository
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.auth.AuthRepository
+import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.ui.base.BaseViewModel
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val repository: IRepository) : BaseViewModel() {
+class LoginViewModel @Inject constructor(private val authRepository: AuthRepository, private val userRepository: UserRepository) : BaseViewModel() {
     private val _stateUi = MutableStateFlow(
         LoginStateViewModel()
     )
@@ -26,7 +27,7 @@ class LoginViewModel @Inject constructor(private val repository: IRepository) : 
     fun doLogin(email: String, password: String) {
         loginJob?.cancel()
         loginJob = viewModelScope.launch {
-            repository.signIn(email, password).collect { state ->
+            authRepository.signIn(email, password).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -67,7 +68,7 @@ class LoginViewModel @Inject constructor(private val repository: IRepository) : 
 
     fun findUserRole(email: String){
         viewModelScope.launch {
-            repository.getUserByEmail(email).collect { state ->
+            userRepository.getUserByEmail(email).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
