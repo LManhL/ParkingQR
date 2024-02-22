@@ -3,6 +3,7 @@ package com.example.parkingqr.data.remote.invoice
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.remote.dto.invoice.ParkingInvoiceFirebase
 import com.example.parkingqr.data.remote.dto.vehicle.VehicleFirebase
+import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import kotlinx.coroutines.flow.Flow
 
 interface InvoiceRemoteData {
@@ -19,4 +20,6 @@ interface InvoiceRemoteData {
     fun searchParkingInvoiceParkingLot(licensePlate: String): Flow<State<MutableList<ParkingInvoiceFirebase>>>
     fun getParkingLotInvoiceList(): Flow<State<MutableList<ParkingInvoiceFirebase>>>
     fun searchParkingInvoiceByLicensePlateAndStateParking(licensePlate: String): Flow<State<Boolean>>
+
+    fun getUserInvoiceListHaveParkingState(): Flow<State<MutableList<ParkingInvoiceFirebase>>>
 }

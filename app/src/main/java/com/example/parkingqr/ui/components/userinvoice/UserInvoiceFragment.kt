@@ -75,13 +75,11 @@ class UserInvoiceFragment: BaseFragment() {
 
     override fun initListener() {
         hideActionBar()
-        showBottomNavigation()
     }
 
     private fun handleClickItem(parkingInvoice: ParkingInvoice){
         val bundle = Bundle()
         bundle.putString(INVOICE_ID, parkingInvoice.id)
         getNavController().navigate(R.id.myInvoiceDetailFragment, bundle)
-        hideBottomNavigation()
     }
 }

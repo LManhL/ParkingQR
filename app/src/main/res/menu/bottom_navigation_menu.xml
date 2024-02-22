@@ -4,7 +4,7 @@
     <item
         app:showAsAction="always"
         android:icon="@drawable/invoice_menu"
-        android:id="@+id/myinvoiceFragment"
+        android:id="@+id/userQRCodeListFragment"
         android:title=""/>
 
     <item

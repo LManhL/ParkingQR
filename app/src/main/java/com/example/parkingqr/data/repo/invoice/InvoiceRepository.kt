@@ -19,4 +19,8 @@ interface InvoiceRepository {
     fun searchParkingInvoiceParkingLot(licensePlate: String): Flow<State<MutableList<ParkingInvoice>>>
     fun getParkingLotInvoiceList(): Flow<State<MutableList<ParkingInvoice>>>
     fun searchParkingInvoiceByLicensePlateAndStateParking(licensePlate: String): Flow<State<Boolean>>
+
+    fun getUserInvoiceListHaveParkingState(): Flow<State<MutableList<ParkingInvoice>>>
+
+    fun searchHistoryParkingInvoiceUser(licensePlate: String): Flow<State<MutableList<ParkingInvoice>>>
 }

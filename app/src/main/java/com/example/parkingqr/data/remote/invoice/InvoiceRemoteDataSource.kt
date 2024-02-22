@@ -7,6 +7,7 @@ import com.example.parkingqr.data.remote.Params
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.remote.dto.invoice.ParkingInvoiceFirebase
 import com.example.parkingqr.data.remote.dto.vehicle.VehicleFirebase
+import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.utils.ImageUtil
 import com.example.parkingqr.utils.TimeUtil
 import com.google.firebase.firestore.Query
@@ -187,7 +188,9 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
         flow {
             emit(State.loading())
             val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
-            val query: Query = parkingInvoiceRef.whereEqualTo("user.userId", auth.currentUser?.uid)
+            val query: Query = parkingInvoiceRef.whereEqualTo("user.userId", auth.currentUser?.uid).whereNotIn("state",
+                mutableListOf("parking")
+            )
             val querySnapshot = query.get().await()
             val parkingInvoiceList = mutableListOf<ParkingInvoiceFirebase>()
             for (document in querySnapshot.documents) {
@@ -247,4 +250,24 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)
+
+    override fun getUserInvoiceListHaveParkingState(): Flow<State<MutableList<ParkingInvoiceFirebase>>> =
+        flow {
+            emit(State.loading())
+            val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
+            val query: Query = parkingInvoiceRef.whereEqualTo("user.userId", auth.currentUser?.uid).whereIn("state",
+                mutableListOf("parking")
+            )
+            val querySnapshot = query.get().await()
+            val parkingInvoiceList = mutableListOf<ParkingInvoiceFirebase>()
+            for (document in querySnapshot.documents) {
+                document.toObject(ParkingInvoiceFirebase::class.java)?.let {
+                    parkingInvoiceList.add(it)
+                }
+            }
+            emit(State.success(parkingInvoiceList))
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
 }

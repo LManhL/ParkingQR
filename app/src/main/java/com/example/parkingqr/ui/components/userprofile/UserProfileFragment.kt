@@ -54,6 +54,10 @@ class UserProfileFragment: BaseFragment() {
             userProfileViewModel.signOut()
             hideBottomNavigation()
         }
+        binding.tvHistoryMyProfile.setOnClickListener{
+            getNavController().navigate(R.id.myinvoiceFragment)
+            hideBottomNavigation()
+        }
     }
     private fun updateUI(userProfile: UserProfile?){
         binding.clContainerMyProfile.visibility = View.INVISIBLE

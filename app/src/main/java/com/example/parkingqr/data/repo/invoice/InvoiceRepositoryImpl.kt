@@ -116,4 +116,29 @@ class InvoiceRepositoryImpl @Inject constructor(
     override fun searchParkingInvoiceByLicensePlateAndStateParking(licensePlate: String): Flow<State<Boolean>> {
         return invoiceRemoteData.searchParkingInvoiceByLicensePlateAndStateParking(licensePlate)
     }
+
+    override fun getUserInvoiceListHaveParkingState(): Flow<State<MutableList<ParkingInvoice>>> {
+        return invoiceRemoteData.getUserInvoiceListHaveParkingState().map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.map { it.mapToParkingInvoice() }
+                    .toMutableList())
+                is State.Failed -> State.failed(state.message)
+            }
+
+        }
+    }
+
+    override fun searchHistoryParkingInvoiceUser(licensePlate: String): Flow<State<MutableList<ParkingInvoice>>> {
+        return invoiceRemoteData.searchParkingInvoiceUser(licensePlate)
+            .map { state ->
+                when (state) {
+                    is State.Loading -> State.loading()
+                    is State.Success -> State.success(state.data.map { it.mapToParkingInvoice() }
+                        .filter { it.state != "parking" }.toMutableList())
+                    is State.Failed -> State.failed(state.message)
+                }
+
+            }
+    }
 }

@@ -54,46 +54,6 @@ class UserInvoiceDetailViewModel @Inject constructor(private val repository: Inv
             }
         }
     }
-    fun saveInvoice(_type: String, _paymentMethod: String, _note: String ) {
-        saveInVoiceJob?.cancel()
-        _stateUi.update {
-            it.copy(
-                invoice = it.invoice?.apply {
-                    type = _type
-                    paymentMethod = _paymentMethod
-                    note = _note
-                }
-            )
-        }
-        saveInVoiceJob = viewModelScope.launch {
-            repository.updateParkingInvoice(_stateUi.value.invoice!!).collect { state ->
-                when (state) {
-                    is State.Loading -> {
-                        _stateUi.update {
-                            it.copy(isLoading = true)
-                        }
-                    }
-                    is State.Success -> {
-                        _stateUi.update {
-                            it.copy(
-                                message = "Lưu hóa đơn thành công",
-                                isLoading = false
-                            )
-                        }
-                    }
-                    is State.Failed -> {
-                        _stateUi.update {
-                            it.copy(
-                                isLoading = false,
-                                error = state.message
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     fun showError() {
         _stateUi.update {
             it.copy(

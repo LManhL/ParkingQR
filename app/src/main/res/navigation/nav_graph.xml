@@ -125,4 +125,10 @@
         android:name="com.example.parkingqr.ui.components.vehiclemanagement.VehicleDetailAdminFragment"
         android:label="@string/vehicle_management_fragment_name">
     </fragment>
+    <fragment
+        tools:layout="@layout/fragment_user_qrcode_list"
+        android:id="@+id/userQRCodeListFragment"
+        android:name="com.example.parkingqr.ui.components.qrcode.UserQRCodeListFragment"
+        android:label="@string/user_qr_code_fragment_name">
+    </fragment>
 </navigation>

@@ -46,21 +46,6 @@
                         android:text="Giá tiền: 15,000 VND"
                         android:textSize="@dimen/font_size_20" />
 
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:gravity="end|center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:id="@+id/ivQrcodeMyInvoiceDetail"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:src="@drawable/qr_code_bigsize" />
-                    </LinearLayout>
-
                 </LinearLayout>
 
                 <LinearLayout
@@ -311,34 +296,18 @@
                         android:text="Hình thức thanh toán"
                         android:textSize="@dimen/font_size_16" />
 
-                    <LinearLayout
-                        android:id="@+id/llPaymentMethodMyInvoiceDetail"
+                    <EditText
+                        android:id="@+id/edtPaymentMethodMyInvoiceDetail"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="6"
-                        android:background="@drawable/rounded_edit_text_white"
-                        android:gravity="center"
-                        android:weightSum="5">
-
-                        <EditText
-                            android:id="@+id/edtPaymentMethodMyInvoiceDetail"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="4"
-                            android:background="@android:color/transparent"
-                            android:enabled="false"
-                            android:fontFamily="@font/source_sans_pro"
-                            android:hint="Chuyển khoản"
-                            android:padding="@dimen/padding_10"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/font_size_16" />
-
-                        <ImageView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:src="@drawable/down_arrow" />
-                    </LinearLayout>
+                        android:background="@drawable/rounded_edit_text"
+                        android:enabled="false"
+                        android:fontFamily="@font/source_sans_pro"
+                        android:padding="@dimen/padding_10"
+                        android:text="Chuyển khoản"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/font_size_16" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -359,34 +328,20 @@
                         android:text="Hình thức gửi xe"
                         android:textSize="@dimen/font_size_16" />
 
-                    <LinearLayout
-                        android:id="@+id/llInvoiceTypeMyInvoiceDetail"
+
+                    <EditText
+                        android:id="@+id/edtInvoiceTypeMyInvoiceDetail"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="6"
-                        android:background="@drawable/rounded_edit_text_white"
-                        android:gravity="center"
-                        android:weightSum="5">
+                        android:background="@drawable/rounded_edit_text"
+                        android:enabled="false"
+                        android:fontFamily="@font/source_sans_pro"
+                        android:padding="@dimen/padding_10"
+                        android:text="Theo giờ"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/font_size_16" />
 
-                        <EditText
-                            android:id="@+id/edtInvoiceTypeMyInvoiceDetail"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="4"
-                            android:background="@android:color/transparent"
-                            android:enabled="false"
-                            android:fontFamily="@font/source_sans_pro"
-                            android:padding="@dimen/padding_10"
-                            android:text="Theo giờ"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/font_size_16" />
-
-                        <ImageView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:src="@drawable/down_arrow" />
-                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
@@ -491,23 +446,15 @@
                         android:layout_width="0dp"
                         android:layout_height="60dp"
                         android:layout_weight="7"
-                        android:background="@drawable/rounded_edit_text_white"
+                        android:background="@drawable/rounded_edit_text"
                         android:fontFamily="@font/source_sans_pro"
                         android:hint="Không có thông tin ghi chú"
                         android:maxLines="3"
                         android:padding="@dimen/padding_10"
+                        android:enabled="false"
+                        android:inputType="none"
                         android:textSize="@dimen/font_size_16" />
                 </LinearLayout>
-
-                <Button
-                    android:id="@+id/btnSaveMyInvoiceDetail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/margin_20"
-                    android:background="#0C15AA"
-                    android:fontFamily="@font/source_sans_pro_semibold"
-                    android:text="Lưu thay đổi"
-                    android:textColor="@color/white" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

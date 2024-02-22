@@ -60,31 +60,7 @@ class UserInvoiceDetailFragment : BaseFragment() {
     }
 
     override fun initListener() {
-        showActionBar("Xe đang gửi")
-        binding.llPaymentMethodMyInvoiceDetail.setOnClickListener {
-            val popupMenu = PopupMenu(context, it)
-            popupMenu.menuInflater.inflate(R.menu.payment_method_menu, popupMenu.menu)
-            popupMenu.setOnMenuItemClickListener { item ->
-                binding.edtPaymentMethodMyInvoiceDetail.setText(item.title)
-                true
-            }
-            popupMenu.show()
-        }
-        binding.llInvoiceTypeMyInvoiceDetail.setOnClickListener {
-            val popupMenu = PopupMenu(context, it)
-            popupMenu.menuInflater.inflate(R.menu.invoice_type_menu, popupMenu.menu)
-            popupMenu.setOnMenuItemClickListener { item ->
-                binding.edtInvoiceTypeMyInvoiceDetail.setText(item.title)
-                true
-            }
-            popupMenu.show()
-        }
-        binding.btnSaveMyInvoiceDetail.setOnClickListener {
-            handleSaveInvoice()
-        }
-        binding.ivQrcodeMyInvoiceDetail.setOnClickListener {
-            QRCodeDialog(context!!, QRcodeUtil.getQrCodeBitmap(userInvoiceDetailViewModel.stateUi.value.invoice?.id ?: "")).show()
-        }
+        showActionBar(getString(R.string.myinvoice_fragment_name))
     }
 
     private fun showInvoice(parkingInvoice: ParkingInvoice) {
@@ -151,14 +127,6 @@ class UserInvoiceDetailFragment : BaseFragment() {
         } else {
             binding.edtNameMyInvoiceDetail.setText("Không có")
         }
-    }
-
-    private fun handleSaveInvoice() {
-        userInvoiceDetailViewModel.saveInvoice(
-            _type = binding.edtInvoiceTypeMyInvoiceDetail.text.toString(),
-            _paymentMethod = binding.edtPaymentMethodMyInvoiceDetail.text.toString(),
-            _note = binding.edtNoteMyInvoiceDetail.text.toString()
-        )
     }
 
 }

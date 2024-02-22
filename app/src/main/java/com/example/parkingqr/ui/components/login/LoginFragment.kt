@@ -36,7 +36,7 @@ class LoginFragment : BaseFragment() {
                     }
                     if (it.user != null && it.role != null) {
                         if (it.role == LoginViewModel.LOGIN_ROLE.USER) {
-                            getNavController().navigate(R.id.myinvoiceFragment)
+                            getNavController().navigate(R.id.userQRCodeListFragment)
                         } else if (it.role == LoginViewModel.LOGIN_ROLE.BUSINESS) {
                             getNavController().navigate(R.id.homeFragment)
                         } else {
