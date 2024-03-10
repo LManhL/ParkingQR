@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/margin_6">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cdvContainerAvatarRateContent"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        app:cardCornerRadius="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivAvatarRateContent"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@color/white" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tvNameRateContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_6"
+        android:fontFamily="@font/source_sans_pro_semibold"
+        android:text="Nguyễn Văn Mạnh"
+        android:textSize="@dimen/font_size_medium"
+        app:layout_constraintStart_toEndOf="@id/cdvContainerAvatarRateContent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvCreateAtRateContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_6"
+        android:fontFamily="@font/source_sans_pro_italic"
+        android:text="1 tháng trước"
+        android:textSize="@dimen/font_size_medium"
+        app:layout_constraintStart_toEndOf="@id/cdvContainerAvatarRateContent"
+        app:layout_constraintTop_toBottomOf="@id/tvNameRateContent" />
+
+    <LinearLayout
+        android:id="@+id/llStarRateContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_6"
+        android:layout_marginTop="@dimen/margin_6"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="@id/cdvContainerAvatarRateContent"
+        app:layout_constraintTop_toBottomOf="@id/tvCreateAtRateContent">
+
+        <ImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            tools:srcCompat="@drawable/star_full" />
+
+        <ImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            tools:srcCompat="@drawable/star_full" />
+
+        <ImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            tools:srcCompat="@drawable/star_full" />
+
+        <ImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            tools:srcCompat="@drawable/star_full" />
+
+        <ImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            tools:srcCompat="@drawable/star_full" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barRateContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="cdvContainerAvatarRateContent, llStarRateContent" />
+
+    <TextView
+        android:id="@+id/tvCommentRateContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_6"
+        android:fontFamily="@font/source_sans_pro"
+        android:text="abc def abc def abc def abc defabc defabc def abc def abc def abc def abc defabc def abc def abc def abc def abc def def abc def abc defabc def abc def "
+        android:textSize="@dimen/font_size_medium"
+        app:layout_constraintTop_toBottomOf="@id/barRateContent" />
+
+    <View
+        android:id="@+id/dividerRateContent"
+        android:layout_marginTop="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#C6C4C4"
+        app:layout_constraintTop_toBottomOf="@id/tvCommentRateContent"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,7 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentMyProfileBinding
-import com.example.parkingqr.domain.model.user.UserProfile
+import com.example.parkingqr.domain.model.user.Account
 import com.example.parkingqr.ui.base.BaseFragment
 import kotlinx.coroutines.launch
 
@@ -28,7 +28,7 @@ class UserProfileFragment: BaseFragment() {
                         showMessage(it.message)
                         userProfileViewModel.showMessage()
                     }
-                    updateUI(it.userProfile)
+                    updateUI(it.account)
                     if(it.isSignedOut){
                         getNavController().navigate(R.id.loginFragment)
                     }
@@ -58,12 +58,13 @@ class UserProfileFragment: BaseFragment() {
             getNavController().navigate(R.id.myinvoiceFragment)
             hideBottomNavigation()
         }
+        userProfileViewModel.getUserInformation()
     }
-    private fun updateUI(userProfile: UserProfile?){
+    private fun updateUI(account: Account?){
         binding.clContainerMyProfile.visibility = View.INVISIBLE
-        userProfile?.let {
+        account?.let {
             binding.clContainerMyProfile.visibility = View.VISIBLE
-            binding.tvNameMyProfile.text = userProfile.name
+            binding.tvNameMyProfile.text = it.name
         }
     }
 }

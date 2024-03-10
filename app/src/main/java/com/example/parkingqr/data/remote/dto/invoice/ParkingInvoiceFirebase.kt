@@ -1,7 +1,7 @@
 package com.example.parkingqr.data.remote.dto.invoice
 
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
-import com.example.parkingqr.domain.model.user.UserInvoice
+import com.example.parkingqr.domain.model.invoice.UserInvoice
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 
 data class ParkingInvoiceFirebase(

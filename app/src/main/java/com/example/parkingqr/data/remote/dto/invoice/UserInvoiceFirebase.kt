@@ -1,6 +1,6 @@
 package com.example.parkingqr.data.remote.dto.invoice
 
-import com.example.parkingqr.domain.model.user.UserInvoice
+import com.example.parkingqr.domain.model.invoice.UserInvoice
 
 class UserInvoiceFirebase() {
     var id: String? = ""

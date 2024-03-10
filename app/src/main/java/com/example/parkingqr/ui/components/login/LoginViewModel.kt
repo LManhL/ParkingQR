@@ -1,9 +1,11 @@
 package com.example.parkingqr.ui.components.login
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.auth.AuthRepository
 import com.example.parkingqr.data.repo.user.UserRepository
+import com.example.parkingqr.domain.model.user.AccountRole
 import com.example.parkingqr.ui.base.BaseViewModel
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +18,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val authRepository: AuthRepository, private val userRepository: UserRepository) : BaseViewModel() {
+class LoginViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository
+) : BaseViewModel() {
     private val _stateUi = MutableStateFlow(
         LoginStateViewModel()
     )
@@ -66,9 +71,9 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
         }
     }
 
-    fun findUserRole(email: String){
+    fun findUserRole(email: String) {
         viewModelScope.launch {
-            userRepository.getUserByEmail(email).collect { state ->
+            userRepository.getAccountByEmail(email).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -79,30 +84,12 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
 
                         if (state.data.isNotEmpty()) {
 
-                            val role = state.data[0].role!!
-                            if(role == "business"){
-                                _stateUi.update {
-                                    it.copy(
-                                        role = LOGIN_ROLE.BUSINESS,
-                                        isLoading = false
-                                    )
-                                }
-                            }
-                            else if(role == "user"){
-                                _stateUi.update {
-                                    it.copy(
-                                        role = LOGIN_ROLE.USER,
-                                        isLoading = false
-                                    )
-                                }
-                            }
-                            else{
-                                _stateUi.update {
-                                    it.copy(
-                                        role = LOGIN_ROLE.ADMIN,
-                                        isLoading = false
-                                    )
-                                }
+                            val role = state.data[0]
+                            _stateUi.update {
+                                it.copy(
+                                    role = role.getAccountRole(),
+                                    isLoading = false
+                                )
                             }
                         } else {
                             _stateUi.update {
@@ -141,15 +128,11 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
             )
         }
     }
-
-    data class LoginStateViewModel(
-        val isLoading: Boolean = false,
-        val user: FirebaseUser? = null,
-        val role: LOGIN_ROLE? = null,
-        val error: String = "",
-        val message: String = "",
-    )
-    enum class LOGIN_ROLE{
-        USER, BUSINESS, ADMIN
-    }
 }
+data class LoginStateViewModel(
+    val isLoading: Boolean = false,
+    val user: FirebaseUser? = null,
+    val role: AccountRole? = null,
+    val error: String = "",
+    val message: String = ""
+)

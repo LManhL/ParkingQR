@@ -1,4 +1,5 @@
 <resources>
+    <string name="my_map_api_key">AIzaSyAFcDTI-dy0WpcmpJeYDSlWmVVdhL8lEsA</string>
     <string name="app_name">ParkingQR</string>
     <string name="parking_fragment_name">Gửi trả xe</string>
     <string name="scan_fragment_name">Quét QR</string>

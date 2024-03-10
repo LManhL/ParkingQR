@@ -4,7 +4,7 @@ import com.example.parkingqr.data.remote.dto.invoice.ParkingInvoiceFirebase
 import com.example.parkingqr.data.remote.dto.invoice.UserInvoiceFirebase
 import com.example.parkingqr.data.remote.dto.invoice.VehicleInvoiceFirebase
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
-import com.example.parkingqr.domain.model.user.UserInvoice
+import com.example.parkingqr.domain.model.invoice.UserInvoice
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 
 fun ParkingInvoice.mapToParkingInvoiceFirebase(): ParkingInvoiceFirebase {

@@ -1,7 +1,6 @@
 package com.example.parkingqr.domain.model.invoice
 
 import com.example.parkingqr.data.remote.dto.invoice.ParkingInvoiceFirebase
-import com.example.parkingqr.domain.model.user.UserInvoice
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 import com.example.parkingqr.utils.TimeUtil
 

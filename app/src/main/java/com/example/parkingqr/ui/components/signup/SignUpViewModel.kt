@@ -4,7 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.auth.AuthRepository
 import com.example.parkingqr.data.repo.user.UserRepository
-import com.example.parkingqr.domain.model.user.UserLogin
+import com.example.parkingqr.domain.model.user.Account
+import com.example.parkingqr.domain.model.user.User
 import com.example.parkingqr.ui.base.BaseViewModel
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(private val authRepository: AuthRepository, private val userRepository: UserRepository): BaseViewModel() {
+class SignUpViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository
+) : BaseViewModel() {
 
     private val _stateUi = MutableStateFlow(
         SignupStateViewModel()
@@ -25,7 +29,7 @@ class SignUpViewModel @Inject constructor(private val authRepository: AuthReposi
     val stateUi: StateFlow<SignupStateViewModel> = _stateUi.asStateFlow()
     private var signUpJob: Job? = null
 
-    fun doSignUp(email: String, password: String, userLogin: UserLogin) {
+    fun doSignUp(email: String, password: String, account: Account) {
         signUpJob?.cancel()
         signUpJob = viewModelScope.launch {
             authRepository.signUp(email, password).collect { state ->
@@ -44,8 +48,7 @@ class SignUpViewModel @Inject constructor(private val authRepository: AuthReposi
                                     isLoading = false
                                 )
                             }
-                            userLogin.userId = state.data.uid
-                            createUser(userLogin)
+                            createUser(account)
                         } else {
                             _stateUi.update {
                                 it.copy(
@@ -68,10 +71,10 @@ class SignUpViewModel @Inject constructor(private val authRepository: AuthReposi
         }
     }
 
-    fun createUser(userLogin: UserLogin) {
-        signUpJob?.cancel()
-        signUpJob = viewModelScope.launch {
-            userRepository.createNewUser(userLogin).collect { state ->
+    private fun createUser(account: Account) {
+        val user = User(account)
+        viewModelScope.launch {
+            userRepository.createNewUser(user).collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {

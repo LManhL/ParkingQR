@@ -20,6 +20,5 @@ interface InvoiceRemoteData {
     fun searchParkingInvoiceParkingLot(licensePlate: String): Flow<State<MutableList<ParkingInvoiceFirebase>>>
     fun getParkingLotInvoiceList(): Flow<State<MutableList<ParkingInvoiceFirebase>>>
     fun searchParkingInvoiceByLicensePlateAndStateParking(licensePlate: String): Flow<State<Boolean>>
-
     fun getUserInvoiceListHaveParkingState(): Flow<State<MutableList<ParkingInvoiceFirebase>>>
 }

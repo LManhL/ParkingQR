@@ -1,80 +1,39 @@
 package com.example.parkingqr.data.mapper
 
+import com.example.parkingqr.data.remote.dto.user.AccountFirebase
 import com.example.parkingqr.data.remote.dto.user.UserFirebase
-import com.example.parkingqr.domain.model.user.UserDetail
-import com.example.parkingqr.domain.model.user.UserInvoice
-import com.example.parkingqr.domain.model.user.UserLogin
-import com.example.parkingqr.domain.model.user.UserProfile
-import com.google.firebase.firestore.auth.User
+import com.example.parkingqr.domain.model.user.*
 
-fun UserFirebase.mapToUserLogin(): UserLogin {
-    return UserLogin(
+fun AccountFirebase.mapToAccount(): Account {
+    return Account(
         id = id ?: "",
-        userId = userId ?: "",
+        username = username ?: "",
         name = name ?: "",
-        phoneNumber = phoneNumber ?: "",
-        role = role ?: "",
-        email = email ?: "",
-    )
-}
-
-fun UserFirebase.mapToUserProfile(): UserProfile {
-    return UserProfile(
-        id = id ?: "",
-        userId = userId ?: "",
-        name = name ?: "",
-        phoneNumber = phoneNumber ?: "",
-    )
-}
-
-fun UserFirebase.mapToUserDetail(): UserDetail {
-    return UserDetail(
-        id = id ?: "",
-        role = role ?: "",
-        userId = userId ?: "",
-        personalCode = personalCode ?: "",
-        name = name ?: "",
-        phoneNumber = phoneNumber ?: "",
         address = address ?: "",
         birthday = birthday ?: "",
         email = email ?: "",
-        username = username ?: "",
+        personalCode = personalCode ?: "",
+        phoneNumber = phoneNumber ?: "",
+        role = role ?: "",
         status = status ?: ""
     )
 }
 
-fun UserFirebase.mapToUserInvoice(): UserInvoice {
-    return UserInvoice(
-        id = id ?: "",
-        userId = userId ?: "",
-        name = name ?: "",
-        phoneNumber = phoneNumber ?: "",
-    )
-}
-
-fun UserLogin.mapToUserFirebase(): UserFirebase {
-    return UserFirebase(
-        id = id ?: "",
-        role = role ?: "",
-        userId = userId ?: "",
-        name = name ?: "",
-        email = email ?: "",
-        phoneNumber = phoneNumber ?: "",
-    )
-}
-
-fun UserDetail.mapToUserFirebase(): UserFirebase {
-    return UserFirebase(
+fun Account.mapToAccountFirebase(): AccountFirebase {
+    return AccountFirebase(
         id = id,
-        role = role,
-        status = status,
-        userId = userId,
-        personalCode = personalCode,
+        username = username,
         name = name,
-        phoneNumber = phoneNumber,
         address = address,
         birthday = birthday,
         email = email,
-        username = username
+        personalCode = personalCode,
+        phoneNumber = phoneNumber,
+        role = role,
+        status = status
     )
+}
+
+fun User.mapToUserFirebase(): UserFirebase {
+    return UserFirebase(userId = userId, account = account.mapToAccountFirebase())
 }

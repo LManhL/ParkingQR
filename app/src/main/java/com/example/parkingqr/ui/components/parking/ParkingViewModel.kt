@@ -6,7 +6,8 @@ import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.invoice.InvoiceRepository
 import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
-import com.example.parkingqr.domain.model.user.UserInvoice
+import com.example.parkingqr.domain.model.user.Account
+import com.example.parkingqr.domain.model.invoice.UserInvoice
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 import com.example.parkingqr.ui.base.BaseViewModel
 import com.example.parkingqr.utils.ImageUtil
@@ -51,7 +52,7 @@ class ParkingViewModel @Inject constructor(
                     else -> {
                         val userId = _stateUi.value.vehicle?.userId
                         if (!userId.isNullOrEmpty()) {
-                            userRepository.searchUserById(userId)
+                            userRepository.searchAccountById(userId)
                         } else {
                             flowOf()
                         }
@@ -83,14 +84,21 @@ class ParkingViewModel @Inject constructor(
                                 _stateUi.update {
                                     it.copy(vehicle = value)
                                 }
-                            } else if (value is UserInvoice) {
+                            } else if (value is Account) {
+                                val user = UserInvoice(
+                                    id = value.id,
+                                    userId = stateUi.value.vehicle?.userId ?: "",
+                                    name = value.name,
+                                    phoneNumber = value.phoneNumber
+                                )
+
                                 _stateUi.update {
                                     it.copy(
                                         state = ParkingState.SUCCESSFUL_FOUND_VEHICLE,
-                                        user = value,
+                                        user = user,
                                         parkingInvoice = ParkingInvoice(
                                             id = invoiceRepository.getNewParkingInvoiceKey(),
-                                            user = value,
+                                            user = user,
                                             vehicle = it.vehicle!!,
                                             imageIn = ImageUtil.encodeImage(imageCarIn),
                                             timeIn = TimeUtil.getCurrentTime().toString()
@@ -137,7 +145,7 @@ class ParkingViewModel @Inject constructor(
                     else -> {
                         val userId = _stateUi.value.vehicle?.userId
                         if (!userId.isNullOrEmpty()) {
-                            userRepository.searchUserById(userId)
+                            userRepository.searchAccountById(userId)
                         } else {
                             flowOf()
                         }

@@ -3,6 +3,7 @@ package com.example.parkingqr.utils
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 object TimeUtil {
     const val HOUR_TO_MILISECONDS: Long = 3600000
@@ -42,5 +43,25 @@ object TimeUtil {
             e.printStackTrace()
         }
         return milliseconds.toString()
+    }
+    fun getTimeAgoString(timeInMillis: Long): String {
+        val currentTime = System.currentTimeMillis()
+        val timeDifference = currentTime - timeInMillis
+
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(timeDifference)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(timeDifference)
+        val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
+        val days = TimeUnit.MILLISECONDS.toDays(timeDifference)
+        val months = days / 30
+        val years = months / 12
+
+        return when {
+            years > 0 -> "$years năm trước"
+            months > 0 -> "$months tháng trước"
+            days > 0 -> "$days ngày trước"
+            hours > 0 -> "$hours giờ trước"
+            minutes > 0 -> "$minutes phút trước"
+            else -> "$seconds giây trước"
+        }
     }
 }

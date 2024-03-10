@@ -8,6 +8,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentLoginBinding
+import com.example.parkingqr.domain.model.user.Account
+import com.example.parkingqr.domain.model.user.AccountRole
 import com.example.parkingqr.ui.base.BaseFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -35,13 +37,7 @@ class LoginFragment : BaseFragment() {
                         loginViewModel.showMessage()
                     }
                     if (it.user != null && it.role != null) {
-                        if (it.role == LoginViewModel.LOGIN_ROLE.USER) {
-                            getNavController().navigate(R.id.userQRCodeListFragment)
-                        } else if (it.role == LoginViewModel.LOGIN_ROLE.BUSINESS) {
-                            getNavController().navigate(R.id.homeFragment)
-                        } else {
-                            getNavController().navigate(R.id.userManagementFragment)
-                        }
+                        handleNavigate(it.role)
                     }
                 }
             }
@@ -59,7 +55,7 @@ class LoginFragment : BaseFragment() {
         binding.btnSignInLogin.setOnClickListener {
             handleLogin()
         }
-        binding.tvGoToSignUpLogin.setOnClickListener{
+        binding.tvGoToSignUpLogin.setOnClickListener {
             getNavController().navigate(R.id.signUpFragment)
         }
     }
@@ -87,5 +83,22 @@ class LoginFragment : BaseFragment() {
     private fun validateEmail(email: String): Boolean {
         val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$"
         return email.matches(emailRegex.toRegex())
+    }
+
+    private fun handleNavigate(accountRole: AccountRole) {
+        when (accountRole) {
+            AccountRole.PARKING_LOT_MANAGER -> {
+                getNavController().navigate(R.id.homeFragment)
+            }
+            AccountRole.PARKING_ATTENDANT -> {
+                getNavController().navigate(R.id.homeFragment)
+            }
+            AccountRole.USER -> {
+                getNavController().navigate(R.id.userQRCodeListFragment)
+            }
+            AccountRole.ADMIN -> {
+                getNavController().navigate(R.id.userManagementFragment)
+            }
+        }
     }
 }

@@ -8,14 +8,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentSignupBinding
-import com.example.parkingqr.domain.model.user.UserLogin
+import com.example.parkingqr.domain.model.user.Account
 import com.example.parkingqr.ui.base.BaseFragment
 import kotlinx.coroutines.launch
 
 class SignUpFragment : BaseFragment() {
     private lateinit var binding: FragmentSignupBinding
     private val signUpViewModel: SignUpViewModel by viewModels()
-    private var role = ""
 
     override fun observeViewModel() {
         lifecycleScope.launch {
@@ -45,14 +44,7 @@ class SignUpFragment : BaseFragment() {
     }
 
     override fun initListener() {
-        binding.rdgRoleSignUp.setOnCheckedChangeListener { _, checkedId ->
-            if (checkedId == R.id.rdUserRoleSignUp) {
-                role = "user"
-            } else {
-                role = "business"
-            }
-        }
-        binding.btnSignUpSignUp.setOnClickListener{
+        binding.btnSignUpSignUp.setOnClickListener {
             handleSignUp()
         }
         binding.tvBackToLoginSignup.setOnClickListener {
@@ -90,20 +82,14 @@ class SignUpFragment : BaseFragment() {
             binding.edtPhoneSignUp.setError("Số điện thoại không dúng định dạng")
             return
         }
-        if(role.isEmpty()){
-            showMessage("Vui lòng chọn vai trò")
-            return
-        }
 
-        val userLogin = UserLogin()
-        userLogin.id = ""
-        userLogin.email = email
-        userLogin.name = name
-        userLogin.phoneNumber = phoneNumber
-        userLogin.userId = ""
-        userLogin.role = role
+        val account = Account()
+        account.email = email
+        account.name = name
+        account.phoneNumber = phoneNumber
+        account.setUserRole()
 
-        signUpViewModel.doSignUp(email, password, userLogin)
+        signUpViewModel.doSignUp(email, password, account)
 
     }
 

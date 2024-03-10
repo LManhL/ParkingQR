@@ -2,26 +2,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        app:showAsAction="always"
-        android:icon="@drawable/invoice_menu"
         android:id="@+id/userQRCodeListFragment"
-        android:title=""/>
+        android:icon="@drawable/invoice_menu"
+        android:title=""
+        app:showAsAction="always" />
 
     <item
-        app:showAsAction="always"
-        android:icon="@drawable/debt_menu"
+        android:id="@+id/locationFragment"
+        android:icon="@drawable/location"
+        android:title=""
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/mydebtFragment"
-        android:title=""/>
-    <item
-        app:showAsAction="always"
-        android:icon="@drawable/notification_menu"
-        android:id="@+id/mynotificationFragment"
-        android:title=""/>
+        android:icon="@drawable/debt_menu"
+        android:title=""
+        app:showAsAction="always" />
+
 
     <item
-        app:showAsAction="always"
-        android:icon="@drawable/user_menu"
         android:id="@+id/myprofileFragment"
-        android:title=""/>
+        android:icon="@drawable/user_menu"
+        android:title=""
+        app:showAsAction="always" />
 
 </menu>

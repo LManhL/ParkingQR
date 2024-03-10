@@ -72,9 +72,9 @@
             />
     </fragment>
     <fragment
-        tools:layout="@layout/fragment_my_notification"
-        android:id="@+id/mynotificationFragment"
-        android:name="com.example.parkingqr.ui.components.usernotification.UserNotification"
+        tools:layout="@layout/fragment_location"
+        android:id="@+id/locationFragment"
+        android:name="com.example.parkingqr.ui.components.location.LocationFragment"
         android:label="@string/mynotification_fragment_name">
     </fragment>
     <fragment

@@ -13,6 +13,8 @@ import com.example.parkingqr.data.remote.auth.AuthRemoteData
 import com.example.parkingqr.data.remote.auth.AuthRemoteDataSource
 import com.example.parkingqr.data.remote.invoice.InvoiceRemoteData
 import com.example.parkingqr.data.remote.invoice.InvoiceRemoteDataSource
+import com.example.parkingqr.data.remote.parkinglot.ParkingLotRemoteData
+import com.example.parkingqr.data.remote.parkinglot.ParkingLotRemoteDataSource
 import com.example.parkingqr.data.remote.user.UserRemoteData
 import com.example.parkingqr.data.remote.user.UserRemoteDataSource
 import com.example.parkingqr.data.remote.vehicle.VehicleRemoteData
@@ -74,5 +76,11 @@ class AppModule {
     @Singleton
     fun provideVehicleLocalRepository(@ApplicationContext context: Context): VehicleLocalData{
         return VehicleLocalDataSource(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideParkingLotRemoteRepository(@ApplicationContext context: Context): ParkingLotRemoteData{
+        return ParkingLotRemoteDataSource(context)
     }
 }

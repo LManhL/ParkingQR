@@ -1,10 +1,11 @@
 package com.example.parkingqr.ui.components.userprofile
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.auth.AuthRepository
 import com.example.parkingqr.data.repo.user.UserRepository
-import com.example.parkingqr.domain.model.user.UserProfile
+import com.example.parkingqr.domain.model.user.Account
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -25,14 +26,10 @@ class UserProfileViewModel @Inject constructor(private val userRepository: UserR
     val stateUi: StateFlow<MyProfileStateViewModel> = _stateUi.asStateFlow()
     private var getUserInforJob: Job? = null
 
-    init {
-        getUserInformation()
-    }
-
     fun getUserInformation() {
         getUserInforJob?.cancel()
         getUserInforJob = viewModelScope.launch {
-            userRepository.getUserInformation().collect { state ->
+            userRepository.getAccountInformation().collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -42,7 +39,7 @@ class UserProfileViewModel @Inject constructor(private val userRepository: UserR
                     is State.Success -> {
                         _stateUi.update {
                             it.copy(
-                                userProfile = state.data,
+                                account = state.data,
                                 isLoading = false
                             )
                         }
@@ -54,6 +51,7 @@ class UserProfileViewModel @Inject constructor(private val userRepository: UserR
                                 error = "Lỗi không xác định"
                             )
                         }
+                        Log.d("BUGGGGG", state.message)
                     }
                 }
             }
@@ -112,7 +110,7 @@ class UserProfileViewModel @Inject constructor(private val userRepository: UserR
         val isLoading: Boolean = false,
         val error: String = "",
         val message: String = "",
-        val userProfile: UserProfile? = null,
+        val account: Account? = null,
         val isSignedOut: Boolean = false
     )
 }

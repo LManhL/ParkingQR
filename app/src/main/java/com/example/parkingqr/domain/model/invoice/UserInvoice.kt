@@ -1,4 +1,4 @@
-package com.example.parkingqr.domain.model.user
+package com.example.parkingqr.domain.model.invoice
 
 import com.example.parkingqr.data.remote.dto.invoice.UserInvoiceFirebase
 
