@@ -2,7 +2,6 @@ package com.example.parkingqr.ui.components.userinvoice
 
 import android.os.Bundle
 import android.view.View
-import android.widget.PopupMenu
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -13,9 +12,7 @@ import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentMyInvoiceDetailBinding
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseFragment
-import com.example.parkingqr.ui.components.dialog.QRCodeDialog
 import com.example.parkingqr.utils.FormatCurrencyUtil
-import com.example.parkingqr.utils.QRcodeUtil
 import com.example.parkingqr.utils.TimeUtil
 import kotlinx.coroutines.launch
 

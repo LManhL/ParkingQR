@@ -5,7 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.RadioButton
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.parkingqr.R
@@ -41,21 +43,42 @@ class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>
 
         private val licensePlate: TextView = itemView.findViewById(R.id.tvLicensePlateUserQRCodeList)
         private val timeIn: TextView = itemView.findViewById(R.id.tvTimeInUserQRCodeList)
-        private val paymentMethod: TextView = itemView.findViewById(R.id.tvPaymentMethodUserQRCodeList)
         private val qrCodeImage: ImageView = itemView.findViewById(R.id.ivQRUserQRCodeList)
+        private val chooseCash: RadioButton = itemView.findViewById(R.id.rdCashUserQrCodeList)
+        private val chooseOnlinePayment: RadioButton = itemView.findViewById(R.id.rdOnlinePaymentUserQrCodeList)
+        private val containerCash: CardView = itemView.findViewById(R.id.crdCashUserQRCodeList)
+        private val containerOnlinePayment: CardView = itemView.findViewById(R.id.crdOnlinePaymentUserQRCodeList)
         private lateinit var curInvoice: ParkingInvoice
 
         init {
             itemView.setOnClickListener {
                 onClickItem?.invoke(curInvoice)
             }
+            chooseCash.setOnClickListener {
+                handleChooseCash()
+            }
+            chooseOnlinePayment.setOnClickListener {
+                handleChooseOnlinePayment()
+            }
         }
         fun bind(invoice: ParkingInvoice){
             curInvoice = invoice
-            licensePlate.text = "Biển số: ${invoice.vehicle.licensePlate}"
+            licensePlate.text = "${invoice.vehicle.licensePlate}"
             timeIn.text = "Thời gian vào là ${TimeUtil.convertMilisecondsToDate(invoice.timeIn)}"
-            paymentMethod.text = "Thanh toán bằng ${invoice.paymentMethod}"
             qrCodeImage.setImageBitmap(QRcodeUtil.getQrCodeBitmap(invoice.id))
+        }
+
+        private fun handleChooseCash(){
+            containerCash.setCardBackgroundColor(itemView.resources.getColor(R.color.light_orange))
+            containerOnlinePayment.setCardBackgroundColor(itemView.resources.getColor(R.color.white))
+            chooseCash.isChecked = true
+            chooseOnlinePayment.isChecked = false
+        }
+        private fun handleChooseOnlinePayment(){
+            containerOnlinePayment.setCardBackgroundColor(itemView.resources.getColor(R.color.light_orange))
+            containerCash.setCardBackgroundColor(itemView.resources.getColor(R.color.white))
+            chooseCash.isChecked = false
+            chooseOnlinePayment.isChecked = true
         }
     }
 }

@@ -99,4 +99,8 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getUserId(): Flow<State<String>> {
+        return userRemoteData.getUserID()
+    }
+
 }

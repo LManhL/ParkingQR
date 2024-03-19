@@ -6,14 +6,14 @@ import android.graphics.Bitmap
 import android.widget.ImageView
 import com.example.parkingqr.R
 
-class QRCodeDialog(context: Context, bitmap: Bitmap) {
+class InvoiceQRCodeDialog(context: Context, bitmap: Bitmap) {
 
-    var dialog = Dialog(context)
-    var bm = bitmap
+    private var dialog = Dialog(context)
+    private var bm = bitmap
 
     fun show() {
-        dialog.setContentView(R.layout.qrcode_dialog)
-        dialog.findViewById<ImageView>(R.id.ivQrcodeQrcodeDialog).setImageBitmap(bm)
+        dialog.setContentView(R.layout.dialog_user_qr_code)
+        dialog.findViewById<ImageView>(R.id.ivQRDialogUserQRCode).setImageBitmap(bm)
         dialog.setCancelable(true)
         dialog.create()
         dialog.show()

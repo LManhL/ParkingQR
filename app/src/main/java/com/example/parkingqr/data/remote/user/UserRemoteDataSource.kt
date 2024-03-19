@@ -146,4 +146,8 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)
+
+    override fun getUserID(): Flow<State<String>> = flow {
+        emit(State.success(auth.uid ?: ""))
+    }.flowOn(Dispatchers.IO)
 }

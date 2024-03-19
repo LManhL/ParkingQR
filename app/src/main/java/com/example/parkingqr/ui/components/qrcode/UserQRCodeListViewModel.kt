@@ -3,19 +3,20 @@ package com.example.parkingqr.ui.components.qrcode
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.invoice.InvoiceRepository
+import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserQRCodeListViewModel @Inject constructor(private val repository: InvoiceRepository): BaseViewModel() {
+class UserQRCodeListViewModel @Inject constructor(
+    private val invoiceRepository: InvoiceRepository,
+    private val userRepository: UserRepository
+) : BaseViewModel() {
     private val _stateUi = MutableStateFlow(
         UserQRCodeListUiState()
     )
@@ -30,7 +31,7 @@ class UserQRCodeListViewModel @Inject constructor(private val repository: Invoic
     fun getParkingInvoiceList() {
         getParkingInvoiceListJob?.cancel()
         getParkingInvoiceListJob = viewModelScope.launch {
-            repository.getUserInvoiceListHaveParkingState().collect { state ->
+            invoiceRepository.getUserInvoiceListHaveParkingState().collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -58,13 +59,54 @@ class UserQRCodeListViewModel @Inject constructor(private val repository: Invoic
         }
     }
 
-    fun showError(){
+    fun getUserID() {
+        viewModelScope.launch {
+            userRepository.getUserId().collect { state ->
+                when (state) {
+                    is State.Loading -> {
+                        _stateUi.update {
+                            it.copy(isLoading = true)
+                        }
+                    }
+                    is State.Success -> {
+                        _stateUi.update {
+                            it.copy(
+                                userId = state.data,
+                                isShowDialog = true,
+                                isLoading = false
+                            )
+                        }
+                    }
+                    is State.Failed -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                error = state.message
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    fun showDialog(){
+        _stateUi.update {
+            it.copy(
+                isShowDialog = false
+            )
+        }
+    }
+
+    fun showError() {
         _stateUi.update {
             it.copy(
                 error = ""
             )
         }
     }
+
     fun showMessage() {
         _stateUi.update {
             it.copy(
@@ -78,6 +120,8 @@ class UserQRCodeListViewModel @Inject constructor(private val repository: Invoic
         val isLoading: Boolean = false,
         val error: String = "",
         val message: String = "",
-        val invoiceList: MutableList<ParkingInvoice> = mutableListOf()
+        val invoiceList: MutableList<ParkingInvoice> = mutableListOf(),
+        val userId: String = "",
+        val isShowDialog: Boolean = false
     )
 }

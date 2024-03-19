@@ -2,76 +2,99 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
+
     <LinearLayout
-        android:gravity="center"
         android:id="@+id/llHeaderUserQRCodeList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/custom_action_bar"
+        android:gravity="center"
         android:orientation="horizontal"
         android:paddingTop="60dp"
         android:paddingBottom="10dp"
         android:weightSum="10"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mã QR của tôi"
             android:fontFamily="@font/source_sans_pro"
-            android:textSize="@dimen/font_size_medium"
+            android:text=""
             android:textColor="@color/white"
-            />
+            android:textSize="@dimen/font_size_medium" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivHeaderUserQrcodeList"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="-40dp"
+        android:src="@drawable/my_qr_code"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llHeaderUserQRCodeList" />
+
+    <TextView
+        android:layout_margin="@dimen/margin_6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/source_sans_pro"
+        android:text="Nhấn vào biểu tượng để hiện mã QR của bạn"
+        android:textColor="#787777"
+        android:textSize="@dimen/font_size_small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivHeaderUserQrcodeList" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/vpgUserQRcodeList"
-        app:layout_constraintTop_toBottomOf="@id/llHeaderUserQRCodeList"
-        app:layout_constraintBottom_toTopOf="@id/btnHistoryUserQRCodeList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/btnHistoryUserQRCodeList"
+        app:layout_constraintTop_toBottomOf="@id/llHeaderUserQRCodeList" />
+
     <me.relex.circleindicator.CircleIndicator3
         android:id="@+id/cir3UserQRCodeList"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/vpgUserQRcodeList"
         app:ci_drawable="@drawable/bg_indicator_3"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vpgUserQRcodeList" />
 
 
     <LinearLayout
         android:id="@+id/llDisplayEmptyUserQRCodeList"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/llHeaderUserQRCodeList"
-        app:layout_constraintBottom_toTopOf="@id/btnHistoryUserQRCodeList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/btnHistoryUserQRCodeList"
+        app:layout_constraintTop_toBottomOf="@id/llHeaderUserQRCodeList">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Không có dữ liệu hiển thị"
             android:fontFamily="@font/source_sans_pro"
-            android:textSize="@dimen/font_size_large"
+            android:text="Không có dữ liệu hiển thị"
             android:textColor="@color/black"
-            />
+            android:textSize="@dimen/font_size_large" />
     </LinearLayout>
 
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnHistoryUserQRCodeList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_40"
+        android:layout_marginRight="@dimen/margin_40"
         android:layout_marginBottom="70dp"
-        android:layout_marginLeft="@dimen/margin_20"
-        android:layout_marginRight="@dimen/margin_20"
-        android:background="#0C15AA"
+        android:background="@drawable/rounded_button_icon_color"
         android:text="Xem lịch sử hóa đơn"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        android:textAllCaps="false"
+        android:fontFamily="@font/source_sans_pro_semibold"
+        android:textSize="@dimen/font_size_medium"
+        app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

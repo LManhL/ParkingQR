@@ -21,4 +21,6 @@ interface UserRemoteData {
     fun blockAccount(id: String): Flow<State<Boolean>>
     fun activeAccount(id: String): Flow<State<Boolean>>
     fun searchAccountById(userId: String): Flow<State<MutableList<AccountFirebase>>>
+
+    fun getUserID(): Flow<State<String>>
 }

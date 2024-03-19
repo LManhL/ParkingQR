@@ -14,7 +14,7 @@ import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentInvoiceDetailBinding
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseFragment
-import com.example.parkingqr.ui.components.dialog.QRCodeDialog
+import com.example.parkingqr.ui.components.dialog.InvoiceQRCodeDialog
 import com.example.parkingqr.utils.FormatCurrencyUtil
 import com.example.parkingqr.utils.QRcodeUtil
 import com.example.parkingqr.utils.TimeUtil
@@ -93,7 +93,7 @@ class InvoiceDetailFragment : BaseFragment() {
             handleSaveInvoice()
         }
         binding.ivQrcodeInvoiceDetail.setOnClickListener {
-            QRCodeDialog(
+            InvoiceQRCodeDialog(
                 context!!,
                 QRcodeUtil.getQrCodeBitmap(
                     invoiceDetailViewModel.stateUi.value.invoice?.id ?: ""

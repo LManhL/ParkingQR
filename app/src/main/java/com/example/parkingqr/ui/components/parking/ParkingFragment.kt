@@ -22,7 +22,7 @@ import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentParkingBinding
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseFragment
-import com.example.parkingqr.ui.components.dialog.QRCodeDialog
+import com.example.parkingqr.ui.components.dialog.InvoiceQRCodeDialog
 import com.example.parkingqr.utils.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -254,7 +254,7 @@ class ParkingFragment : BaseFragment() {
         }
     }
     private fun showInvoiceQRCode() {
-        QRCodeDialog(
+        InvoiceQRCodeDialog(
             context!!,
             QRcodeUtil.getQrCodeBitmap(
                 parkingViewModel.stateUi.value.parkingInvoice?.id ?: ""
