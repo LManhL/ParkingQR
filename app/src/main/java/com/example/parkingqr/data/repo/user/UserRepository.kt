@@ -1,10 +1,7 @@
 package com.example.parkingqr.data.repo.user
 
 import com.example.parkingqr.data.remote.State
-import com.example.parkingqr.data.remote.dto.user.AccountFirebase
-import com.example.parkingqr.data.remote.dto.user.ParkingAttendantFirebase
-import com.example.parkingqr.data.remote.dto.user.ParkingLotManagerFirebase
-import com.example.parkingqr.data.remote.dto.user.UserFirebase
+import com.example.parkingqr.domain.model.invoice.UserInvoice
 import com.example.parkingqr.domain.model.user.*
 import kotlinx.coroutines.flow.Flow
 
@@ -20,6 +17,8 @@ interface UserRepository {
     fun deleteAccount(id: String): Flow<State<Boolean>>
     fun blockAccount(id: String): Flow<State<Boolean>>
     fun activeAccount(id: String): Flow<State<Boolean>>
-    fun searchAccountById(userId: String): Flow<State<MutableList<Account>>>
+    fun searchUserById(userId: String): Flow<State<MutableList<User>>>
+
+    fun searchUserInvoiceById(userId: String): Flow<State<MutableList<UserInvoice>>>
     fun getUserId(): Flow<State<String>>
 }

@@ -6,10 +6,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.provider.MediaStore
-import android.text.InputFilter
 import android.text.InputType
 import android.view.View
-import android.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
@@ -21,7 +19,9 @@ import com.bumptech.glide.Glide
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentParkingBinding
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.qrcode.InvoiceQRCode
 import com.example.parkingqr.ui.base.BaseFragment
+import com.example.parkingqr.ui.components.dialog.ChooseVehicleTypeDialog
 import com.example.parkingqr.ui.components.dialog.InvoiceQRCodeDialog
 import com.example.parkingqr.utils.*
 import com.google.firebase.auth.FirebaseAuth
@@ -41,29 +41,19 @@ class ParkingFragment : BaseFragment() {
     private lateinit var binding: FragmentParkingBinding
     private lateinit var auth: FirebaseAuth
     private val parkingViewModel: ParkingViewModel by hiltNavGraphViewModels(R.id.parkingFragment)
-    private var carNumberIn = ""
-    private var carNumberOut = ""
-    private var imageCarIn: Bitmap? = null
-    private var imageCarOut: Bitmap? = null
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PIC_CODE_CAR_IN && resultCode == RESULT_OK) {
-            imageCarIn = data?.extras!!["data"] as Bitmap?
-            if (imageCarIn != null) {
-                binding.ivPhotoCarInParking.setImageBitmap(imageCarIn)
-                TextRecognizerUtil.invoke(imageCarIn!!) {
-                    carNumberIn = it
-                }
+            val bm = data?.extras!!["data"] as Bitmap?
+            bm?.let {
+                parkingViewModel.processImageVehicleIn(it)
             }
         }
         if (requestCode == PIC_CODE_CAR_OUT && resultCode == RESULT_OK) {
-            imageCarOut = data?.extras!!["data"] as Bitmap?
-            if (imageCarOut != null) {
-                binding.ivPhotoCarOutParking.setImageBitmap(imageCarOut)
-                TextRecognizerUtil.invoke(imageCarOut!!) {
-                    carNumberOut = it
-                }
+            val bm = data?.extras!!["data"] as Bitmap?
+            bm?.let {
+                parkingViewModel.processImageVehicleOut(it)
             }
         }
     }
@@ -72,6 +62,18 @@ class ParkingFragment : BaseFragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 parkingViewModel.stateUi.collect {
+
+                    if (it.bmVehicleIn != null) {
+                        binding.ivPhotoCarInParking.setImageBitmap(it.bmVehicleIn)
+                    } else {
+                        binding.ivPhotoCarInParking.setImageResource(R.drawable.img_car_in)
+                    }
+                    if (it.bmVehicleOut != null) {
+                        binding.ivPhotoCarOutParking.setImageBitmap(it.bmVehicleOut)
+                    } else {
+                        binding.ivPhotoCarOutParking.setImageResource(R.drawable.img_car_out)
+                    }
+
                     when (it.state) {
                         ParkingViewModel.ParkingState.BLANK -> {
                             hideLoading()
@@ -87,36 +89,30 @@ class ParkingFragment : BaseFragment() {
                         }
                         ParkingViewModel.ParkingState.SUCCESSFUL_CREATE_PARKING_INVOICE -> {
                             hideLoading()
-                            showMessage("${it.messageList[it.state]}: $carNumberIn")
+                            showMessage("${it.messageList[it.state]} ${it.licensePlateOfVehicleIn.uppercase()}")
                             parkingViewModel.refreshData()
                         }
                         ParkingViewModel.ParkingState.SUCCESSFUL_FOUND_VEHICLE -> {
                             hideLoading()
                             binding.tvStateMessageParking.text = "Hóa đơn gửi xe cho xe có đăng ký"
-                            binding.ivCarInParking.setBackgroundResource(R.drawable.create)
-                            binding.tvCarInParking.text = "Tạo"
                             displayParkingInvoice(it.parkingInvoice!!)
                         }
                         ParkingViewModel.ParkingState.SUCCESSFUL_SEARCH_PARKING_INVOICE -> {
                             hideLoading()
-                            if (carNumberOut.isNotEmpty()) {
-                                if (carNumberOut == it.parkingInvoice?.vehicle?.licensePlate) {
+                            if (it.licensePlateOfVehicleOut.isNotEmpty()) {
+                                if (it.licensePlateOfVehicleOut == it.parkingInvoice?.vehicle?.licensePlate) {
                                     showMessage("Biển số xe khớp nhau: ${it.parkingInvoice.vehicle.licensePlate}")
                                     binding.tvStateMessageParking.text = "Biển số xe khớp nhau"
                                 } else {
-                                    showMessage("Biển số xe không khớp nhau: ${it.parkingInvoice?.vehicle?.licensePlate} và $carNumberOut")
+                                    showMessage("Biển số xe không khớp nhau: ${it.parkingInvoice?.vehicle?.licensePlate} và ${it.licensePlateOfVehicleOut}")
                                     binding.tvStateMessageParking.text =
-                                        "Biển số xe không khớp nhau: ${it.parkingInvoice?.vehicle?.licensePlate} và $carNumberOut"
+                                        "Biển số xe không khớp nhau: ${it.parkingInvoice?.vehicle?.licensePlate} và ${it.licensePlateOfVehicleOut}"
                                 }
                             } else {
                                 showMessage("${it.messageList[it.state]}: ${it.parkingInvoice?.vehicle?.licensePlate}")
                             }
                             displayParkingInvoice(it.parkingInvoice!!)
-                            binding.ivCarOutParking.setBackgroundResource(R.drawable.confirm)
-                            imageCarOut?.let { bm ->
-                                binding.ivPhotoCarOutParking.setImageBitmap(bm)
-                            }
-                            binding.tvCarOutParking.text = "Trả xe"
+                            binding.tvActionQrcodeParking.text = "Nhấn vào để xác nhận trả xe"
                         }
                         ParkingViewModel.ParkingState.FAIL_CREATE_PARKING_INVOICE -> {
                             hideLoading()
@@ -128,8 +124,6 @@ class ParkingFragment : BaseFragment() {
                         }
                         ParkingViewModel.ParkingState.FAIL_FOUND_VEHICLE -> {
                             hideLoading()
-                            binding.ivCarInParking.setBackgroundResource(R.drawable.create)
-                            binding.tvCarInParking.text = "Tạo"
                             binding.tvStateMessageParking.text =
                                 "Hóa đơn gửi xe cho xe chưa đăng ký"
                             displayParkingInvoice(it.parkingInvoice!!)
@@ -153,20 +147,17 @@ class ParkingFragment : BaseFragment() {
                             hideLoading()
                             showMessage("${it.errorList[it.state]}")
                         }
-                        ParkingViewModel.ParkingState.SUCCESSFUL_GET_QR_CODE -> {
-                            parkingViewModel.searchParkingInvoiceById(it.qrcode)
+                        ParkingViewModel.ParkingState.SUCCESSFUL_GET_INVOICE_QR_CODE -> {
+                            parkingViewModel.searchParkingInvoiceById(
+                                (it.qrcode as InvoiceQRCode).invoiceId ?: ""
+                            )
                         }
                         ParkingViewModel.ParkingState.FAIL_GET_QR_CODE -> {
                             showMessage("${it.errorList[it.state]}")
                             parkingViewModel.refreshData()
                         }
-                        ParkingViewModel.ParkingState.SUCCESSFUL_SEARCH_VEHICLE -> {
-                            hideLoading()
-                            setSearchSuccessState("Tìm thấy xe có biển số ${it.vehicle?.licensePlate.toString().uppercase()} của người dùng ${it.user?.name.toString().uppercase()}. Nhấn vào đây để tạo hóa đơn ngay!")
-                        }
-                        ParkingViewModel.ParkingState.FAIL_SEARCH_VEHICLE -> {
-                            hideLoading()
-                            setSearchErrorState("Không tìm thấy xe tương ứng")
+                        ParkingViewModel.ParkingState.SUCCESSFUL_GET_USER_QR_CODE -> {
+                            searchVehicle()
                         }
                     }
                 }
@@ -185,30 +176,9 @@ class ParkingFragment : BaseFragment() {
         showActionBar(getString(R.string.parking_fragment_name))
         binding.edtPaymentMethodParking.inputType = InputType.TYPE_NULL
         binding.edtInvoiceTypeParking.inputType = InputType.TYPE_NULL
-        binding.edtSearchLicensePlateParking.filters = arrayOf(InputFilter.AllCaps())
-
-        binding.llPaymentMethodParking.setOnClickListener {
-            val popupMenu = PopupMenu(context, it)
-            popupMenu.menuInflater.inflate(R.menu.payment_method_menu, popupMenu.menu)
-            popupMenu.setOnMenuItemClickListener { item ->
-                binding.edtPaymentMethodParking.setText(item.title)
-                true
-            }
-            popupMenu.show()
-        }
-
-        binding.llInvoiceTypeParking.setOnClickListener {
-            val popupMenu = PopupMenu(context, it)
-            popupMenu.menuInflater.inflate(R.menu.invoice_type_menu, popupMenu.menu)
-            popupMenu.setOnMenuItemClickListener { item ->
-                binding.edtInvoiceTypeParking.setText(item.title)
-                true
-            }
-            popupMenu.show()
-        }
 
         binding.ivPhotoCarInParking.setOnClickListener {
-           handlePickImageCarIn()
+            handlePickImageCarIn()
         }
         binding.ivPhotoCarOutParking.setOnClickListener {
             handlePickImageCarOut()
@@ -217,7 +187,7 @@ class ParkingFragment : BaseFragment() {
             handlePickImageCarIn()
         }
         binding.llButtonCarIn.setOnClickListener {
-            handleCarIn()
+            searchVehicleIn()
         }
         binding.llButtonCarOut.setOnClickListener {
             handleCarOut()
@@ -229,23 +199,33 @@ class ParkingFragment : BaseFragment() {
             parkingViewModel.refreshData()
             handleRefresh()
         }
-        binding.ivSearchLicensePlateParking.setOnClickListener {
-            onClickSearchLicensePlate()
-        }
-        binding.tvSearchStateParking.setOnClickListener {
-            onClickSearchState()
+        binding.tvActionQrcodeParking.setOnClickListener {
+            val action = binding.tvActionQrcodeParking.text.toString()
+            if (action.contains("tạo")) {
+                if (parkingViewModel.isUnregisterVehicle()) {
+                    ChooseVehicleTypeDialog(requireContext()){
+                        showMessage(it)
+                    }.show()
+                } else {
+                    createNewInvoice()
+                }
+            } else {
+                completeInvoice()
+            }
         }
     }
 
-    private fun handlePickImageCarIn(){
-        if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.BLANK || parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.SUCCESSFUL_SEARCH_VEHICLE) {
+
+    private fun handlePickImageCarIn() {
+        if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.BLANK) {
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             startActivityForResult(cameraIntent, PIC_CODE_CAR_IN)
         } else {
             showMessage("Vui lòng xử lí giao dịch hiện tại trước")
         }
     }
-    private fun handlePickImageCarOut(){
+
+    private fun handlePickImageCarOut() {
         if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.BLANK) {
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             startActivityForResult(cameraIntent, PIC_CODE_CAR_OUT)
@@ -253,49 +233,31 @@ class ParkingFragment : BaseFragment() {
             showMessage("Vui lòng xử lí giao dịch hiện tại trước")
         }
     }
+
     private fun showInvoiceQRCode() {
         InvoiceQRCodeDialog(
             context!!,
             QRcodeUtil.getQrCodeBitmap(
-                parkingViewModel.stateUi.value.parkingInvoice?.id ?: ""
+                parkingViewModel.stateUi.value.parkingInvoice?.id ?: "0"
             )
         ).show()
     }
 
     private fun handleRefresh() {
-        binding.ivCarInParking.setBackgroundResource(R.drawable.image_search)
-        binding.tvCarInParking.text = "Tìm kiếm"
-        binding.ivCarOutParking.setBackgroundResource(R.drawable.qr_scan)
-        binding.tvCarOutParking.text = "Quét"
         binding.llBlankCarParking.visibility = View.VISIBLE
         binding.llContainerParking.visibility = View.INVISIBLE
         binding.llParkingInvoiceCarinParking.visibility = View.GONE
         binding.tvStateMessageParking.text = "Hóa đơn gửi xe hiện đang trống"
-        binding.ivPhotoCarOutParking.setImageResource(R.drawable.img_car_out)
-        binding.ivPhotoCarInParking.setImageResource(R.drawable.img_car_in)
-        binding.tvSearchStateParking.visibility = View.GONE
-        binding.edtSearchLicensePlateParking.setText("")
-        carNumberOut = ""
-        carNumberIn = ""
-        imageCarIn = null
-        imageCarOut = null
     }
 
-    private fun handleCarIn() {
-        if (imageCarIn == null) {
+    private fun searchVehicleIn() {
+        if (parkingViewModel.stateUi.value.licensePlateOfVehicleIn.isEmpty()) {
             showMessage("Chưa có ảnh xe vào")
         } else {
-            if (carNumberIn.isEmpty()) {
+            if (parkingViewModel.stateUi.value.licensePlateOfVehicleIn.isEmpty()) {
                 showMessage("Không nhận dạng dược ảnh xe vào")
             } else {
-                if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.SUCCESSFUL_FOUND_VEHICLE
-                    || parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.FAIL_FOUND_VEHICLE
-                    || parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.PARKED_VEHICLE
-                ) {
-                    createNewInvoice()
-                } else {
-                    searchVehicle()
-                }
+                searchVehicle()
             }
         }
     }
@@ -310,36 +272,40 @@ class ParkingFragment : BaseFragment() {
     }
 
     private fun searchVehicle() {
-        if (LicensePlateUtil.checkLicensePlateValid(carNumberIn)) {
+        if (parkingViewModel.stateUi.value.bmVehicleIn == null) {
+            showMessage("Chưa có ảnh xe vào")
+            return
+        }
+        if (LicensePlateUtil.checkLicensePlateValid(parkingViewModel.stateUi.value.licensePlateOfVehicleIn)) {
             parkingViewModel.searchVehicleAndUserByLicensePlateToCreateInvoice(
-                licensePlate = carNumberIn,
-                imageCarIn = imageCarIn!!
+                parkingViewModel.stateUi.value.licensePlateOfVehicleIn,
+                parkingViewModel.stateUi.value.bmVehicleIn!!
             )
         } else {
-            showMessage("Biển số xe không hợp lệ: $carNumberIn")
+            showMessage("Biển số xe không hợp lệ: ${parkingViewModel.stateUi.value.licensePlateOfVehicleIn}")
         }
     }
 
 
     private fun handleCarOut() {
-        if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.SUCCESSFUL_SEARCH_PARKING_INVOICE) {
-            val note = binding.edtNoteParking.text.toString()
-            val paymentMethod = binding.edtPaymentMethodParking.text.toString()
-            val type = binding.edtInvoiceTypeParking.text.toString()
-            var imgOutString = ""
-
-            imageCarOut?.let {
-                imgOutString = ImageUtil.encodeImage(it)
-            }
-            parkingViewModel.updateInvoiceOut(paymentMethod, type, imgOutString, note)
-            parkingViewModel.completeParkingInvoice()
+        if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.BLANK) {
+            handleOpenQRScan()
         } else {
-            if (parkingViewModel.stateUi.value.state == ParkingViewModel.ParkingState.BLANK) {
-                handleOpenQRScan()
-            } else {
-                showMessage("Vui lòng xử lí giao dịch hiện tại trước")
-            }
+            showMessage("Vui lòng xử lí giao dịch hiện tại trước")
         }
+    }
+
+    private fun completeInvoice() {
+        val note = binding.edtNoteParking.text.toString()
+        val paymentMethod = binding.edtPaymentMethodParking.text.toString()
+        val type = binding.edtInvoiceTypeParking.text.toString()
+        var imgOutString = ""
+
+        parkingViewModel.stateUi.value.bmVehicleOut?.let {
+            imgOutString = ImageUtil.encodeImage(it)
+        }
+        parkingViewModel.updateInvoiceOut(paymentMethod, type, imgOutString, note)
+        parkingViewModel.completeParkingInvoice()
     }
 
     private fun handleOpenQRScan() {
@@ -395,49 +361,12 @@ class ParkingFragment : BaseFragment() {
             if (!parkingInvoice.user.name.isNullOrEmpty()) {
                 edtNameParking.setText(parkingInvoice.user.name)
             } else {
-                edtNameParking.setText("Không có")
+                edtNameParking.setText("Không có tên người dùng")
             }
             if (!parkingInvoice.vehicle.type.isNullOrEmpty()) {
-                edtVehicleTypeParking.setText(parkingInvoice.vehicle.type)
+                edtVehicleTypeParking.setText(parkingInvoice.vehicle.getVehicleType())
             } else {
-                edtVehicleTypeParking.setText("Không có")
-            }
-        }
-    }
-
-    private fun onClickSearchLicensePlate() {
-        val licensePlate = binding.edtSearchLicensePlateParking.text.toString()
-        if (licensePlate.isEmpty()) {
-            setSearchErrorState("Vui lòng nhập biển số xe")
-        } else {
-            if (LicensePlateUtil.checkLicensePlateValid(licensePlate))
-                parkingViewModel.searchVehicleAndUserByLicensePlate(binding.edtSearchLicensePlateParking.text.toString())
-            else {
-                setSearchErrorState("Biển số xe không hợp lệ")
-            }
-        }
-    }
-    private fun setSearchErrorState(message: String){
-        binding.tvSearchStateParking.visibility = View.VISIBLE
-        binding.tvSearchStateParking.text = message
-        binding.tvSearchStateParking.setTextColor(requireContext().resources.getColor(R.color.light_red))
-        binding.tvSearchStateParking.isEnabled = false
-    }
-    private fun setSearchSuccessState(message: String){
-        binding.tvSearchStateParking.visibility = View.VISIBLE
-        binding.tvSearchStateParking.text = message
-        binding.tvSearchStateParking.setTextColor(requireContext().resources.getColor(R.color.light_green))
-        binding.tvSearchStateParking.isEnabled = true
-    }
-
-    private fun onClickSearchState(){
-        if (imageCarIn == null) {
-            showMessage("Chưa có ảnh xe vào")
-        } else {
-            if (carNumberIn.isEmpty()) {
-                showMessage("Không nhận dạng dược ảnh xe vào")
-            } else {
-                parkingViewModel.createTemporaryParkingInvoice(imageCarIn!!)
+                edtVehicleTypeParking.setText("Không có loại xe")
             }
         }
     }

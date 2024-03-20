@@ -6,7 +6,6 @@ import com.example.parkingqr.data.remote.dto.user.ParkingAttendantFirebase
 import com.example.parkingqr.data.remote.dto.user.ParkingLotManagerFirebase
 import com.example.parkingqr.data.remote.dto.user.UserFirebase
 import kotlinx.coroutines.flow.Flow
-import org.checkerframework.checker.units.qual.A
 
 interface UserRemoteData {
     fun getAccountByEmail(email: String): Flow<State<MutableList<AccountFirebase>>>
@@ -20,7 +19,7 @@ interface UserRemoteData {
     fun deleteAccount(id: String): Flow<State<Boolean>>
     fun blockAccount(id: String): Flow<State<Boolean>>
     fun activeAccount(id: String): Flow<State<Boolean>>
-    fun searchAccountById(userId: String): Flow<State<MutableList<AccountFirebase>>>
+    fun searchUserById(userId: String): Flow<State<MutableList<UserFirebase>>>
 
     fun getUserID(): Flow<State<String>>
 }

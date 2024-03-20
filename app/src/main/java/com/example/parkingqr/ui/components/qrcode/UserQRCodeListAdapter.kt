@@ -12,13 +12,16 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.parkingqr.R
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.qrcode.InvoiceQRCode
+import com.example.parkingqr.utils.AESEncyptionUtil
 import com.example.parkingqr.utils.FormatCurrencyUtil
 import com.example.parkingqr.utils.QRcodeUtil
 import com.example.parkingqr.utils.TimeUtil
 
-class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>): Adapter<UserQRCodeListAdapter.InvoiceViewHolder>() {
+class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>) :
+    Adapter<UserQRCodeListAdapter.InvoiceViewHolder>() {
 
-    private var onClickItem: ((ParkingInvoice)-> Unit)? = null
+    private var onClickItem: ((ParkingInvoice) -> Unit)? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InvoiceViewHolder {
@@ -35,19 +38,22 @@ class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>
         holder.bind(invoiceList[position])
     }
 
-    fun setEventClick(callback : ((ParkingInvoice) -> Unit)){
+    fun setEventClick(callback: ((ParkingInvoice) -> Unit)) {
         onClickItem = callback
     }
 
-    inner class InvoiceViewHolder(itemView: View): ViewHolder(itemView){
+    inner class InvoiceViewHolder(itemView: View) : ViewHolder(itemView) {
 
-        private val licensePlate: TextView = itemView.findViewById(R.id.tvLicensePlateUserQRCodeList)
+        private val licensePlate: TextView =
+            itemView.findViewById(R.id.tvLicensePlateUserQRCodeList)
         private val timeIn: TextView = itemView.findViewById(R.id.tvTimeInUserQRCodeList)
         private val qrCodeImage: ImageView = itemView.findViewById(R.id.ivQRUserQRCodeList)
         private val chooseCash: RadioButton = itemView.findViewById(R.id.rdCashUserQrCodeList)
-        private val chooseOnlinePayment: RadioButton = itemView.findViewById(R.id.rdOnlinePaymentUserQrCodeList)
+        private val chooseOnlinePayment: RadioButton =
+            itemView.findViewById(R.id.rdOnlinePaymentUserQrCodeList)
         private val containerCash: CardView = itemView.findViewById(R.id.crdCashUserQRCodeList)
-        private val containerOnlinePayment: CardView = itemView.findViewById(R.id.crdOnlinePaymentUserQRCodeList)
+        private val containerOnlinePayment: CardView =
+            itemView.findViewById(R.id.crdOnlinePaymentUserQRCodeList)
         private lateinit var curInvoice: ParkingInvoice
 
         init {
@@ -61,20 +67,29 @@ class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>
                 handleChooseOnlinePayment()
             }
         }
-        fun bind(invoice: ParkingInvoice){
+
+        fun bind(invoice: ParkingInvoice) {
             curInvoice = invoice
             licensePlate.text = "${invoice.vehicle.licensePlate}"
             timeIn.text = "Thời gian vào là ${TimeUtil.convertMilisecondsToDate(invoice.timeIn)}"
-            qrCodeImage.setImageBitmap(QRcodeUtil.getQrCodeBitmap(invoice.id))
+            AESEncyptionUtil.encrypt(
+                InvoiceQRCode(
+                    invoiceId = invoice.id,
+                    timeOut = TimeUtil.getDateCurrentTime()
+                ).toString()
+            )?.let {
+                qrCodeImage.setImageBitmap(QRcodeUtil.getQrCodeBitmap(it))
+            }
         }
 
-        private fun handleChooseCash(){
+        private fun handleChooseCash() {
             containerCash.setCardBackgroundColor(itemView.resources.getColor(R.color.light_orange))
             containerOnlinePayment.setCardBackgroundColor(itemView.resources.getColor(R.color.white))
             chooseCash.isChecked = true
             chooseOnlinePayment.isChecked = false
         }
-        private fun handleChooseOnlinePayment(){
+
+        private fun handleChooseOnlinePayment() {
             containerOnlinePayment.setCardBackgroundColor(itemView.resources.getColor(R.color.light_orange))
             containerCash.setCardBackgroundColor(itemView.resources.getColor(R.color.white))
             chooseCash.isChecked = false

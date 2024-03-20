@@ -1,6 +1,7 @@
 package com.example.parkingqr.data.remote.user
 
 import android.content.Context
+import android.util.Log
 import com.example.parkingqr.data.remote.BaseRemoteDataSource
 import com.example.parkingqr.data.remote.Params
 import com.example.parkingqr.data.remote.State
@@ -132,15 +133,17 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
         emit(State.success(true))
     }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
 
-    override fun searchAccountById(userId: String): Flow<State<MutableList<AccountFirebase>>> =
+    override fun searchUserById(userId: String): Flow<State<MutableList<UserFirebase>>> =
         flow {
-            val userRef = db.collection(Params.ACCOUNT_PATH_COLLECTION)
+            val userRef = db.collection(Params.USER_PATH_COLLECTION)
             val query = userRef.whereEqualTo("userId", userId)
             emit(State.loading())
             val querySnapshot = query.get().await()
-            val userList: MutableList<AccountFirebase> = mutableListOf()
+            val userList: MutableList<UserFirebase> = mutableListOf()
             for (document in querySnapshot.documents) {
-                document.toObject(AccountFirebase::class.java)?.let { userList.add(it) }
+                document.toObject(UserFirebase::class.java)?.let {
+                    userList.add(it)
+                }
             }
             emit(State.success(userList))
         }.catch {

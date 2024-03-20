@@ -97,13 +97,12 @@ class UserQRCodeListFragment : BaseFragment() {
 
     private fun handleShowUserQRCodeDialog(userId: String) {
         val userQRCode = UserQRCode(userId, TimeUtil.getCurrentTime().toString())
-        val encrypt = AESEncyptionUtil.encrypt(userQRCode.toString())?.apply {
+        AESEncyptionUtil.encrypt(userQRCode.toString())?.apply {
             UserQRCodeDialog(
                 requireContext(),
                 QRcodeUtil.getQrCodeBitmap(this),
                 TimeUtil.getDateCurrentTime()
             ).show()
-            Log.d("QRCODE", this)
         }
     }
 

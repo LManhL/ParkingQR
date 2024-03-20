@@ -91,11 +91,11 @@
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:checked="true"
-                    android:buttonTint="@color/black"
                     android:id="@+id/rdCashUserQrCodeList"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:buttonTint="@color/black"
+                    android:checked="true"
                     android:textSize="@dimen/font_size_medium" />
 
                 <TextView

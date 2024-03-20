@@ -1,6 +1,7 @@
 package com.example.parkingqr.ui.components.parking
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.invoice.InvoiceRepository
@@ -8,9 +9,14 @@ import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.user.Account
 import com.example.parkingqr.domain.model.invoice.UserInvoice
+import com.example.parkingqr.domain.model.qrcode.InvoiceQRCode
+import com.example.parkingqr.domain.model.qrcode.QRCode
+import com.example.parkingqr.domain.model.qrcode.UserQRCode
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 import com.example.parkingqr.ui.base.BaseViewModel
+import com.example.parkingqr.utils.AESEncyptionUtil
 import com.example.parkingqr.utils.ImageUtil
+import com.example.parkingqr.utils.TextRecognizerUtil
 import com.example.parkingqr.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -19,8 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ParkingViewModel @Inject constructor(
-    private val invoiceRepository: InvoiceRepository,
-    private val userRepository: UserRepository
+    private val invoiceRepository: InvoiceRepository, private val userRepository: UserRepository
 ) : BaseViewModel() {
 
     companion object {
@@ -41,8 +46,7 @@ class ParkingViewModel @Inject constructor(
     val stateUi: StateFlow<ParkingViewModelState> = _stateUi.asStateFlow()
 
     fun searchVehicleAndUserByLicensePlateToCreateInvoice(
-        licensePlate: String,
-        imageCarIn: Bitmap
+        licensePlate: String, imageCarIn: Bitmap
     ) {
         searchVehicleJob?.cancel()
         searchVehicleJob = viewModelScope.launch {
@@ -50,9 +54,9 @@ class ParkingViewModel @Inject constructor(
                 when (it) {
                     SEARCH_LICENSE_PLATE -> invoiceRepository.searchLicensePlate(licensePlate)
                     else -> {
-                        val userId = _stateUi.value.vehicle?.userId
+                        val userId = stateUi.value.vehicle?.userId
                         if (!userId.isNullOrEmpty()) {
-                            userRepository.searchAccountById(userId)
+                            userRepository.searchUserInvoiceById(userId)
                         } else {
                             flowOf()
                         }
@@ -72,8 +76,7 @@ class ParkingViewModel @Inject constructor(
                                 it.copy(
                                     state = ParkingState.FAIL_FOUND_VEHICLE,
                                     parkingInvoice = createParkingInvoiceForUnRegisterVehicle(
-                                        licensePlate,
-                                        imageCarIn
+                                        licensePlate, imageCarIn
                                     )
                                 )
                             }
@@ -84,21 +87,14 @@ class ParkingViewModel @Inject constructor(
                                 _stateUi.update {
                                     it.copy(vehicle = value)
                                 }
-                            } else if (value is Account) {
-                                val user = UserInvoice(
-                                    id = value.id,
-                                    userId = stateUi.value.vehicle?.userId ?: "",
-                                    name = value.name,
-                                    phoneNumber = value.phoneNumber
-                                )
-
+                            } else if (value is UserInvoice) {
                                 _stateUi.update {
                                     it.copy(
                                         state = ParkingState.SUCCESSFUL_FOUND_VEHICLE,
-                                        user = user,
+                                        user = value,
                                         parkingInvoice = ParkingInvoice(
                                             id = invoiceRepository.getNewParkingInvoiceKey(),
-                                            user = user,
+                                            user = value,
                                             vehicle = it.vehicle!!,
                                             imageIn = ImageUtil.encodeImage(imageCarIn),
                                             timeIn = TimeUtil.getCurrentTime().toString()
@@ -136,71 +132,8 @@ class ParkingViewModel @Inject constructor(
         }
     }
 
-    fun searchVehicleAndUserByLicensePlate(licensePlate: String) {
-        searchVehicleJob?.cancel()
-        searchVehicleJob = viewModelScope.launch {
-            flowOf(SEARCH_LICENSE_PLATE, SEARCH_USER).flatMapConcat {
-                when (it) {
-                    SEARCH_LICENSE_PLATE -> invoiceRepository.searchLicensePlate(licensePlate)
-                    else -> {
-                        val userId = _stateUi.value.vehicle?.userId
-                        if (!userId.isNullOrEmpty()) {
-                            userRepository.searchAccountById(userId)
-                        } else {
-                            flowOf()
-                        }
-                    }
-                }
-            }.collect { state ->
-                when (state) {
-                    is State.Loading -> {
-                        _stateUi.update {
-                            it.copy(state = ParkingState.LOADING)
-                        }
-                    }
-                    is State.Success -> {
-
-                        if (state.data.isEmpty()) {
-                            _stateUi.update {
-                                it.copy(
-                                    state = ParkingState.FAIL_SEARCH_VEHICLE,
-                                    vehicle = null,
-                                    user = null
-                                )
-                            }
-                        }
-
-                        for (value in state.data) {
-                            if (value is VehicleInvoice) {
-                                _stateUi.update {
-                                    it.copy(vehicle = value)
-                                }
-                            } else if (value is UserInvoice) {
-                                _stateUi.update {
-                                    it.copy(
-                                        state = ParkingState.SUCCESSFUL_SEARCH_VEHICLE,
-                                        user = value,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    is State.Failed -> {
-                        _stateUi.update {
-                            it.copy(
-                                state = ParkingState.FAIL_FOUND_VEHICLE,
-                                errorMessage = state.message
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     fun createParkingInvoiceForUnRegisterVehicle(
-        licensePlate: String,
-        imageCarIn: Bitmap
+        licensePlate: String, imageCarIn: Bitmap
     ): ParkingInvoice {
         return ParkingInvoice(
             id = invoiceRepository.getNewParkingInvoiceKey(),
@@ -270,6 +203,11 @@ class ParkingViewModel @Inject constructor(
                 parkingInvoice = null,
                 user = null,
                 vehicle = null,
+                qrcode = null,
+                licensePlateOfVehicleIn = "",
+                licensePlateOfVehicleOut = "",
+                bmVehicleIn = null,
+                bmVehicleOut = null
             )
         }
     }
@@ -311,8 +249,7 @@ class ParkingViewModel @Inject constructor(
                     is State.Failed -> {
                         _stateUi.update {
                             it.copy(
-                                state = ParkingState.ERROR,
-                                errorMessage = it.errorMessage
+                                state = ParkingState.ERROR, errorMessage = it.errorMessage
                             )
                         }
                     }
@@ -325,7 +262,7 @@ class ParkingViewModel @Inject constructor(
     fun completeParkingInvoice() {
         updateParkingInvoiceJob?.cancel()
         updateParkingInvoiceJob = viewModelScope.launch {
-            invoiceRepository.completeParkingInvoice(_stateUi.value.parkingInvoice!!)
+            invoiceRepository.completeParkingInvoice(stateUi.value.parkingInvoice!!)
                 .collect { state ->
                     when (state) {
                         is State.Loading -> {
@@ -354,12 +291,9 @@ class ParkingViewModel @Inject constructor(
     }
 
     fun updateInvoiceOut(
-        _paymentMethod: String,
-        _type: String,
-        _imgOutString: String,
-        _note: String
+        _paymentMethod: String, _type: String, _imgOutString: String, _note: String
     ) {
-        val newParkingInvoice = _stateUi.value.parkingInvoice
+        val newParkingInvoice = stateUi.value.parkingInvoice
         newParkingInvoice?.apply {
             paymentMethod = _paymentMethod
             type = _type
@@ -389,12 +323,52 @@ class ParkingViewModel @Inject constructor(
     }
 
     fun getDataFromQRCode(result: String) {
-        _stateUi.update {
-            it.copy(
-                state = ParkingState.SUCCESSFUL_GET_QR_CODE,
-                qrcode = result
-            )
+
+        val qrcode = AESEncyptionUtil.decrypt(result)?.let {
+            QRCode.fromString(it)
         }
+
+        if (qrcode is UserQRCode) {
+            _stateUi.update {
+                it.copy(
+                    state = ParkingState.SUCCESSFUL_GET_USER_QR_CODE,
+                    qrcode = qrcode
+                )
+            }
+        } else if (qrcode is InvoiceQRCode) {
+            _stateUi.update {
+                it.copy(
+                    state = ParkingState.SUCCESSFUL_GET_INVOICE_QR_CODE,
+                    qrcode = qrcode
+                )
+            }
+        }
+    }
+
+    fun processImageVehicleIn(bm: Bitmap) {
+        TextRecognizerUtil.invoke(bm) { licensePlate ->
+            _stateUi.update {
+                it.copy(
+                    licensePlateOfVehicleIn = licensePlate,
+                    bmVehicleIn = bm
+                )
+            }
+        }
+    }
+
+    fun processImageVehicleOut(bm: Bitmap) {
+        TextRecognizerUtil.invoke(bm) { licensePlate ->
+            _stateUi.update {
+                it.copy(
+                    licensePlateOfVehicleOut = licensePlate,
+                    bmVehicleOut = bm
+                )
+            }
+        }
+    }
+
+    fun isUnregisterVehicle(): Boolean {
+        return stateUi.value.state == ParkingState.FAIL_FOUND_VEHICLE
     }
 
 
@@ -406,24 +380,22 @@ class ParkingViewModel @Inject constructor(
         val state: ParkingState = ParkingState.BLANK,
         val errorList: MutableMap<ParkingState, String> = hashMapOf(),
         val messageList: MutableMap<ParkingState, String> = hashMapOf(),
-        val qrcode: String = ""
+        val qrcode: QRCode? = null,
+        val licensePlateOfVehicleIn: String = "",
+        val licensePlateOfVehicleOut: String = "",
+        val bmVehicleIn: Bitmap? = null,
+        val bmVehicleOut: Bitmap? = null
     ) {
         init {
             errorList[ParkingState.FAIL_FOUND_VEHICLE] =
                 "Không tìm thấy phương tiện tương ứng có biển số"
-            errorList[ParkingState.FAIL_CREATE_PARKING_INVOICE] =
-                "Tạo hóa đơn thất bại"
-            errorList[ParkingState.FAIL_SEARCH_PARKING_INVOICE] =
-                "Không tìm thấy hóa đơn tương ứng"
+            errorList[ParkingState.FAIL_CREATE_PARKING_INVOICE] = "Tạo hóa đơn thất bại"
+            errorList[ParkingState.FAIL_SEARCH_PARKING_INVOICE] = "Không tìm thấy hóa đơn tương ứng"
             errorList[ParkingState.FAIL_COMPLETE_PARKING_INVOICE] =
                 "Trả hóa đơn xe không thành công"
-            errorList[ParkingState.FAIL_GET_QR_CODE] =
-                "Không tìm thấy QRCODE"
-            errorList[ParkingState.PARKED_PARKING_INVOICE] =
-                "Hóa đơn không hợp lệ"
-            errorList[ParkingState.PARKED_VEHICLE] =
-                "Xe đã được gửi"
-            errorList[ParkingState.FAIL_SEARCH_VEHICLE] = "Không tìm thấy phương tiện tương ứng"
+            errorList[ParkingState.FAIL_GET_QR_CODE] = "Không tìm thấy QRCODE"
+            errorList[ParkingState.PARKED_PARKING_INVOICE] = "Hóa đơn không hợp lệ"
+            errorList[ParkingState.PARKED_VEHICLE] = "Xe đã được gửi"
 
             messageList[ParkingState.SUCCESSFUL_FOUND_VEHICLE] =
                 "Tìm thấy phương tiện tương ứng có biển số"
@@ -438,22 +410,9 @@ class ParkingViewModel @Inject constructor(
     }
 
     enum class ParkingState {
-        BLANK,
-        LOADING,
-        ERROR,
-        SUCCESSFUL_FOUND_VEHICLE,
-        PARKED_VEHICLE,
-        FAIL_FOUND_VEHICLE,
-        SUCCESSFUL_SEARCH_VEHICLE,
-        FAIL_SEARCH_VEHICLE,
-        SUCCESSFUL_CREATE_PARKING_INVOICE,
-        FAIL_CREATE_PARKING_INVOICE,
-        SUCCESSFUL_SEARCH_PARKING_INVOICE,
-        FAIL_SEARCH_PARKING_INVOICE,
-        SUCCESSFUL_COMPLETE_PARKING_INVOICE,
-        PARKED_PARKING_INVOICE,
-        FAIL_COMPLETE_PARKING_INVOICE,
-        SUCCESSFUL_GET_QR_CODE,
-        FAIL_GET_QR_CODE
+        BLANK, LOADING, ERROR, SUCCESSFUL_FOUND_VEHICLE, PARKED_VEHICLE, FAIL_FOUND_VEHICLE,
+        SUCCESSFUL_CREATE_PARKING_INVOICE, FAIL_CREATE_PARKING_INVOICE,
+        SUCCESSFUL_SEARCH_PARKING_INVOICE, FAIL_SEARCH_PARKING_INVOICE, SUCCESSFUL_COMPLETE_PARKING_INVOICE, PARKED_PARKING_INVOICE,
+        FAIL_COMPLETE_PARKING_INVOICE, SUCCESSFUL_GET_INVOICE_QR_CODE, FAIL_GET_QR_CODE, SUCCESSFUL_GET_USER_QR_CODE
     }
 }

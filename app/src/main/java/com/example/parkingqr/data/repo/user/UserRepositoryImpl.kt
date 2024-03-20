@@ -1,11 +1,10 @@
 package com.example.parkingqr.data.repo.user
 
 import com.example.parkingqr.data.local.user.UserLocalData
-import com.example.parkingqr.data.mapper.mapToAccount
-import com.example.parkingqr.data.mapper.mapToAccountFirebase
-import com.example.parkingqr.data.mapper.mapToUserFirebase
+import com.example.parkingqr.data.mapper.*
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.remote.user.UserRemoteData
+import com.example.parkingqr.domain.model.invoice.UserInvoice
 import com.example.parkingqr.domain.model.user.Account
 import com.example.parkingqr.domain.model.user.ParkingAttendant
 import com.example.parkingqr.domain.model.user.ParkingLotManager
@@ -88,11 +87,22 @@ class UserRepositoryImpl @Inject constructor(
         return userRemoteData.activeAccount(id)
     }
 
-    override fun searchAccountById(userId: String): Flow<State<MutableList<Account>>> {
-        return userRemoteData.searchAccountById(userId).map { state ->
+    override fun searchUserById(userId: String): Flow<State<MutableList<User>>> {
+        return userRemoteData.searchUserById(userId).map { state ->
             when (state) {
                 is State.Loading -> State.loading()
-                is State.Success -> State.success(state.data.map { it.mapToAccount() }
+                is State.Success -> State.success(state.data.map { it.mapToUser() }
+                    .toMutableList())
+                is State.Failed -> State.failed(state.message)
+            }
+        }
+    }
+
+    override fun searchUserInvoiceById(userId: String): Flow<State<MutableList<UserInvoice>>> {
+        return userRemoteData.searchUserById(userId).map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.map { it.mapToUserInvoice() }
                     .toMutableList())
                 is State.Failed -> State.failed(state.message)
             }
