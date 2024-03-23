@@ -134,4 +134,19 @@ class VehicleRemoteDataSource @Inject constructor(val context: Context) : BaseRe
         emit(State.success(true))
     }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
 
+    override fun getAllVehicleOfUserByUserId(userId: String): Flow<State<MutableList<VehicleFirebase>>> =
+        flow {
+            emit(State.loading())
+            val ref = db.collection(Params.VEHICLE_PATH_COLLECTION)
+            val query: Query = ref.whereEqualTo("userId", userId)
+            val querySnapshot = query.get().await()
+            val vehicleList = mutableListOf<VehicleFirebase>()
+            for (document in querySnapshot.documents) {
+                document.toObject(VehicleFirebase::class.java)?.let {
+                    vehicleList.add(it)
+                }
+            }
+            emit(State.success(vehicleList))
+        }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
+
 }

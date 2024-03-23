@@ -14,4 +14,6 @@ interface VehicleRemoteData {
     fun acceptVehicle(vehicle: VehicleFirebase): Flow<State<Boolean>>
     fun refuseVehicle(vehicle: VehicleFirebase): Flow<State<Boolean>>
     fun pendingVehicle(vehicle: VehicleFirebase): Flow<State<Boolean>>
+
+    fun getAllVehicleOfUserByUserId(userId: String): Flow<State<MutableList<VehicleFirebase>>>
 }

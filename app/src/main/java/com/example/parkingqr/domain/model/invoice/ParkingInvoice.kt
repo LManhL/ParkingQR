@@ -6,6 +6,17 @@ import com.example.parkingqr.utils.TimeUtil
 
 
 class ParkingInvoice() {
+
+    companion object {
+        const val PARKING_STATE_TYPE = "parking"
+        const val PARKED_STATE_TYPE = "parked"
+        const val REFUSED_STATE_TYPE = "refused"
+        const val CASH_PAYMENT_METHOD = "cash"
+        const val VNPAY_PAYMENT_METHOD = "vnpay"
+        const val HOUR_INVOICE_TYPE = "hourType"
+        const val MONTH_INVOICE_TYPE = "monthType"
+    }
+
     var id: String = ""
     var user: UserInvoice = UserInvoice()
     var vehicle: VehicleInvoice = VehicleInvoice()
@@ -34,8 +45,8 @@ class ParkingInvoice() {
         this.imageIn = imageIn
         this.price = 0.0
         this.timeIn = timeIn
-        this.paymentMethod = "Tiền mặt"
-        this.type = "Theo giờ"
+        this.paymentMethod = CASH_PAYMENT_METHOD
+        this.type = HOUR_INVOICE_TYPE
     }
 
     constructor(
@@ -101,13 +112,29 @@ class ParkingInvoice() {
     }
 
     fun getState(): ParkingState {
-        return if (state == "parking") {
+        return if (state == PARKING_STATE_TYPE) {
             ParkingState.PARKING
-        } else if (state == "parked") {
+        } else if (state == PARKED_STATE_TYPE) {
             ParkingState.PARKED
         } else {
             ParkingState.REFUSED
         }
+    }
+
+    fun getPaymentMethod(): String {
+        return if (paymentMethod == CASH_PAYMENT_METHOD) {
+            "Tiền mặt"
+        } else if (paymentMethod == VNPAY_PAYMENT_METHOD) {
+            "VNPAY"
+        } else ""
+    }
+
+    fun getInvoiceType(): String {
+        return if (type == HOUR_INVOICE_TYPE) {
+            "Gửi theo giờ"
+        } else if (type == MONTH_INVOICE_TYPE) {
+            "Gửi theo tháng"
+        } else ""
     }
 
     enum class ParkingState {

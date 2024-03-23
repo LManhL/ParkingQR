@@ -16,8 +16,8 @@ class InvoiceRepositoryImpl @Inject constructor(
     private val invoiceRemoteData: InvoiceRemoteData,
     private val invoiceLocalData: InvoiceLocalData
 ) : InvoiceRepository {
-    override fun searchLicensePlate(licensePlate: String): Flow<State<MutableList<VehicleInvoice>>> {
-        return invoiceRemoteData.searchLicensePlate(licensePlate).map { state ->
+    override fun searchLicensePlateByUserId(licensePlate: String, userId: String): Flow<State<MutableList<VehicleInvoice>>> {
+        return invoiceRemoteData.searchLicensePlateByUserId(licensePlate, userId).map { state ->
             when (state) {
                 is State.Loading -> State.loading()
                 is State.Success -> State.success(state.data.map { it.mapToVehicleInvoice() }

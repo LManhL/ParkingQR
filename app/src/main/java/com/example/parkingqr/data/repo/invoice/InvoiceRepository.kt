@@ -6,7 +6,7 @@ import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 import kotlinx.coroutines.flow.Flow
 
 interface InvoiceRepository {
-    fun searchLicensePlate(licensePlate: String): Flow<State<MutableList<VehicleInvoice>>>
+    fun searchLicensePlateByUserId(licensePlate: String, userId: String): Flow<State<MutableList<VehicleInvoice>>>
     fun addNewParkingInvoice(parkingInvoice: ParkingInvoice): Flow<State<String>>
     fun searchParkingInvoiceById(id: String): Flow<State<MutableList<ParkingInvoice>>>
     fun getNewParkingInvoiceKey(): String

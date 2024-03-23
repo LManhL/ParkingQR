@@ -22,10 +22,10 @@ import javax.inject.Inject
 
 class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRemoteDataSource(),
     InvoiceRemoteData {
-    override fun searchLicensePlate(licensePlate: String): Flow<State<MutableList<VehicleFirebase>>> =
+    override fun searchLicensePlateByUserId(licensePlate: String, userId: String): Flow<State<MutableList<VehicleFirebase>>> =
         flow {
             val vehicleRef = db.collection(Params.VEHICLE_PATH_COLLECTION)
-            val query = vehicleRef.whereEqualTo("licensePlate", licensePlate)
+            val query = vehicleRef.whereEqualTo("licensePlate", licensePlate).whereEqualTo("userId", userId)
             emit(State.loading())
             val querySnapshot = query.get().await()
             val vehicleList: MutableList<VehicleFirebase> = mutableListOf()

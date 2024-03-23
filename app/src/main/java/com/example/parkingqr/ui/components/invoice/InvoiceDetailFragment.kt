@@ -13,8 +13,12 @@ import com.bumptech.glide.Glide
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentInvoiceDetailBinding
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.qrcode.InvoiceQRCode
+import com.example.parkingqr.domain.model.qrcode.UserQRCode
 import com.example.parkingqr.ui.base.BaseFragment
 import com.example.parkingqr.ui.components.dialog.InvoiceQRCodeDialog
+import com.example.parkingqr.ui.components.dialog.UserQRCodeDialog
+import com.example.parkingqr.utils.AESEncyptionUtil
 import com.example.parkingqr.utils.FormatCurrencyUtil
 import com.example.parkingqr.utils.QRcodeUtil
 import com.example.parkingqr.utils.TimeUtil
@@ -48,11 +52,11 @@ class InvoiceDetailFragment : BaseFragment() {
                         showMessage(it.message)
                     }
                     if (it.invoice == null) binding.llWrapAllInvoiceDetail.visibility = View.GONE
-                    it.invoice?.let {invoice ->
+                    it.invoice?.let { invoice ->
                         showInvoice(invoice)
                         parkingInvoice = invoice
                     }
-                    if(it.isSaved || it.isRefused || it.isConfirmed){
+                    if (it.isSaved || it.isRefused || it.isConfirmed) {
                         getNavController().popBackStack()
                     }
                 }
@@ -93,12 +97,7 @@ class InvoiceDetailFragment : BaseFragment() {
             handleSaveInvoice()
         }
         binding.ivQrcodeInvoiceDetail.setOnClickListener {
-            InvoiceQRCodeDialog(
-                context!!,
-                QRcodeUtil.getQrCodeBitmap(
-                    invoiceDetailViewModel.stateUi.value.invoice?.id ?: ""
-                )
-            ).show()
+            showInvoiceQRCode()
         }
         binding.ivEditInvoiceDetail.setOnClickListener {
             isEditing = !isEditing
@@ -112,12 +111,22 @@ class InvoiceDetailFragment : BaseFragment() {
         }
     }
 
+    private fun showInvoiceQRCode() {
+        val invoiceQRCode = InvoiceQRCode(parkingInvoice?.id ?: "0", TimeUtil.getCurrentTime().toString())
+        AESEncyptionUtil.encrypt(invoiceQRCode.toString())?.apply {
+            InvoiceQRCodeDialog(
+                requireContext(),
+                QRcodeUtil.getQrCodeBitmap(this),
+            ).show()
+        }
+    }
+
     private fun showInvoice(parkingInvoice: ParkingInvoice) {
         binding.llWrapAllInvoiceDetail.visibility = View.VISIBLE
         binding.edtTimeInInvoiceDetail.setText(TimeUtil.convertMilisecondsToDate(parkingInvoice.timeIn))
         binding.edtLicensePlateInvoiceDetail.setText(parkingInvoice.vehicle.licensePlate)
-        binding.edtPaymentMethodInvoiceDetail.setText(parkingInvoice.paymentMethod)
-        binding.edtInvoiceTypeInvoiceDetail.setText(parkingInvoice.type)
+        binding.edtPaymentMethodInvoiceDetail.setText(parkingInvoice.getPaymentMethod())
+        binding.edtInvoiceTypeInvoiceDetail.setText(parkingInvoice.getInvoiceType())
         binding.edtTimeOutInvoiceDetail.setText(
             TimeUtil.convertMilisecondsToDate(
                 parkingInvoice.timeOut
@@ -166,7 +175,7 @@ class InvoiceDetailFragment : BaseFragment() {
         }
 
         if (!parkingInvoice.vehicle.type.isNullOrEmpty()) {
-            binding.edtVehicleTypeInvoiceDetail.setText(parkingInvoice.vehicle.type)
+            binding.edtVehicleTypeInvoiceDetail.setText(parkingInvoice.vehicle.getVehicleType())
         } else {
             binding.edtVehicleTypeInvoiceDetail.setText("Không có")
         }
@@ -185,7 +194,8 @@ class InvoiceDetailFragment : BaseFragment() {
         }
 
     }
-    private fun showParkingState(){
+
+    private fun showParkingState() {
         binding.ivEditInvoiceDetail.visibility = View.VISIBLE
         if (isEditing) {
             binding.btnConfirmInvoiceDetail.visibility = View.GONE
@@ -207,13 +217,15 @@ class InvoiceDetailFragment : BaseFragment() {
             binding.ivEditInvoiceDetail.setBackgroundResource(R.drawable.edit)
         }
     }
-    private fun showParkedState(){
+
+    private fun showParkedState() {
         binding.ivEditInvoiceDetail.visibility = View.GONE
         binding.btnConfirmInvoiceDetail.visibility = View.GONE
         binding.btnRefuseInvoiceDetail.visibility = View.GONE
         binding.btnSaveInvoiceDetail.visibility = View.GONE
     }
-    private fun showRefusedState(){
+
+    private fun showRefusedState() {
         binding.ivEditInvoiceDetail.visibility = View.GONE
         binding.btnConfirmInvoiceDetail.visibility = View.GONE
         binding.btnRefuseInvoiceDetail.visibility = View.GONE
@@ -227,6 +239,7 @@ class InvoiceDetailFragment : BaseFragment() {
             _note = binding.edtNoteInvoiceDetail.text.toString()
         )
     }
+
     private fun handleConfirmInvoice() {
         invoiceDetailViewModel.updateInvoice()
         invoiceDetailViewModel.confirmInvoice()

@@ -19,7 +19,7 @@ class UserQRCodeDialog(
     private lateinit var qrcode: ImageView
     private lateinit var timeIn: TextView
     private lateinit var timeLeft: TextView
-    private val timeDelay: Long = 1000
+    private val timeDelay: Long = Timer.SECOND_MILLISECONDS
     private val limit: Int = 60
 
     fun show() {

@@ -25,7 +25,7 @@
         android:layout_marginTop="@dimen/margin_20"
         android:layout_marginRight="@dimen/margin_40"
         android:layout_weight="5"
-        app:cardBackgroundColor="@color/light_orange"
+        app:cardBackgroundColor="@color/light_gold"
         app:cardCornerRadius="@dimen/corner_radius_10"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvQuestionDialogChooseVehicleType">
@@ -62,7 +62,7 @@
         android:layout_marginTop="@dimen/margin_20"
         android:layout_marginRight="@dimen/margin_40"
         android:layout_weight="5"
-        app:cardBackgroundColor="@color/light_orange"
+        app:cardBackgroundColor="@color/light_gold"
         app:cardCornerRadius="@dimen/corner_radius_10"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/crdMotobikeDialogChooseVehicleType">
@@ -91,46 +91,9 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/crdOtherDialogChooseVehicleType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_40"
-        android:layout_marginTop="@dimen/margin_20"
-        android:layout_marginRight="@dimen/margin_40"
-        android:layout_weight="5"
-        app:cardBackgroundColor="@color/light_orange"
-        app:cardCornerRadius="@dimen/corner_radius_10"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/crdCarDialogChooseVehicleType">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_10"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:enabled="false"
-                android:id="@+id/rdOtherDialogChooseVehicleType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:buttonTint="@color/black"
-                android:checked="false"
-                android:textSize="@dimen/font_size_medium" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/source_sans_pro_semibold"
-                android:text="Khác"
-                android:textSize="@dimen/font_size_medium" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnConfirmDialogChooseVehicleType"
-        app:layout_constraintTop_toBottomOf="@id/crdOtherDialogChooseVehicleType"
+        app:layout_constraintTop_toBottomOf="@id/crdCarDialogChooseVehicleType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/margin_40"

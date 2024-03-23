@@ -3,11 +3,10 @@ package com.example.parkingqr.data.remote.invoice
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.remote.dto.invoice.ParkingInvoiceFirebase
 import com.example.parkingqr.data.remote.dto.vehicle.VehicleFirebase
-import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import kotlinx.coroutines.flow.Flow
 
 interface InvoiceRemoteData {
-    fun searchLicensePlate(licensePlate: String): Flow<State<MutableList<VehicleFirebase>>>
+    fun searchLicensePlateByUserId(licensePlate: String, userId: String): Flow<State<MutableList<VehicleFirebase>>>
     fun addNewParkingInvoice(parkingInvoice: ParkingInvoiceFirebase): Flow<State<String>>
     fun searchParkingInvoiceById(id: String): Flow<State<MutableList<ParkingInvoiceFirebase>>>
     fun getNewParkingInvoiceKey(): String

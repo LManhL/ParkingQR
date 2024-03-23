@@ -3,6 +3,13 @@ package com.example.parkingqr.ui.components.qrcode
 import kotlinx.coroutines.*
 
 abstract class Timer(val timeDelay: Long, val limit: Int) : TimerCallBack {
+
+    companion object{
+        const val SECOND_MILLISECONDS: Long = 1000
+        const val MINUTE_MILLISECONDS: Long = 60000
+        const val HOUR_MILLISECONDS: Long = 3600000
+    }
+
     private var job: Job? = null
     private var count = 0
 
@@ -20,10 +27,6 @@ abstract class Timer(val timeDelay: Long, val limit: Int) : TimerCallBack {
             }
         }
     }
-
-    abstract override fun onFinish()
-    abstract override fun onWorking(count: Int)
-
     fun stop() {
         job?.cancel()
         count = 0
