@@ -1,6 +1,5 @@
 package com.example.parkingqr.ui.components.login
 
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -8,13 +7,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentLoginBinding
-import com.example.parkingqr.domain.model.user.Account
 import com.example.parkingqr.domain.model.user.AccountRole
 import com.example.parkingqr.ui.base.BaseFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class LoginFragment : BaseFragment() {
@@ -36,8 +33,20 @@ class LoginFragment : BaseFragment() {
                         showMessage(it.message)
                         loginViewModel.showMessage()
                     }
-                    if (it.user != null && it.role != null) {
-                        handleNavigate(it.role)
+
+                    it.user?.let { user ->
+                        loginViewModel.findUserRole(user.email ?: "")
+                    }
+                    it.role?.let {
+                        loginViewModel.getDetailAccountInfo()
+                    }
+                    it.person?.let { person ->
+                        if (!it.isReady) loginViewModel.saveAccountInfo()
+                    }
+                    if (it.isReady) {
+                        it.role?.let { role ->
+                            handleNavigate(role)
+                        }
                     }
                 }
             }

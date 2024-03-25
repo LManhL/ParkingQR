@@ -44,8 +44,8 @@
 
                         <ImageView
                             android:id="@+id/ivEditInvoiceDetail"
-                            android:layout_width="25dp"
-                            android:layout_height="30dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:background="@drawable/edit" />
                     </LinearLayout>
 
@@ -336,7 +336,7 @@
                             android:id="@+id/edtPaymentMethodInvoiceDetail"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="4"
+                            android:layout_weight="5"
                             android:background="@android:color/transparent"
                             android:enabled="false"
                             android:fontFamily="@font/source_sans_pro"
@@ -344,13 +344,6 @@
                             android:padding="@dimen/padding_10"
                             android:textColor="@color/black"
                             android:textSize="@dimen/font_size_16" />
-
-                        <ImageView
-                            android:id="@+id/ivPaymentMethodInvoiceDetail"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:src="@drawable/down_arrow" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -385,7 +378,7 @@
                             android:id="@+id/edtInvoiceTypeInvoiceDetail"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="4"
+                            android:layout_weight="5"
                             android:background="@android:color/transparent"
                             android:enabled="false"
                             android:fontFamily="@font/source_sans_pro"
@@ -393,13 +386,6 @@
                             android:text="Theo giờ"
                             android:textColor="@color/black"
                             android:textSize="@dimen/font_size_16" />
-
-                        <ImageView
-                            android:id="@+id/ivInvoiceTypeInvoiceDetail"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:src="@drawable/down_arrow" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -525,37 +511,37 @@
                     android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="parent" />
 
-                <LinearLayout
-                    android:weightSum="10"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+<!--                <LinearLayout-->
+<!--                    android:weightSum="10"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content">-->
 
-                    <Button
-                        android:id="@+id/btnConfirmInvoiceDetail"
-                        android:layout_weight="6"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/margin_10"
-                        android:background="@color/light_green"
-                        android:fontFamily="@font/source_sans_pro"
-                        android:text="Xác nhận trả xe"
-                        android:textColor="@color/white"
-                        />
+<!--                    <Button-->
+<!--                        android:id="@+id/btnConfirmInvoiceDetail"-->
+<!--                        android:layout_weight="6"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_margin="@dimen/margin_10"-->
+<!--                        android:background="@color/light_green"-->
+<!--                        android:fontFamily="@font/source_sans_pro"-->
+<!--                        android:text="Xác nhận trả xe"-->
+<!--                        android:textColor="@color/white"-->
+<!--                        />-->
 
-                    <Button
-                        android:id="@+id/btnRefuseInvoiceDetail"
-                        android:layout_weight="4"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/margin_10"
-                        android:background="@color/light_red"
-                        android:fontFamily="@font/source_sans_pro"
-                        android:text="Từ chối trả xe"
-                        android:textColor="@color/white"
-                        android:layout_gravity="end|center"
-                         />
-                </LinearLayout>
+<!--                    <Button-->
+<!--                        android:id="@+id/btnRefuseInvoiceDetail"-->
+<!--                        android:layout_weight="4"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_margin="@dimen/margin_10"-->
+<!--                        android:background="@color/light_red"-->
+<!--                        android:fontFamily="@font/source_sans_pro"-->
+<!--                        android:text="Từ chối trả xe"-->
+<!--                        android:textColor="@color/white"-->
+<!--                        android:layout_gravity="end|center"-->
+<!--                         />-->
+<!--                </LinearLayout>-->
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.TextView
 import androidx.cardview.widget.CardView
@@ -14,7 +13,6 @@ import com.example.parkingqr.R
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.qrcode.InvoiceQRCode
 import com.example.parkingqr.utils.AESEncyptionUtil
-import com.example.parkingqr.utils.FormatCurrencyUtil
 import com.example.parkingqr.utils.QRcodeUtil
 import com.example.parkingqr.utils.TimeUtil
 
@@ -22,6 +20,7 @@ class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>
     Adapter<UserQRCodeListAdapter.InvoiceViewHolder>() {
 
     private var onClickItem: ((ParkingInvoice) -> Unit)? = null
+    private var onClickChoosePaymentMethod: ((ParkingInvoice) -> Unit)? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InvoiceViewHolder {
@@ -38,9 +37,14 @@ class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>
         holder.bind(invoiceList[position])
     }
 
-    fun setEventClick(callback: ((ParkingInvoice) -> Unit)) {
+    fun setOnClickItem(callback: ((ParkingInvoice) -> Unit)) {
         onClickItem = callback
     }
+
+    fun setOnClickChoosePaymentMethod(callback: ((ParkingInvoice) -> Unit)) {
+        onClickChoosePaymentMethod = callback
+    }
+
 
     inner class InvoiceViewHolder(itemView: View) : ViewHolder(itemView) {
 
@@ -62,9 +66,11 @@ class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>
             }
             chooseCash.setOnClickListener {
                 handleChooseCash()
+                onClickChoosePaymentMethod?.invoke(curInvoice)
             }
             chooseOnlinePayment.setOnClickListener {
                 handleChooseOnlinePayment()
+                onClickChoosePaymentMethod?.invoke(curInvoice)
             }
         }
 
@@ -87,6 +93,7 @@ class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>
             containerOnlinePayment.setCardBackgroundColor(itemView.resources.getColor(R.color.white))
             chooseCash.isChecked = true
             chooseOnlinePayment.isChecked = false
+            curInvoice.paymentMethod = ParkingInvoice.CASH_PAYMENT_METHOD
         }
 
         private fun handleChooseOnlinePayment() {
@@ -94,6 +101,7 @@ class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>
             containerCash.setCardBackgroundColor(itemView.resources.getColor(R.color.white))
             chooseCash.isChecked = false
             chooseOnlinePayment.isChecked = true
+            curInvoice.paymentMethod = ParkingInvoice.VNPAY_PAYMENT_METHOD
         }
     }
 }

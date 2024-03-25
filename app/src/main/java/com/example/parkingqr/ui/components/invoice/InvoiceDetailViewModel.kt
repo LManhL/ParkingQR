@@ -55,13 +55,11 @@ class InvoiceDetailViewModel @Inject constructor(private val repository: Invoice
             }
         }
     }
-    fun saveInvoice(_type: String, _paymentMethod: String, _note: String ) {
+    fun saveInvoice(_note: String ) {
         saveInVoiceJob?.cancel()
         _stateUi.update {
             it.copy(
                 invoice = it.invoice?.apply {
-                    type = _type
-                    paymentMethod = _paymentMethod
                     note = _note
                 }
             )

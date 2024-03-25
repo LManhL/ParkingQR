@@ -16,7 +16,10 @@ class InvoiceRepositoryImpl @Inject constructor(
     private val invoiceRemoteData: InvoiceRemoteData,
     private val invoiceLocalData: InvoiceLocalData
 ) : InvoiceRepository {
-    override fun searchLicensePlateByUserId(licensePlate: String, userId: String): Flow<State<MutableList<VehicleInvoice>>> {
+    override fun searchLicensePlateByUserId(
+        licensePlate: String,
+        userId: String
+    ): Flow<State<MutableList<VehicleInvoice>>> {
         return invoiceRemoteData.searchLicensePlateByUserId(licensePlate, userId).map { state ->
             when (state) {
                 is State.Loading -> State.loading()
@@ -139,6 +142,17 @@ class InvoiceRepositoryImpl @Inject constructor(
                     is State.Failed -> State.failed(state.message)
                 }
 
+            }
+    }
+
+    override fun updateInvoicePaymentMethod(parkingInvoice: ParkingInvoice): Flow<State<Boolean>> {
+        return invoiceRemoteData.updateInvoicePaymentMethod(parkingInvoice.mapToParkingInvoiceFirebase())
+            .map { state ->
+                when (state) {
+                    is State.Loading -> State.loading()
+                    is State.Success -> State.success(state.data)
+                    is State.Failed -> State.failed(state.message)
+                }
             }
     }
 }

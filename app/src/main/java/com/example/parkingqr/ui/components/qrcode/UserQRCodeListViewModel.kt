@@ -91,7 +91,37 @@ class UserQRCodeListViewModel @Inject constructor(
         }
     }
 
-    fun showDialog(){
+    fun updatePaymentMethod(parkingInvoice: ParkingInvoice) {
+        viewModelScope.launch {
+            invoiceRepository.updateInvoicePaymentMethod(parkingInvoice).collect { state ->
+                when (state) {
+                    is State.Loading -> {
+                        _stateUi.update {
+                            it.copy(isLoading = true)
+                        }
+                    }
+                    is State.Success -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false
+                            )
+                        }
+                    }
+                    is State.Failed -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                error = state.message
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    fun showDialog() {
         _stateUi.update {
             it.copy(
                 isShowDialog = false
@@ -122,6 +152,6 @@ class UserQRCodeListViewModel @Inject constructor(
         val message: String = "",
         val invoiceList: MutableList<ParkingInvoice> = mutableListOf(),
         val userId: String = "",
-        val isShowDialog: Boolean = false
+        val isShowDialog: Boolean = false,
     )
 }

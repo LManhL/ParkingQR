@@ -22,4 +22,5 @@ interface UserRemoteData {
     fun searchUserById(userId: String): Flow<State<MutableList<UserFirebase>>>
 
     fun getUserID(): Flow<State<String>>
+    fun getParkingLotManagerById(parkingLotManagerId: String): Flow<State<ParkingLotManagerFirebase>>
 }

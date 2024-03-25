@@ -1,6 +1,7 @@
 package com.example.parkingqr.data.mapper
 
 import com.example.parkingqr.data.remote.dto.user.AccountFirebase
+import com.example.parkingqr.data.remote.dto.user.ParkingLotManagerFirebase
 import com.example.parkingqr.data.remote.dto.user.UserFirebase
 import com.example.parkingqr.domain.model.invoice.UserInvoice
 import com.example.parkingqr.domain.model.user.*
@@ -53,5 +54,15 @@ fun UserFirebase.mapToUserInvoice(): UserInvoice {
         userId = userId ?: "",
         name = account?.name ?: "",
         phoneNumber = account?.phoneNumber ?: ""
+    )
+}
+
+fun ParkingLotManagerFirebase.mapToParkingLotManager(): ParkingLotManager {
+    return ParkingLotManager(
+        id = id ?: "",
+        parkingLotManagerId = parkingLotManagerId ?: "",
+        parkingLotId = parkingLotId ?: "",
+        account = account?.mapToAccount() ?: Account()
+
     )
 }

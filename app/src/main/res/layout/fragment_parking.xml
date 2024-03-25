@@ -113,7 +113,7 @@
                 android:layout_marginBottom="@dimen/margin_10"
                 android:fontFamily="@font/source_sans_pro_semibold"
                 android:gravity="center"
-                android:text="Hóa đơn gửi xe cho xe chưa đăng ký"
+                android:text="Hóa đơn gửi xe hiện đang trống"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -125,6 +125,7 @@
                 android:background="@color/icon_color" />
 
             <LinearLayout
+                android:visibility="gone"
                 android:layout_marginTop="@dimen/margin_10"
                 android:gravity="center"
                 android:layout_marginRight="60dp"
@@ -177,7 +178,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/llButtonCarOut"
+                android:id="@+id/llButtonQRCodeParking"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/llButtonCarIn"
@@ -245,6 +246,7 @@
                             android:id="@+id/llContainerParking"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:visibility="invisible"
                             android:layout_margin="5dp"
                             android:orientation="vertical">
 

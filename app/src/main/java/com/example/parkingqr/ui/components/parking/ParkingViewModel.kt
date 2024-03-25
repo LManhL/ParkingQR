@@ -1,7 +1,6 @@
 package com.example.parkingqr.ui.components.parking
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.invoice.InvoiceRepository
@@ -37,8 +36,6 @@ class ParkingViewModel @Inject constructor(
         const val VALIDATE_VEHICLE = "VALIDATE_VEHICLE"
     }
 
-    private var validateVehicleJob: Job? = null
-    private var searchVehicleJob: Job? = null
     private var addParkingInvoiceJob: Job? = null
     private var updateParkingInvoiceJob: Job? = null
     private var searchParkingInvoiceJob: Job? = null
@@ -67,9 +64,14 @@ class ParkingViewModel @Inject constructor(
                                     user = state.data[0]
                                 )
                             }
-                            _searchVehicleAndUserByUserId()
+                            searchVehicleOfUserByUserId()
                         } else {
-                            // Ma QR khong hop le
+                            // Khong tim thay user tuong ung -> Ma QR co van de
+                            _stateUi.update {
+                                it.copy(
+                                    state = ParkingState.FAIL_GET_QR_CODE
+                                )
+                            }
                         }
                     }
                     is State.Failed -> {
@@ -84,7 +86,7 @@ class ParkingViewModel @Inject constructor(
         }
     }
 
-    fun _searchVehicleAndUserByUserId() {
+    private fun searchVehicleOfUserByUserId() {
         val userId = stateUi.value.qrcode?.let { qrcode ->
             (qrcode as UserQRCode).userId
         }
@@ -151,7 +153,7 @@ class ParkingViewModel @Inject constructor(
         }
     }
 
-    fun createInvoiceForUserNotRegisterVehicle(): ParkingInvoice {
+    private fun createInvoiceForUserNotRegisterVehicle(): ParkingInvoice {
         return ParkingInvoice(
             id = invoiceRepository.getNewParkingInvoiceKey(),
             user = stateUi.value.user ?: UserInvoice(),
@@ -168,11 +170,20 @@ class ParkingViewModel @Inject constructor(
             flowOf(VALIDATE_VEHICLE, ADD_NEW_PARKING_INVOICE).flatMapConcat {
                 when (it) {
                     VALIDATE_VEHICLE -> invoiceRepository.searchParkingInvoiceByLicensePlateAndStateParking(
-                        _stateUi.value.parkingInvoice?.vehicle?.licensePlate!!
+                        stateUi.value.parkingInvoice?.vehicle?.licensePlate!!
                     )
                     else -> {
                         if (!available) {
-                            invoiceRepository.addNewParkingInvoice(_stateUi.value.parkingInvoice!!)
+                            userRepository.getLocalParkingLotId()?.let { parkingLotId ->
+                                _stateUi.update { state ->
+                                    state.copy(
+                                        parkingInvoice = state.parkingInvoice?.apply {
+                                            this.parkingLotId = parkingLotId
+                                        }
+                                    )
+                                }
+                            }
+                            invoiceRepository.addNewParkingInvoice(stateUi.value.parkingInvoice!!)
                         } else {
                             flowOf()
                         }
@@ -308,33 +319,27 @@ class ParkingViewModel @Inject constructor(
     }
 
     fun updateInvoiceOut(
-        _paymentMethod: String, _type: String, _imgOutString: String, _note: String
+        _note: String
     ) {
-        val newParkingInvoice = stateUi.value.parkingInvoice
-        newParkingInvoice?.apply {
-            paymentMethod = _paymentMethod
-            type = _type
-            imageOut = _imgOutString
-            note = _note
-            timeOut = TimeUtil.getCurrentTime().toString()
-        }
         _stateUi.update {
             it.copy(
-                parkingInvoice = newParkingInvoice
+                parkingInvoice = it.parkingInvoice?.apply {
+                    imageOut = stateUi.value.bmVehicleOut?.let { bm ->
+                        ImageUtil.encodeImage(bm)
+                    }.toString()
+                    note = _note
+                    timeOut = TimeUtil.getCurrentTime().toString()
+                }
             )
         }
     }
 
-    fun updateInvoiceIn(_paymentMethod: String, _type: String, _note: String) {
-        val newParkingInvoice = _stateUi.value.parkingInvoice
-        newParkingInvoice?.apply {
-            paymentMethod = _paymentMethod
-            type = _type
-            note = _note
-        }
+    fun updateInvoiceIn(_note: String) {
         _stateUi.update {
             it.copy(
-                parkingInvoice = newParkingInvoice
+                parkingInvoice = it.parkingInvoice?.apply {
+                    note = _note
+                }
             )
         }
     }
@@ -359,8 +364,7 @@ class ParkingViewModel @Inject constructor(
                     qrcode = qrcode
                 )
             }
-        }
-        else{
+        } else {
             _stateUi.update {
                 it.copy(
                     state = ParkingState.FAIL_GET_QR_CODE
@@ -419,7 +423,7 @@ class ParkingViewModel @Inject constructor(
         val licensePlateOfVehicleOut: String = "",
         val bmVehicleIn: Bitmap? = null,
         val bmVehicleOut: Bitmap? = null,
-        val timeLimit: Int = 3
+        val timeLimit: Int = 5
     ) {
         init {
             errorList[ParkingState.FAIL_FOUND_VEHICLE] =
@@ -428,7 +432,7 @@ class ParkingViewModel @Inject constructor(
             errorList[ParkingState.FAIL_SEARCH_PARKING_INVOICE] = "Không tìm thấy hóa đơn tương ứng"
             errorList[ParkingState.FAIL_COMPLETE_PARKING_INVOICE] =
                 "Trả hóa đơn xe không thành công"
-            errorList[ParkingState.FAIL_GET_QR_CODE] = "Không tìm thấy QRCODE"
+            errorList[ParkingState.FAIL_GET_QR_CODE] = "Mã QRCode không hợp lệ"
             errorList[ParkingState.PARKED_PARKING_INVOICE] = "Hóa đơn không hợp lệ"
             errorList[ParkingState.PARKED_VEHICLE] = "Xe đã được gửi"
 

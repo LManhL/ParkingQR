@@ -103,16 +103,11 @@ class InvoiceDetailFragment : BaseFragment() {
             isEditing = !isEditing
             showInvoice(parkingInvoice!!)
         }
-        binding.btnConfirmInvoiceDetail.setOnClickListener {
-            handleConfirmInvoice()
-        }
-        binding.btnRefuseInvoiceDetail.setOnClickListener {
-            handleRefuseInvoice()
-        }
     }
 
     private fun showInvoiceQRCode() {
-        val invoiceQRCode = InvoiceQRCode(parkingInvoice?.id ?: "0", TimeUtil.getCurrentTime().toString())
+        val invoiceQRCode =
+            InvoiceQRCode(parkingInvoice?.id ?: "0", TimeUtil.getCurrentTime().toString())
         AESEncyptionUtil.encrypt(invoiceQRCode.toString())?.apply {
             InvoiceQRCodeDialog(
                 requireContext(),
@@ -125,8 +120,8 @@ class InvoiceDetailFragment : BaseFragment() {
         binding.llWrapAllInvoiceDetail.visibility = View.VISIBLE
         binding.edtTimeInInvoiceDetail.setText(TimeUtil.convertMilisecondsToDate(parkingInvoice.timeIn))
         binding.edtLicensePlateInvoiceDetail.setText(parkingInvoice.vehicle.licensePlate)
-        binding.edtPaymentMethodInvoiceDetail.setText(parkingInvoice.getPaymentMethod())
-        binding.edtInvoiceTypeInvoiceDetail.setText(parkingInvoice.getInvoiceType())
+        binding.edtPaymentMethodInvoiceDetail.setText(parkingInvoice.getPaymentMethodReadable())
+        binding.edtInvoiceTypeInvoiceDetail.setText(parkingInvoice.getInvoiceTypeReadable())
         binding.edtTimeOutInvoiceDetail.setText(
             TimeUtil.convertMilisecondsToDate(
                 parkingInvoice.timeOut
@@ -198,20 +193,12 @@ class InvoiceDetailFragment : BaseFragment() {
     private fun showParkingState() {
         binding.ivEditInvoiceDetail.visibility = View.VISIBLE
         if (isEditing) {
-            binding.btnConfirmInvoiceDetail.visibility = View.GONE
-            binding.btnRefuseInvoiceDetail.visibility = View.GONE
             binding.btnSaveInvoiceDetail.visibility = View.VISIBLE
             binding.edtNoteInvoiceDetail.inputType = InputType.TYPE_CLASS_TEXT
-            binding.llPaymentMethodInvoiceDetail.setBackgroundResource(R.drawable.rounded_edit_text_white)
-            binding.llInvoiceTypeInvoiceDetail.setBackgroundResource(R.drawable.rounded_edit_text_white)
             binding.edtNoteInvoiceDetail.setBackgroundResource(R.drawable.rounded_edit_text_white)
             binding.ivEditInvoiceDetail.setBackgroundResource(R.drawable.cancel)
         } else {
-            binding.btnConfirmInvoiceDetail.visibility = View.VISIBLE
-            binding.btnRefuseInvoiceDetail.visibility = View.VISIBLE
             binding.btnSaveInvoiceDetail.visibility = View.GONE
-            binding.llPaymentMethodInvoiceDetail.setBackgroundResource(R.drawable.rounded_edit_text)
-            binding.llInvoiceTypeInvoiceDetail.setBackgroundResource(R.drawable.rounded_edit_text)
             binding.edtNoteInvoiceDetail.setBackgroundResource(R.drawable.rounded_edit_text)
             binding.edtNoteInvoiceDetail.inputType = InputType.TYPE_NULL
             binding.ivEditInvoiceDetail.setBackgroundResource(R.drawable.edit)
@@ -220,34 +207,18 @@ class InvoiceDetailFragment : BaseFragment() {
 
     private fun showParkedState() {
         binding.ivEditInvoiceDetail.visibility = View.GONE
-        binding.btnConfirmInvoiceDetail.visibility = View.GONE
-        binding.btnRefuseInvoiceDetail.visibility = View.GONE
         binding.btnSaveInvoiceDetail.visibility = View.GONE
     }
 
     private fun showRefusedState() {
         binding.ivEditInvoiceDetail.visibility = View.GONE
-        binding.btnConfirmInvoiceDetail.visibility = View.GONE
-        binding.btnRefuseInvoiceDetail.visibility = View.GONE
         binding.btnSaveInvoiceDetail.visibility = View.GONE
     }
 
     private fun handleSaveInvoice() {
         invoiceDetailViewModel.saveInvoice(
-            _type = binding.edtInvoiceTypeInvoiceDetail.text.toString(),
-            _paymentMethod = binding.edtPaymentMethodInvoiceDetail.text.toString(),
             _note = binding.edtNoteInvoiceDetail.text.toString()
         )
-    }
-
-    private fun handleConfirmInvoice() {
-        invoiceDetailViewModel.updateInvoice()
-        invoiceDetailViewModel.confirmInvoice()
-    }
-
-    private fun handleRefuseInvoice() {
-        invoiceDetailViewModel.updateInvoice()
-        invoiceDetailViewModel.refuseInvoice()
     }
 
 }

@@ -1,6 +1,5 @@
 package com.example.parkingqr.ui.components.qrcode
 
-import android.util.Log
 import android.view.View
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
@@ -15,7 +14,6 @@ import com.example.parkingqr.ui.components.dialog.UserQRCodeDialog
 import com.example.parkingqr.utils.AESEncyptionUtil
 import com.example.parkingqr.utils.QRcodeUtil
 import com.example.parkingqr.utils.TimeUtil
-import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -76,8 +74,11 @@ class UserQRCodeListFragment : BaseFragment() {
         userQRCodeListViewModel.getParkingInvoiceList()
         invoiceList = mutableListOf()
         userQRCodeListAdapter = UserQRCodeListAdapter(invoiceList)
-        userQRCodeListAdapter.setEventClick {
+        userQRCodeListAdapter.setOnClickItem {
             handleClickItem(it)
+        }
+        userQRCodeListAdapter.setOnClickChoosePaymentMethod {
+            handleChoosePaymentMethod(it)
         }
         binding.vpgUserQRcodeList.apply {
             adapter = userQRCodeListAdapter
@@ -93,6 +94,10 @@ class UserQRCodeListFragment : BaseFragment() {
 
     private fun handleClickItem(parkingInvoice: ParkingInvoice) {
 
+    }
+
+    private fun handleChoosePaymentMethod(parkingInvoice: ParkingInvoice) {
+        userQRCodeListViewModel.updatePaymentMethod(parkingInvoice)
     }
 
     private fun handleShowUserQRCodeDialog(userId: String) {

@@ -41,7 +41,7 @@ class ParkingInvoice() {
         this.id = id
         this.user = user
         this.vehicle = vehicle
-        this.state = "parking"
+        this.state = PARKING_STATE_TYPE
         this.imageIn = imageIn
         this.price = 0.0
         this.timeIn = timeIn
@@ -121,7 +121,11 @@ class ParkingInvoice() {
         }
     }
 
-    fun getPaymentMethod(): String {
+    fun isOnlinePayment(): Boolean {
+        return paymentMethod == VNPAY_PAYMENT_METHOD
+    }
+
+    fun getPaymentMethodReadable(): String {
         return if (paymentMethod == CASH_PAYMENT_METHOD) {
             "Tiền mặt"
         } else if (paymentMethod == VNPAY_PAYMENT_METHOD) {
@@ -129,7 +133,7 @@ class ParkingInvoice() {
         } else ""
     }
 
-    fun getInvoiceType(): String {
+    fun getInvoiceTypeReadable(): String {
         return if (type == HOUR_INVOICE_TYPE) {
             "Gửi theo giờ"
         } else if (type == MONTH_INVOICE_TYPE) {

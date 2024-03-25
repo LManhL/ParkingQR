@@ -1,7 +1,6 @@
 package com.example.parkingqr.data.remote.user
 
 import android.content.Context
-import android.util.Log
 import com.example.parkingqr.data.remote.BaseRemoteDataSource
 import com.example.parkingqr.data.remote.Params
 import com.example.parkingqr.data.remote.State
@@ -153,4 +152,22 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
     override fun getUserID(): Flow<State<String>> = flow {
         emit(State.success(auth.uid ?: ""))
     }.flowOn(Dispatchers.IO)
+
+    override fun getParkingLotManagerById(parkingLotManagerId: String): Flow<State<ParkingLotManagerFirebase>> =
+        flow {
+            val userRef = db.collection(Params.PARKING_LOT_MANAGER_PATH_COLLECTION)
+            val query = userRef.whereEqualTo("parkingLotManagerId", parkingLotManagerId)
+            emit(State.loading())
+            val querySnapshot = query.get().await()
+            val accountList: MutableList<ParkingLotManagerFirebase> = mutableListOf()
+            for (document in querySnapshot.documents) {
+                document.toObject(ParkingLotManagerFirebase::class.java)?.let {
+                    accountList.add(it)
+                }
+            }
+            if (accountList.isNotEmpty()) emit(State.success(accountList[0]))
+            else emit(State.failed("Không tìm thấy"))
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
 }

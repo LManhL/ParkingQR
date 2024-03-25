@@ -2,7 +2,7 @@ package com.example.parkingqr.ui.components.qrcode
 
 import kotlinx.coroutines.*
 
-abstract class Timer(val timeDelay: Long, val limit: Int) : TimerCallBack {
+abstract class Timer(private val timeDelay: Long, private val limit: Int) : TimerCallBack {
 
     companion object{
         const val SECOND_MILLISECONDS: Long = 1000

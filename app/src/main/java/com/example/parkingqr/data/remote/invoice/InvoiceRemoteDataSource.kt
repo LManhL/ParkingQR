@@ -22,10 +22,14 @@ import javax.inject.Inject
 
 class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRemoteDataSource(),
     InvoiceRemoteData {
-    override fun searchLicensePlateByUserId(licensePlate: String, userId: String): Flow<State<MutableList<VehicleFirebase>>> =
+    override fun searchLicensePlateByUserId(
+        licensePlate: String,
+        userId: String
+    ): Flow<State<MutableList<VehicleFirebase>>> =
         flow {
             val vehicleRef = db.collection(Params.VEHICLE_PATH_COLLECTION)
-            val query = vehicleRef.whereEqualTo("licensePlate", licensePlate).whereEqualTo("userId", userId)
+            val query =
+                vehicleRef.whereEqualTo("licensePlate", licensePlate).whereEqualTo("userId", userId)
             emit(State.loading())
             val querySnapshot = query.get().await()
             val vehicleList: MutableList<VehicleFirebase> = mutableListOf()
@@ -44,17 +48,15 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
             emit(State.loading())
 
             val storageRef = storage.reference
-            val bitmap = ImageUtil.decodeImage(parkingInvoice.imageIn!!)
+            val bitmap = ImageUtil.decodeImage(parkingInvoice.imageIn ?: "0")
             val baos = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
             val data = baos.toByteArray()
             val vehicleRegisterRef =
-                storageRef.child("${auth.currentUser?.uid}/${Params.PARKING_INVOICE_STORAGE_PATH}/${parkingInvoice.id}/${TimeUtil.getCurrentTime()}")
+                storageRef.child("${parkingInvoice.parkingLotId}/${Params.PARKING_INVOICE_STORAGE_PATH}/${parkingInvoice.id}/${TimeUtil.getCurrentTime()}")
             var uploadTask = vehicleRegisterRef.putBytes(data).await()
             val url = vehicleRegisterRef.downloadUrl.await()
-
             parkingInvoice.imageIn = url.toString()
-            parkingInvoice.parkingLotId = auth.currentUser?.uid
             parkingInvoiceRef.document(parkingInvoice.id!!).set(parkingInvoice)
                 .await()
             emit(State.success("${parkingInvoiceRef.path}/${parkingInvoice.id!!}"))
@@ -110,10 +112,6 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
                     url,
                     "note",
                     parkingInvoice.note,
-                    "paymentMethod",
-                    parkingInvoice.paymentMethod,
-                    "type",
-                    parkingInvoice.type,
                     "timeOut",
                     parkingInvoice.timeOut
                 )
@@ -188,9 +186,11 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
         flow {
             emit(State.loading())
             val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
-            val query: Query = parkingInvoiceRef.whereEqualTo("user.userId", auth.currentUser?.uid).whereNotIn("state",
-                mutableListOf("parking")
-            )
+            val query: Query =
+                parkingInvoiceRef.whereEqualTo("user.userId", auth.currentUser?.uid).whereNotIn(
+                    "state",
+                    mutableListOf("parking")
+                )
             val querySnapshot = query.get().await()
             val parkingInvoiceList = mutableListOf<ParkingInvoiceFirebase>()
             for (document in querySnapshot.documents) {
@@ -255,9 +255,11 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
         flow {
             emit(State.loading())
             val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
-            val query: Query = parkingInvoiceRef.whereEqualTo("user.userId", auth.currentUser?.uid).whereIn("state",
-                mutableListOf("parking")
-            )
+            val query: Query =
+                parkingInvoiceRef.whereEqualTo("user.userId", auth.currentUser?.uid).whereIn(
+                    "state",
+                    mutableListOf("parking")
+                )
             val querySnapshot = query.get().await()
             val parkingInvoiceList = mutableListOf<ParkingInvoiceFirebase>()
             for (document in querySnapshot.documents) {
@@ -266,6 +268,19 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
                 }
             }
             emit(State.success(parkingInvoiceList))
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
+    override fun updateInvoicePaymentMethod(parkingInvoice: ParkingInvoiceFirebase): Flow<State<Boolean>> =
+        flow {
+            emit(State.loading())
+            val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
+            parkingInvoiceRef.document(parkingInvoice.id!!).update(
+                "paymentMethod",
+                parkingInvoice.paymentMethod
+            ).await()
+            emit(State.success(true))
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)
