@@ -33,7 +33,7 @@ class HomeFragment: BaseFragment() {
             getNavController().navigate(R.id.invoiceListFragment)
         }
         binding.ivSettingHome.setOnClickListener {
-            showMessage("Ứng dụng hiện chưa hỗ trợ tính năng này")
+            getNavController().navigate(R.id.parkingLotSettingFragment)
         }
         binding.ivSecurityCameraHome.setOnClickListener {
             showMessage("Ứng dụng hiện chưa hỗ trợ tính năng này")

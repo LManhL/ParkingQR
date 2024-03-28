@@ -94,23 +94,6 @@ class ParkingInvoice() {
         this.note = parkingInvoiceFirebase.note.toString()
     }
 
-    fun calTotalPrice(): Double {
-
-        val endTime: Long = if (getState() == ParkingState.PARKING) {
-            TimeUtil.getCurrentTime()
-        } else {
-            if (timeOut.isNotEmpty()) timeOut.toLong()
-            else TimeUtil.getCurrentTime()
-        }
-        val hoursParked = ((endTime - timeIn.toLong()) / (1000 * 60 * 60)).toInt()
-        var parkingFee = 3000.0
-        if (hoursParked > 5) {
-            val additionalHours = hoursParked - 5
-            parkingFee += additionalHours * 250
-        }
-        return parkingFee
-    }
-
     fun getState(): ParkingState {
         return if (state == PARKING_STATE_TYPE) {
             ParkingState.PARKING

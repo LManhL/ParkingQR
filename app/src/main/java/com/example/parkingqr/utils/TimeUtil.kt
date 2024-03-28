@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit
 object TimeUtil {
     const val HOUR_TO_MILISECONDS: Long = 3600000
     const val MINUTE_TO_MILISECONDS: Long = 60000
+    const val MINUTES_TO_HOUR: Long = 60
 
     fun convertToLocalTime(systemTime: Long, offSet: Long): Long {
         return systemTime + HOUR_TO_MILISECONDS * offSet
@@ -63,5 +64,18 @@ object TimeUtil {
             minutes > 0 -> "$minutes phút trước"
             else -> "$seconds giây trước"
         }
+    }
+
+    // Dạng HH:mm
+    fun isTimeAfter(time1: String, time2: String): Boolean {
+        val (hour1, minute1) = time1.split(":").map { it.toInt() }
+        val (hour2, minute2) = time2.split(":").map { it.toInt() }
+
+        if (hour1 > hour2) {
+            return true
+        } else if (hour1 == hour2 && minute1 > minute2) {
+            return true
+        }
+        return false
     }
 }

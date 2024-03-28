@@ -405,14 +405,22 @@ class ParkingFragment : BaseFragment() {
             edtTimeInParking.setText(TimeUtil.convertMilisecondsToDate(parkingInvoice.timeIn))
             edtVehicleTypeParking.setText(parkingInvoice.vehicle.getVehicleType())
             edtPaymentMethodParking.setText(parkingInvoice.getPaymentMethodReadable())
-            edtPriceParking.setText("${FormatCurrencyUtil.formatNumberCeil(parkingInvoice.calTotalPrice())} VND")
+            edtPriceParking.setText(
+                "${
+                    FormatCurrencyUtil.formatNumberCeil(
+                        parkingViewModel.calculateInvoicePrice(
+                            parkingInvoice
+                        )
+                    )
+                } VND"
+            )
             edtInvoiceTypeParking.setText(parkingInvoice.getInvoiceTypeReadable())
-            if (!parkingInvoice.user.name.isNullOrEmpty()) {
+            if (parkingInvoice.user.name.isNotEmpty()) {
                 edtNameParking.setText(parkingInvoice.user.name)
             } else {
                 edtNameParking.setText("Không có tên người dùng")
             }
-            if (!parkingInvoice.vehicle.type.isNullOrEmpty()) {
+            if (parkingInvoice.vehicle.type.isNotEmpty()) {
                 edtVehicleTypeParking.setText(parkingInvoice.vehicle.getVehicleType())
             } else {
                 edtVehicleTypeParking.setText("Không có loại xe")

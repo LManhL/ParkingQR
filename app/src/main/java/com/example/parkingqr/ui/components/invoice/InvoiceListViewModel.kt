@@ -1,10 +1,15 @@
 package com.example.parkingqr.ui.components.invoice
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.invoice.InvoiceRepository
+import com.example.parkingqr.data.repo.parkinglot.ParkingLotRepository
+import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.parkinglot.BillingType
 import com.example.parkingqr.ui.base.BaseViewModel
+import com.example.parkingqr.utils.TimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +20,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class InvoiceListViewModel @Inject constructor(private val repository: InvoiceRepository): BaseViewModel() {
+class InvoiceListViewModel @Inject constructor(
+    private val invoiceRepository: InvoiceRepository,
+    private val parkingLotRepository: ParkingLotRepository,
+    private val userRepository: UserRepository
+) : BaseViewModel() {
     private val _stateUi = MutableStateFlow(
         InvoiceListViewModelState()
     )
@@ -24,33 +33,35 @@ class InvoiceListViewModel @Inject constructor(private val repository: InvoiceRe
     private var searchInvoiceJob: Job? = null
 
     init {
-        getParkingInvoiceList()
+        getBillingTypeList()
     }
 
     fun getParkingInvoiceList() {
         getInvoiceListJob?.cancel()
         getInvoiceListJob = viewModelScope.launch {
-            repository.getParkingLotInvoiceList().collect { state ->
-                when (state) {
-                    is State.Loading -> {
-                        _stateUi.update {
-                            it.copy(isLoading = true)
+            userRepository.getLocalParkingLotId()?.let { parkingLotId ->
+                invoiceRepository.getParkingLotInvoiceList(parkingLotId).collect { state ->
+                    when (state) {
+                        is State.Loading -> {
+                            _stateUi.update {
+                                it.copy(isLoading = true)
+                            }
                         }
-                    }
-                    is State.Success -> {
-                        _stateUi.update {
-                            it.copy(
-                                invoiceList = state.data,
-                                isLoading = false
-                            )
+                        is State.Success -> {
+                            _stateUi.update {
+                                it.copy(
+                                    invoiceList = state.data,
+                                    isLoading = false
+                                )
+                            }
                         }
-                    }
-                    is State.Failed -> {
-                        _stateUi.update {
-                            it.copy(
-                                isLoading = false,
-                                error = state.message
-                            )
+                        is State.Failed -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = state.message
+                                )
+                            }
                         }
                     }
                 }
@@ -61,36 +72,74 @@ class InvoiceListViewModel @Inject constructor(private val repository: InvoiceRe
     fun searchParkingInvoice(licensePlate: String) {
         searchInvoiceJob?.cancel()
         searchInvoiceJob = viewModelScope.launch {
-            repository.searchParkingInvoiceParkingLot(licensePlate).collect { state ->
-                when (state) {
-                    is State.Loading -> {
-                        _stateUi.update {
-                            it.copy(
-                                isLoading = true
-                            )
+            userRepository.getLocalParkingLotId()?.let { parkingLotId ->
+                invoiceRepository.searchParkingInvoiceParkingLot(licensePlate, parkingLotId)
+                    .collect { state ->
+                        when (state) {
+                            is State.Loading -> {
+                                _stateUi.update {
+                                    it.copy(
+                                        isLoading = true
+                                    )
+                                }
+                            }
+                            is State.Success -> {
+                                _stateUi.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        invoiceList = state.data,
+                                    )
+                                }
+                            }
+                            is State.Failed -> {
+                                _stateUi.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        error = state.message
+                                    )
+                                }
+                            }
                         }
                     }
-                    is State.Success -> {
-                        _stateUi.update {
-                            it.copy(
-                                isLoading = false,
-                                invoiceList = state.data,
-                            )
+            }
+        }
+    }
+
+    fun calculateInvoicePrice(parkingInvoice: ParkingInvoice): Double {
+        if (parkingInvoice.state == ParkingInvoice.PARKED_STATE_TYPE || parkingInvoice.state == ParkingInvoice.REFUSED_STATE_TYPE) return parkingInvoice.price
+        return stateUi.value.billingTypeHashMap[parkingInvoice.vehicle.type]?.calculateInvoicePrice(
+            parkingInvoice.timeIn,
+            TimeUtil.getCurrentTime().toString()
+        ) ?: 0.0
+    }
+
+    private fun getBillingTypeList() {
+        userRepository.getLocalParkingLotId()?.let { parkingLotId ->
+            viewModelScope.launch {
+                parkingLotRepository.getBillingTypesByParkingLotId(parkingLotId).collect { state ->
+                    when (state) {
+                        is State.Loading -> {}
+                        is State.Success -> {
+                            _stateUi.update { viewModelState ->
+                                viewModelState.copy(billingTypeHashMap = state.data.associateBy { it.vehicleType }
+                                    .toMutableMap())
+                            }
                         }
-                    }
-                    is State.Failed -> {
-                        _stateUi.update {
-                            it.copy(
-                                isLoading = false,
-                                error = state.message
-                            )
+                        is State.Failed -> {
+                            _stateUi.update {
+                                it.copy(
+                                    error = state.message
+                                )
+                            }
                         }
                     }
                 }
             }
         }
     }
-    fun showError(){
+
+
+    fun showError() {
         _stateUi.update {
             it.copy(
                 error = ""
@@ -102,6 +151,7 @@ class InvoiceListViewModel @Inject constructor(private val repository: InvoiceRe
     data class InvoiceListViewModelState(
         val isLoading: Boolean = false,
         val error: String = "",
-        val invoiceList: MutableList<ParkingInvoice> = mutableListOf()
+        val invoiceList: MutableList<ParkingInvoice> = mutableListOf(),
+        val billingTypeHashMap: MutableMap<String, BillingType> = mutableMapOf()
     )
 }

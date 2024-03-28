@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/llContainerBillingTypeDetail"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_marginTop="@dimen/margin_10"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:textColorHint="@color/black"
+                    android:theme="@style/Theme.App.Base"
+                    app:hintTextAppearance="@style/MyHintStyle">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:focusable="false"
+                        android:id="@+id/edtTypeBillingTypeDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:inputType="none"
+                        android:fontFamily="@font/source_sans_pro_semibold"
+                        android:gravity="center"
+                        android:hint="Ấn vào để đổi loại hóa đơn"
+                        android:text="Xe máy"
+                        android:textColor="@color/icon_color"
+                        android:textColorHint="@color/icon_color"
+                        android:textSize="@dimen/font_size_large"
+                        app:hintTextColor="@color/icon_color" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:textColorHint="@color/black"
+                    android:theme="@style/Theme.App.Base"
+                    app:hintTextAppearance="@style/MyHintStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtfirstBlockBillingTypeDetail"
+                        android:layout_width="200dp"
+                        android:layout_height="match_parent"
+                        android:enabled="true"
+                        android:fontFamily="@font/source_sans_pro"
+                        android:hint="Số giờ đầu"
+                        android:inputType="number"
+                        android:text="5"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/font_size_large" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:textColorHint="@color/black"
+                    android:theme="@style/Theme.App.Base"
+                    app:hintTextAppearance="@style/MyHintStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtfirstBlockPriceBillingTypeDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/icon_color"
+                        android:fontFamily="@font/source_sans_pro"
+                        android:hint="Giá giờ đầu"
+                        android:inputType="number"
+                        android:text="5,000"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/font_size_large" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:textColorHint="@color/black"
+                    android:theme="@style/Theme.App.Base"
+                    app:hintTextAppearance="@style/MyHintStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtafterFirstBlockBillingTypeDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/source_sans_pro"
+                        android:hint="Giá sau giờ đầu"
+                        android:inputType="number"
+                        android:text="500"
+                        android:textColor="@color/black"
+
+                        android:textSize="@dimen/font_size_large" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:textColorHint="@color/black"
+                    android:theme="@style/Theme.App.Base"
+                    app:hintTextAppearance="@style/MyHintStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtRoundedMinutesToHourBillingTypeDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/source_sans_pro"
+                        android:hint="Số phút làm tròn thành giờ"
+                        android:inputType="number"
+                        android:text="30"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/font_size_large" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="10">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="5"
+                        android:textColorHint="@color/black"
+                        android:theme="@style/Theme.App.Base"
+                        app:hintTextAppearance="@style/MyHintStyle">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtstartDaylightBillingTypeDetail"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:enabled="true"
+                            android:fontFamily="@font/source_sans_pro"
+                            android:hint="Giờ vào ca ngày"
+                            android:inputType="time"
+                            android:text="06:00"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/font_size_large" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="5"
+                        android:textColorHint="@color/black"
+                        android:theme="@style/Theme.App.Base"
+                        app:hintTextAppearance="@style/MyHintStyle">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtEndDaylightBillingTypeDetail"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:enabled="true"
+                            android:fontFamily="@font/source_sans_pro"
+                            android:hint="Giờ hết ca ngày"
+                            android:inputType="time"
+                            android:text="22:00"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/font_size_large" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="10">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="5"
+                        android:textColorHint="@color/black"
+                        android:theme="@style/Theme.App.Base"
+                        app:hintTextAppearance="@style/MyHintStyle">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtStartNightBillingTypeDetail"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:enabled="true"
+                            android:fontFamily="@font/source_sans_pro"
+                            android:hint="Giờ vào ca đêm"
+                            android:inputType="time"
+                            android:text="06:00"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/font_size_large" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="5"
+                        android:textColorHint="@color/black"
+                        android:theme="@style/Theme.App.Base"
+                        app:hintTextAppearance="@style/MyHintStyle">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtEndNightBillingTypeDetail"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:enabled="true"
+                            android:fontFamily="@font/source_sans_pro"
+                            android:hint="Giờ hết ca đêm"
+                            android:inputType="time"
+                            android:text="22:00"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/font_size_large" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:textColorHint="@color/black"
+                    android:theme="@style/Theme.App.Base"
+                    app:hintTextAppearance="@style/MyHintStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtNightSurchargeBillingTypeDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:enabled="true"
+                        android:fontFamily="@font/source_sans_pro"
+                        android:hint="Phụ phí gửi đêm"
+                        android:inputType="number"
+                        android:text="2,500"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/font_size_large" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:textColorHint="@color/black"
+                    android:theme="@style/Theme.App.Base"
+                    app:hintTextAppearance="@style/MyHintStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtSurchargeBillingTypeDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:enabled="true"
+                        android:fontFamily="@font/source_sans_pro"
+                        android:hint="Phụ phí khác"
+                        android:inputType="number"
+                        android:text="1,000"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/font_size_large" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/flbtnSaveBillingTypeDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/edit"
+            android:textAlignment="center"
+            app:backgroundTint="@color/icon_color"
+            app:tint="@android:color/white" />
+    </RelativeLayout>
+
+</LinearLayout>

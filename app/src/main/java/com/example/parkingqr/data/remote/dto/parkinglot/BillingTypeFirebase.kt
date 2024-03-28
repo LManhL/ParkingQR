@@ -7,6 +7,11 @@ data class BillingTypeFirebase(
     val firstBlock: Double? = null,
     val roundedMinutesToOneHour: Double? = null,
     val nightSurcharge: Double? = null,
-    val nightTime: String? = null,
-    val daylightTime: String? = null,
+    val startDaylightTime: String? = null,
+    val endDaylightTime: String? = null,
+    val startNightTime: String? = null,
+    val endNightTime: String? = null,
+    val type: String? = null,
+    val vehicleType: String? = null,
+    val surcharge: Double? = null
 )

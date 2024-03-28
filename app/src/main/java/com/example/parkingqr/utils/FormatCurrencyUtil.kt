@@ -1,5 +1,6 @@
 package com.example.parkingqr.utils
 
+import android.util.Log
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -14,8 +15,19 @@ object FormatCurrencyUtil {
         decimalFormat.roundingMode = RoundingMode.CEILING
         return decimalFormat.format(number)
     }
-    fun formatNumberCeilAndTruncate(number: Double): String{
+
+    fun formatNumberCeilAndTruncate(number: Double): String {
         return truncateText(formatNumberCeil(number))
+    }
+
+    fun convertFormatToNumber(format: String): Double {
+        var res = 0.0
+        try {
+            res = format.replace(",", "").toDouble()
+        } catch (e: NumberFormatException) {
+            Log.e("NumberFormatException", e.message.toString())
+        }
+        return res
     }
 
     private fun truncateText(text: String): String {

@@ -4,10 +4,12 @@ import android.graphics.Bitmap
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.invoice.InvoiceRepository
+import com.example.parkingqr.data.repo.parkinglot.ParkingLotRepository
 import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.data.repo.vehicle.VehicleRepository
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.invoice.UserInvoice
+import com.example.parkingqr.domain.model.parkinglot.BillingType
 import com.example.parkingqr.domain.model.qrcode.InvoiceQRCode
 import com.example.parkingqr.domain.model.qrcode.QRCode
 import com.example.parkingqr.domain.model.qrcode.UserQRCode
@@ -26,7 +28,8 @@ import javax.inject.Inject
 class ParkingViewModel @Inject constructor(
     private val invoiceRepository: InvoiceRepository,
     private val userRepository: UserRepository,
-    private val vehicleRepository: VehicleRepository
+    private val vehicleRepository: VehicleRepository,
+    private val parkingLotRepository: ParkingLotRepository
 ) : BaseViewModel() {
 
     companion object {
@@ -43,6 +46,11 @@ class ParkingViewModel @Inject constructor(
         ParkingViewModelState()
     )
     val stateUi: StateFlow<ParkingViewModelState> = _stateUi.asStateFlow()
+
+    init {
+        getBillingTypeList()
+    }
+
     fun searchUserByIdThenSearchVehicle() {
         val userId = stateUi.value.qrcode?.let { qrcode ->
             (qrcode as UserQRCode).userId
@@ -329,6 +337,7 @@ class ParkingViewModel @Inject constructor(
                     }.toString()
                     note = _note
                     timeOut = TimeUtil.getCurrentTime().toString()
+                    price = calculateInvoicePrice(this)
                 }
             )
         }
@@ -409,6 +418,38 @@ class ParkingViewModel @Inject constructor(
         }
     }
 
+    fun calculateInvoicePrice(parkingInvoice: ParkingInvoice): Double {
+        return stateUi.value.billingTypeHashMap[parkingInvoice.vehicle.type]?.calculateInvoicePrice(
+            parkingInvoice.timeIn,
+            TimeUtil.getCurrentTime().toString()
+        ) ?: 0.0
+    }
+
+    private fun getBillingTypeList() {
+        userRepository.getLocalParkingLotId()?.let { parkingLotId ->
+            viewModelScope.launch {
+                parkingLotRepository.getBillingTypesByParkingLotId(parkingLotId).collect { state ->
+                    when (state) {
+                        is State.Loading -> {}
+                        is State.Success -> {
+                            _stateUi.update { viewModelState ->
+                                viewModelState.copy(billingTypeHashMap = state.data.associateBy { it.vehicleType }
+                                    .toMutableMap())
+                            }
+                        }
+                        is State.Failed -> {
+                            _stateUi.update {
+                                it.copy(
+                                    errorMessage = state.message
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     data class ParkingViewModelState(
         val errorMessage: String = "",
@@ -423,7 +464,8 @@ class ParkingViewModel @Inject constructor(
         val licensePlateOfVehicleOut: String = "",
         val bmVehicleIn: Bitmap? = null,
         val bmVehicleOut: Bitmap? = null,
-        val timeLimit: Int = 5
+        val timeLimit: Int = 5,
+        val billingTypeHashMap: MutableMap<String, BillingType> = mutableMapOf()
     ) {
         init {
             errorList[ParkingState.FAIL_FOUND_VEHICLE] =

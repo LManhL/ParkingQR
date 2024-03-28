@@ -52,7 +52,7 @@ class UserInvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoice
         fun bind(invoice: ParkingInvoice){
             curInvoice = invoice
             licensePlate.text = invoice.vehicle.licensePlate
-            price.text = FormatCurrencyUtil.formatNumberCeil(invoice.calTotalPrice())
+            price.text = "${FormatCurrencyUtil.formatNumberCeil(invoice.price)} VND"
             timeIn.text = TimeUtil.convertMilisecondsToDate(invoice.timeIn)
             bindState()
         }

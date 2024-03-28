@@ -9,12 +9,15 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.parkingqr.R
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.parkinglot.BillingType
 import com.example.parkingqr.utils.FormatCurrencyUtil
 import com.example.parkingqr.utils.TimeUtil
 
-class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoice>): Adapter<InvoiceListAdapter.InvoiceViewHolder>() {
+class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoice>) :
+    Adapter<InvoiceListAdapter.InvoiceViewHolder>() {
 
-    private var onClickItem: ((ParkingInvoice)-> Unit)? = null
+    private var onClickItem: ((ParkingInvoice) -> Unit)? = null
+    private var calculatePriceCallback: ((ParkingInvoice) -> Double)? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InvoiceViewHolder {
@@ -31,11 +34,15 @@ class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoice>): 
         holder.bind(invoiceList[position])
     }
 
-    fun setEventClick(callback : ((ParkingInvoice) -> Unit)){
+    fun setEventClick(callback: ((ParkingInvoice) -> Unit)) {
         onClickItem = callback
     }
 
-    inner class InvoiceViewHolder(itemView: View): ViewHolder(itemView){
+    fun setCalculatePriceCallBack(callback: (ParkingInvoice) -> Double) {
+        this.calculatePriceCallback = callback
+    }
+
+    inner class InvoiceViewHolder(itemView: View) : ViewHolder(itemView) {
 
         private val container: LinearLayout = itemView.findViewById(R.id.llContainerItemInvoiceList)
         private val licensePlate: TextView = itemView.findViewById(R.id.tvLicensePlateInvoiceList)
@@ -49,19 +56,20 @@ class InvoiceListAdapter(private val invoiceList: MutableList<ParkingInvoice>): 
                 onClickItem?.invoke(curInvoice)
             }
         }
-        fun bind(invoice: ParkingInvoice){
+
+        fun bind(invoice: ParkingInvoice) {
             curInvoice = invoice
             licensePlate.text = invoice.vehicle.licensePlate
-            price.text = FormatCurrencyUtil.formatNumberCeil(invoice.calTotalPrice())
+            price.text = "${FormatCurrencyUtil.formatNumberCeil(calculatePriceCallback?.invoke(invoice) ?: 0.0)} VND"
             timeIn.text = TimeUtil.convertMilisecondsToDate(invoice.timeIn)
             bindState()
         }
-        private fun bindState(){
-            if(curInvoice.state == "parking"){
+
+        private fun bindState() {
+            if (curInvoice.state == "parking") {
                 status.text = "Xe đang gửi"
                 status.setTextColor(itemView.resources.getColor(R.color.light_red))
-            }
-            else if(curInvoice.state == "parked"){
+            } else if (curInvoice.state == "parked") {
                 status.text = "Đã trả xe"
                 status.setTextColor(itemView.resources.getColor(R.color.light_green))
             }

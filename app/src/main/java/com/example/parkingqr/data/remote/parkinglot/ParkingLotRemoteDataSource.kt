@@ -4,9 +4,9 @@ import android.content.Context
 import com.example.parkingqr.data.remote.BaseRemoteDataSource
 import com.example.parkingqr.data.remote.Params
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.remote.dto.parkinglot.BillingTypeFirebase
 import com.example.parkingqr.data.remote.dto.parkinglot.ParkingLotFirebase
 import com.example.parkingqr.data.remote.dto.parkinglot.RateFirebase
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -64,4 +64,37 @@ class ParkingLotRemoteDataSource @Inject constructor(val context: Context) : Bas
     }.catch {
         emit(State.failed(it.message.toString()))
     }.flowOn(Dispatchers.IO)
+
+    override fun getBillingTypesByParkingLotId(parkingLotId: String): Flow<State<MutableList<BillingTypeFirebase>>> =
+        flow {
+            emit(State.loading())
+            val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+                .collection(Params.BILLING_TYPE_PATH_COLLECTION)
+            val query: Query = ref
+            val querySnapshot = query.get().await()
+            val billingTypes = mutableListOf<BillingTypeFirebase>()
+            for (document in querySnapshot.documents) {
+                document.toObject(BillingTypeFirebase::class.java)?.let {
+                    billingTypes.add(it)
+                }
+            }
+            emit(State.success(billingTypes))
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
+    override fun updateBillingType(
+        parkingLotId: String,
+        billingTypeFirebase: BillingTypeFirebase
+    ): Flow<State<Boolean>> =
+        flow {
+            emit(State.loading())
+            val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+                .collection(Params.BILLING_TYPE_PATH_COLLECTION)
+            ref.document(billingTypeFirebase.id.toString()).set(billingTypeFirebase)
+            emit(State.success(true))
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
 }

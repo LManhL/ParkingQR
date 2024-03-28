@@ -17,4 +17,7 @@
     <string name="user_management_fragment_name">Quản lý tài khoản</string>
     <string name="vehicle_management_fragment_name">Quản lý xe</string>
     <string name="user_qr_code_fragment_name">Mã QR</string>
+    <string name="parking_lot_setting_fragment_name">Cấu hình</string>
+    <string name="billing_type_detail_fragment_name">Chi tiết hóa đơn</string>
+    <string name="billing_type_list_fragment_name">Loại hóa đơn</string>
 </resources>

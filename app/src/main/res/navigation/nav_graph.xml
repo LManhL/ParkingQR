@@ -131,4 +131,22 @@
         android:name="com.example.parkingqr.ui.components.qrcode.UserQRCodeListFragment"
         android:label="@string/user_qr_code_fragment_name">
     </fragment>
+    <fragment
+        tools:layout="@layout/fragment_parkinglot_setting"
+        android:id="@+id/parkingLotSettingFragment"
+        android:name="com.example.parkingqr.ui.components.parkinglotsetting.ParkingLotSettingFragment"
+        android:label="@string/parking_lot_setting_fragment_name">
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_billing_type_detail"
+        android:id="@+id/billingTypeDetailFragment"
+        android:name="com.example.parkingqr.ui.components.parkinglotsetting.BillingTypeDetailFragment"
+        android:label="@string/billing_type_detail_fragment_name">
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_billing_type_list"
+        android:id="@+id/billingTypeListFragment"
+        android:name="com.example.parkingqr.ui.components.parkinglotsetting.BillingTypeListFragment"
+        android:label="@string/billing_type_list_fragment_name">
+    </fragment>
 </navigation>

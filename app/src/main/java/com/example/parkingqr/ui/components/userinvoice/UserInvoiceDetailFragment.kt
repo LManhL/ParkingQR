@@ -105,7 +105,7 @@ class UserInvoiceDetailFragment : BaseFragment() {
         binding.edtNoteMyInvoiceDetail.setText(parkingInvoice.note)
 
         binding.tvPriceMyInvoiceDetail.text =
-            "Giá tiền: ${FormatCurrencyUtil.formatNumberCeil(parkingInvoice.calTotalPrice())} VND"
+            "Giá tiền: ${FormatCurrencyUtil.formatNumberCeil(parkingInvoice.price)} VND"
 
         if (!parkingInvoice.user.name.isNullOrEmpty()) {
             binding.edtIsRegisterMyInvoiceDetail.setText("Xe đã đăng ký")

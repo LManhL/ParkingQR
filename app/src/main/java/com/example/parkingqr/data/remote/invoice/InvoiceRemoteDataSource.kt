@@ -131,11 +131,11 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
         emit(State.failed(it.message.toString()))
     }.flowOn(Dispatchers.IO)
 
-    override fun getParkingLotInvoiceList(): Flow<State<MutableList<ParkingInvoiceFirebase>>> =
+    override fun getParkingLotInvoiceList(parkingLotId: String): Flow<State<MutableList<ParkingInvoiceFirebase>>> =
         flow {
             emit(State.loading())
             val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
-            val query: Query = parkingInvoiceRef.whereEqualTo("parkingLotId", auth.currentUser?.uid)
+            val query: Query = parkingInvoiceRef.whereEqualTo("parkingLotId", parkingLotId)
             val querySnapshot = query.get().await()
             val parkingInvoiceList = mutableListOf<ParkingInvoiceFirebase>()
             for (document in querySnapshot.documents) {
@@ -220,11 +220,11 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
             emit(State.success(parkingInvoiceList))
         }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
 
-    override fun searchParkingInvoiceParkingLot(licensePlate: String): Flow<State<MutableList<ParkingInvoiceFirebase>>> =
+    override fun searchParkingInvoiceParkingLot(licensePlate: String, parkingLotId: String): Flow<State<MutableList<ParkingInvoiceFirebase>>> =
         flow {
             emit(State.loading())
             val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
-            val query: Query = parkingInvoiceRef.whereEqualTo("parkingLotId", auth.currentUser?.uid)
+            val query: Query = parkingInvoiceRef.whereEqualTo("parkingLotId", parkingLotId)
                 .whereGreaterThanOrEqualTo("vehicle.licensePlate", licensePlate.uppercase())
                 .whereLessThanOrEqualTo("vehicle.licensePlate", "${licensePlate.uppercase()}~")
             val querySnapshot = query.get().await()

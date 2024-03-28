@@ -158,7 +158,12 @@ class LoginViewModel @Inject constructor(
             } else if (accountRole == AccountRole.PARKING_ATTENDANT) {
 
             } else {
-
+                _stateUi.update {
+                    it.copy(
+                        isReady = true,
+                        isLoading = false
+                    )
+                }
             }
         }
     }

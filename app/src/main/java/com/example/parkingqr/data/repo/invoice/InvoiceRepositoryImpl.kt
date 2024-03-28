@@ -94,8 +94,8 @@ class InvoiceRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun searchParkingInvoiceParkingLot(licensePlate: String): Flow<State<MutableList<ParkingInvoice>>> {
-        return invoiceRemoteData.searchParkingInvoiceParkingLot(licensePlate).map { state ->
+    override fun searchParkingInvoiceParkingLot(licensePlate: String, parkingLotId: String): Flow<State<MutableList<ParkingInvoice>>> {
+        return invoiceRemoteData.searchParkingInvoiceParkingLot(licensePlate, parkingLotId).map { state ->
             when (state) {
                 is State.Loading -> State.loading()
                 is State.Success -> State.success(state.data.map { it.mapToParkingInvoice() }
@@ -105,8 +105,8 @@ class InvoiceRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getParkingLotInvoiceList(): Flow<State<MutableList<ParkingInvoice>>> {
-        return invoiceRemoteData.getParkingLotInvoiceList().map { state ->
+    override fun getParkingLotInvoiceList(parkingLotId: String): Flow<State<MutableList<ParkingInvoice>>> {
+        return invoiceRemoteData.getParkingLotInvoiceList(parkingLotId).map { state ->
             when (state) {
                 is State.Loading -> State.loading()
                 is State.Success -> State.success(state.data.map { it.mapToParkingInvoice() }

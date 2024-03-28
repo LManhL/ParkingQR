@@ -15,9 +15,9 @@ import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.ui.base.BaseFragment
 import kotlinx.coroutines.*
 
-class InvoiceListFragment: BaseFragment() {
+class InvoiceListFragment : BaseFragment() {
 
-    companion object{
+    companion object {
         const val INVOICE_ID_KEY = "INVOICE_ID_KEY"
     }
 
@@ -28,21 +28,19 @@ class InvoiceListFragment: BaseFragment() {
     private var searchJob: Job? = null
 
     override fun observeViewModel() {
-        lifecycleScope.launch{
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                invoiceViewModel.stateUi.collect{
-
-                    if(it.isLoading) showLoading() else hideLoading()
-                    if(it.error.isNotEmpty()) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                invoiceViewModel.stateUi.collect {
+                    if (it.isLoading) showLoading() else hideLoading()
+                    if (it.error.isNotEmpty()) {
                         showError(it.error)
                         invoiceViewModel.showError()
                     }
-                    if(invoiceList.isEmpty()) invoiceList.addAll(it.invoiceList)
-                    else{
+                    if (it.billingTypeHashMap.isNotEmpty()) {
                         invoiceList.clear()
                         invoiceList.addAll(it.invoiceList)
+                        invoiceListAdapter.notifyDataSetChanged()
                     }
-                    invoiceListAdapter.notifyDataSetChanged()
                 }
             }
         }
@@ -55,6 +53,9 @@ class InvoiceListFragment: BaseFragment() {
         invoiceListAdapter.setEventClick {
             handleClickItem(it)
         }
+        invoiceListAdapter.setCalculatePriceCallBack { parkingInvoice ->
+            invoiceViewModel.calculateInvoicePrice(parkingInvoice)
+        }
         binding.rlvListInvoiceList.apply {
             adapter = invoiceListAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -62,14 +63,15 @@ class InvoiceListFragment: BaseFragment() {
         return binding.root
     }
 
-    private fun handleClickItem(parkingInvoice: ParkingInvoice){
+    private fun handleClickItem(parkingInvoice: ParkingInvoice) {
         val bundle = Bundle()
         bundle.putString(INVOICE_ID_KEY, parkingInvoice.id)
         getNavController().navigate(R.id.invoiceDetailFragment, bundle)
     }
+
     override fun initListener() {
         hideActionBar()
-        binding.edtSearchInvoiceList.addTextChangedListener(object : TextWatcher{
+        binding.edtSearchInvoiceList.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 searchJob?.cancel()
@@ -80,5 +82,6 @@ class InvoiceListFragment: BaseFragment() {
             }
             override fun afterTextChanged(s: Editable?) {}
         })
+        invoiceViewModel.getParkingInvoiceList()
     }
 }

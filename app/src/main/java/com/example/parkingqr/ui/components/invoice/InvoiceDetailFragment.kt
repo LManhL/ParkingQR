@@ -5,6 +5,7 @@ import android.text.InputType
 import android.view.View
 import android.widget.PopupMenu
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -28,6 +29,7 @@ class InvoiceDetailFragment : BaseFragment() {
     private lateinit var binding: FragmentInvoiceDetailBinding
     private lateinit var invoiceId: String
     private val invoiceDetailViewModel: InvoiceDetailViewModel by viewModels()
+    private val invoiceViewModel: InvoiceListViewModel by hiltNavGraphViewModels(R.id.invoiceListFragment)
     private var isEditing = false
     private var parkingInvoice: ParkingInvoice? = null
 
@@ -161,7 +163,13 @@ class InvoiceDetailFragment : BaseFragment() {
         binding.edtNoteInvoiceDetail.setText(parkingInvoice.note)
 
         binding.tvPriceInvoiceDetail.text =
-            "Giá tiền: ${FormatCurrencyUtil.formatNumberCeil(parkingInvoice.calTotalPrice())} VND"
+            "Giá tiền: ${
+                FormatCurrencyUtil.formatNumberCeil(
+                    invoiceViewModel.calculateInvoicePrice(
+                        parkingInvoice
+                    )
+                )
+            } VND"
 
         if (!parkingInvoice.user.name.isNullOrEmpty()) {
             binding.edtIsRegisterInvoiceDetail.setText("Xe đã đăng ký")
