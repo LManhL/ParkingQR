@@ -78,6 +78,11 @@ class UserQRCodeListAdapter(private val invoiceList: MutableList<ParkingInvoice>
             curInvoice = invoice
             licensePlate.text = "${invoice.vehicle.licensePlate}"
             timeIn.text = "Thời gian vào là ${TimeUtil.convertMilisecondsToDate(invoice.timeIn)}"
+            if (curInvoice.paymentMethod == ParkingInvoice.CASH_PAYMENT_METHOD) {
+                handleChooseCash()
+            } else {
+                handleChooseOnlinePayment()
+            }
             AESEncyptionUtil.encrypt(
                 InvoiceQRCode(
                     invoiceId = invoice.id,

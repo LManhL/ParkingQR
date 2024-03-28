@@ -19,8 +19,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_20"
                 android:orientation="vertical">
+
+                <View
+                    android:layout_width="20dp"
+                    android:layout_height="6dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/margin_10"
+                    android:layout_marginBottom="@dimen/margin_20"
+                    android:background="@drawable/rounded_button_icon_color" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -32,7 +39,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="3"
+                        android:layout_weight="2"
                         android:gravity="center">
 
                         <ImageView
@@ -45,16 +52,22 @@
                         android:id="@+id/tvAreaBottomSheetPlaceDetail"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="6"
+                        android:layout_weight="7"
                         android:fontFamily="@font/source_sans_pro"
                         android:text="300m2"
                         android:textSize="@dimen/font_size_medium" />
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/margin_20"
+                    android:layout_marginBottom="@dimen/margin_20"
+                    android:background="@color/white" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_10"
                     android:orientation="horizontal"
                     android:weightSum="10">
 
@@ -62,7 +75,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="3"
+                        android:layout_weight="2"
                         android:gravity="center">
 
                         <ImageView
@@ -75,16 +88,22 @@
                         android:id="@+id/tvCapacityBottomSheetPlaceDetail"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="6"
+                        android:layout_weight="7"
                         android:fontFamily="@font/source_sans_pro"
                         android:text="200 xe ô tô (dưới 7 chỗ) và 300 xe máy"
                         android:textSize="@dimen/font_size_medium" />
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/margin_20"
+                    android:layout_marginBottom="@dimen/margin_20"
+                    android:background="#40070FAD" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_10"
                     android:orientation="horizontal"
                     android:weightSum="10">
 
@@ -92,7 +111,7 @@
                         android:layout_width="0dp"
                         android:layout_height="40dp"
                         android:layout_gravity="center"
-                        android:layout_weight="3"
+                        android:layout_weight="2"
                         android:gravity="center">
 
                         <ImageView
@@ -105,16 +124,22 @@
                         android:id="@+id/tvInformationBottomSheetPlaceDetail"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="6"
+                        android:layout_weight="7"
                         android:fontFamily="@font/source_sans_pro"
                         android:text="Bãi gửi xe hiện đại xây dựng bằng công nghệ Nhật Bản"
                         android:textSize="@dimen/font_size_medium" />
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/margin_20"
+                    android:layout_marginBottom="@dimen/margin_20"
+                    android:background="@color/white" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_10"
                     android:orientation="horizontal"
                     android:weightSum="10">
 
@@ -122,7 +147,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="3"
+                        android:layout_weight="2"
                         android:gravity="center">
 
                         <ImageView
@@ -135,146 +160,190 @@
                         android:id="@+id/tvPhoneNumberBottomSheetPlaceDetail"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="6"
+                        android:layout_weight="7"
                         android:fontFamily="@font/source_sans_pro"
                         android:text="0123456789"
                         android:textSize="@dimen/font_size_medium" />
                 </LinearLayout>
 
                 <View
-                    android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="@color/white"/>
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/margin_20"
+                    android:layout_marginBottom="@dimen/margin_20"
+                    android:background="#40070FAD" />
 
                 <LinearLayout
-                    android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/margin_10"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:weightSum="10">
 
                     <TextView
-                        android:gravity="start"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
                         android:fontFamily="@font/source_sans_pro"
-                        android:text="Cho ô tô: "
+                        android:gravity="start"
+                        android:text="Cho xe hơi: "
                         android:textSize="@dimen/font_size_medium" />
 
                     <LinearLayout
-                        android:weightSum="9"
-                        android:orientation="horizontal"
-                        android:layout_weight="4"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:layout_weight="4"
+                        android:orientation="horizontal"
+                        android:weightSum="9">
+
                         <TextView
-                            android:textColor="@color/light_red"
-                            android:gravity="end"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="4"
                             android:fontFamily="@font/source_sans_pro"
+                            android:gravity="end"
                             android:text="10"
+                            android:textColor="@color/light_red"
                             android:textSize="@dimen/font_size_extra_large" />
+
                         <TextView
-                            android:gravity="center"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:fontFamily="@font/source_sans_pro"
+                            android:gravity="center"
                             android:text="/"
                             android:textSize="@dimen/font_size_extra_large" />
+
                         <TextView
-                            android:gravity="start"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="4"
                             android:fontFamily="@font/source_sans_pro"
+                            android:gravity="start"
                             android:text="20"
                             android:textSize="@dimen/font_size_extra_large" />
                     </LinearLayout>
 
                     <TextView
-                        android:textColor="@color/icon_color"
-                        android:gravity="center"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
-                        android:fontFamily="@font/source_sans_pro"
+                        android:fontFamily="@font/source_sans_pro_semibold"
+                        android:gravity="center"
                         android:text="Đặt chỗ ngay"
+                        android:textColor="@color/icon_color"
                         android:textSize="@dimen/font_size_medium" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/margin_10"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:weightSum="10">
 
                     <TextView
-                        android:gravity="start"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
                         android:fontFamily="@font/source_sans_pro"
+                        android:gravity="start"
                         android:text="Cho xe máy: "
                         android:textSize="@dimen/font_size_medium" />
 
                     <LinearLayout
-                        android:weightSum="9"
-                        android:orientation="horizontal"
-                        android:layout_weight="4"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:layout_weight="4"
+                        android:orientation="horizontal"
+                        android:weightSum="9">
+
                         <TextView
-                            android:textColor="@color/light_red"
-                            android:gravity="end"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="4"
                             android:fontFamily="@font/source_sans_pro"
+                            android:gravity="end"
                             android:text="30"
+                            android:textColor="@color/light_red"
                             android:textSize="@dimen/font_size_extra_large" />
+
                         <TextView
-                            android:gravity="center"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:fontFamily="@font/source_sans_pro"
+                            android:gravity="center"
                             android:text="/"
                             android:textSize="@dimen/font_size_extra_large" />
+
                         <TextView
-                            android:gravity="start"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="4"
                             android:fontFamily="@font/source_sans_pro"
+                            android:gravity="start"
                             android:text="60"
                             android:textSize="@dimen/font_size_extra_large" />
                     </LinearLayout>
 
                     <TextView
-                        android:textColor="@color/icon_color"
-                        android:gravity="center"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
-                        android:fontFamily="@font/source_sans_pro"
+                        android:fontFamily="@font/source_sans_pro_semibold"
+                        android:gravity="center"
                         android:text="Đặt chỗ ngay"
+                        android:textColor="@color/icon_color"
+                        android:textSize="@dimen/font_size_medium" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/margin_10"
+                    android:layout_marginBottom="@dimen/margin_10"
+                    android:background="#40070FAD" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/margin_10"
+                    android:gravity="start"
+                    android:orientation="horizontal"
+                    android:weightSum="10">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:fontFamily="@font/source_sans_pro"
+                        android:gravity="start"
+                        android:text="Bạn muốn gửi lâu dài?"
+                        android:textSize="@dimen/font_size_medium" />
+
+                    <TextView
+                        android:id="@+id/tvChooseRegisterMonthlyInvoice"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:fontFamily="@font/source_sans_pro_semibold"
+                        android:gravity="end"
+                        android:text="Chọn mua vé tháng"
+                        android:textColor="@color/icon_color"
                         android:textSize="@dimen/font_size_medium" />
                 </LinearLayout>
 
                 <View
                     android:id="@+id/dividerRateContent"
-                    android:layout_marginTop="4dp"
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="#C6C4C4"/>
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/margin_10"
+                    android:layout_marginBottom="@dimen/margin_10"
+                    android:background="#40070FAD" />
 
                 <TextView
                     android:layout_width="wrap_content"

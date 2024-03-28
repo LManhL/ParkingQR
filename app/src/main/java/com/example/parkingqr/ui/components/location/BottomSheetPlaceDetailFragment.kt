@@ -8,6 +8,7 @@ import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.example.parkingqr.R
@@ -19,14 +20,15 @@ import kotlinx.coroutines.launch
 
 class BottomSheetPlaceDetailFragment : BottomSheetDialogFragment() {
 
+    companion object {
+        const val TAG = "BottomSheetDialogFragment"
+        const val PARKING_LOT_ID = "PARKING_LOT_ID"
+    }
+
     private lateinit var binding: FragmentBottomSheetPlaceDetailBinding
     private lateinit var rateListAdapter: RateListAdapter
     private lateinit var rateList: MutableList<Rate>
     private val locationViewModel: LocationViewModel by hiltNavGraphViewModels(R.id.locationFragment)
-
-    companion object {
-        const val TAG = "BottomSheetDialogFragment"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,14 +60,15 @@ class BottomSheetPlaceDetailFragment : BottomSheetDialogFragment() {
             layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         }
+        binding.tvChooseRegisterMonthlyInvoice.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putString(PARKING_LOT_ID, locationViewModel.stateUi.value.parkingLotDetail.id)
+            findNavController().navigate(R.id.registerMonthlyInvoiceFragment)
+        }
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-    private fun bindView(parkingLot: ParkingLot){
+    private fun bindView(parkingLot: ParkingLot) {
         binding.tvAreaBottomSheetPlaceDetail.text = "${parkingLot.area} m2"
         binding.tvCapacityBottomSheetPlaceDetail.text = parkingLot.capacity
         binding.tvInformationBottomSheetPlaceDetail.text = parkingLot.description

@@ -8,16 +8,18 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cdvContainerAvatarRateContent"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        app:cardCornerRadius="20dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:cardCornerRadius="28dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:layout_gravity="center"
             android:id="@+id/ivAvatarRateContent"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:scaleType="centerInside"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="@color/white" />
     </androidx.cardview.widget.CardView>
 
@@ -47,8 +49,7 @@
         android:id="@+id/llStarRateContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_6"
-        android:layout_marginTop="@dimen/margin_6"
+        android:layout_margin="@dimen/margin_10"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="@id/cdvContainerAvatarRateContent"
         app:layout_constraintTop_toBottomOf="@id/tvCreateAtRateContent">
@@ -90,18 +91,20 @@
         android:id="@+id/tvCommentRateContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_6"
+        android:layout_margin="@dimen/margin_10"
         android:fontFamily="@font/source_sans_pro"
         android:text="abc def abc def abc def abc defabc defabc def abc def abc def abc def abc defabc def abc def abc def abc def abc def def abc def abc defabc def abc def "
         android:textSize="@dimen/font_size_medium"
         app:layout_constraintTop_toBottomOf="@id/barRateContent" />
 
     <View
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:id="@+id/dividerRateContent"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/margin_20"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#C6C4C4"
+        android:layout_height="1dp"
+        android:background="#40070FAD"
         app:layout_constraintTop_toBottomOf="@id/tvCommentRateContent"/>
 
 

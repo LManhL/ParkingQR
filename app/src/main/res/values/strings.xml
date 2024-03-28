@@ -20,4 +20,5 @@
     <string name="parking_lot_setting_fragment_name">Cấu hình</string>
     <string name="billing_type_detail_fragment_name">Chi tiết hóa đơn</string>
     <string name="billing_type_list_fragment_name">Loại hóa đơn</string>
+    <string name="register_monthly_invoice_fragment_name">Mua vé tháng</string>
 </resources>

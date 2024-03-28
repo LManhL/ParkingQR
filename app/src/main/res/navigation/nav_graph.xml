@@ -149,4 +149,10 @@
         android:name="com.example.parkingqr.ui.components.parkinglotsetting.BillingTypeListFragment"
         android:label="@string/billing_type_list_fragment_name">
     </fragment>
+    <fragment
+        tools:layout="@layout/fragment_register_monthly_invoice"
+        android:id="@+id/registerMonthlyInvoiceFragment"
+        android:name="com.example.parkingqr.ui.components.location.RegisterMonthlyInvoiceFragment"
+        android:label="@string/register_monthly_invoice_fragment_name">
+    </fragment>
 </navigation>
