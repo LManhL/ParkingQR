@@ -1,6 +1,7 @@
 package com.example.parkingqr.data.remote.user
 
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.remote.dto.parkinglot.MonthlyTicketFirebase
 import com.example.parkingqr.data.remote.dto.user.AccountFirebase
 import com.example.parkingqr.data.remote.dto.user.ParkingAttendantFirebase
 import com.example.parkingqr.data.remote.dto.user.ParkingLotManagerFirebase
@@ -23,4 +24,7 @@ interface UserRemoteData {
 
     fun getUserID(): Flow<State<String>>
     fun getParkingLotManagerById(parkingLotManagerId: String): Flow<State<ParkingLotManagerFirebase>>
+
+    fun getCurrentUserInfo(): Flow<State<UserFirebase>>
+
 }

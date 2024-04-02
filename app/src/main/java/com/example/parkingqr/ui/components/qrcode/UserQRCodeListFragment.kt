@@ -71,6 +71,7 @@ class UserQRCodeListFragment : BaseFragment() {
 
     override fun initListener() {
         showBottomNavigation()
+        hideActionBar()
         userQRCodeListViewModel.getParkingInvoiceList()
         invoiceList = mutableListOf()
         userQRCodeListAdapter = UserQRCodeListAdapter(invoiceList)
@@ -89,6 +90,9 @@ class UserQRCodeListFragment : BaseFragment() {
         }
         binding.ivHeaderUserQrcodeList.setOnClickListener {
             userQRCodeListViewModel.getUserID()
+        }
+        binding.ivSelectQRCodeTypeUserQRCodeList.setOnClickListener {
+            getNavController().navigate(R.id.selectQRCodeTypeFragment)
         }
     }
 

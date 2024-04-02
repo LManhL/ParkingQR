@@ -1,14 +1,9 @@
 package com.example.parkingqr.data.mapper
 
-import com.example.parkingqr.data.remote.dto.parkinglot.BillingTypeFirebase
-import com.example.parkingqr.data.remote.dto.parkinglot.ParkingLotFirebase
-import com.example.parkingqr.data.remote.dto.parkinglot.RateFirebase
-import com.example.parkingqr.data.remote.dto.parkinglot.UserRateFirebase
-import com.example.parkingqr.domain.model.parkinglot.BillingType
-import com.example.parkingqr.domain.model.parkinglot.ParkingLot
-import com.example.parkingqr.domain.model.parkinglot.Rate
-import com.example.parkingqr.domain.model.parkinglot.UserRate
+import com.example.parkingqr.data.remote.dto.parkinglot.*
+import com.example.parkingqr.domain.model.parkinglot.*
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.firestore.GeoPoint
 
 fun ParkingLotFirebase.mapToParkingLot(): ParkingLot {
     return ParkingLot(
@@ -20,6 +15,19 @@ fun ParkingLotFirebase.mapToParkingLot(): ParkingLot {
         description = description ?: "",
         address = address ?: "",
         area = area ?: 0.0,
+    )
+}
+
+fun ParkingLot.mapToParkingLotFirebase(): ParkingLotFirebase {
+    return ParkingLotFirebase(
+        id = id,
+        name = name,
+        location = GeoPoint(location.latitude, location.longitude),
+        phoneNumber = phoneNumber,
+        capacity = capacity,
+        description = description,
+        address = address,
+        area = area,
     )
 }
 
@@ -75,5 +83,27 @@ fun BillingType.mapToBillingTypeFirebase(): BillingTypeFirebase {
         type = type,
         vehicleType = vehicleType,
         surcharge = surcharge
+    )
+}
+
+fun MonthlyTicketTypeFirebase.mapToMonthlyTicket(): MonthlyTicketType {
+    return MonthlyTicketType(
+        id = id ?: "",
+        numberOfMonth = numberOfMonth ?: 0.0,
+        originalPrice = originalPrice ?: 0.0,
+        promotionalPrice = promotionalPrice ?: 0.0,
+        description = description ?: "",
+        vehicleType = vehicleType ?: ""
+    )
+}
+
+fun MonthlyTicketType.mapToMonthlyTicketFirebase(): MonthlyTicketTypeFirebase {
+    return MonthlyTicketTypeFirebase(
+        id = id,
+        numberOfMonth = numberOfMonth,
+        originalPrice = originalPrice,
+        promotionalPrice = promotionalPrice,
+        description = description,
+        vehicleType = vehicleType
     )
 }

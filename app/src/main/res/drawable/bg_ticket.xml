@@ -1,0 +1,33 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:height="150dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="90"
+                android:centerColor="@color/white"
+                android:endColor="@color/white"
+                android:startColor="@color/white" />
+        </shape>
+    </item>
+
+    <item
+        android:width="100dp"
+        android:height="100dp"
+        android:gravity="center_vertical"
+        android:start="-75dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/bg_ticket_color" />
+        </shape>
+    </item>
+
+    <item
+        android:width="100dp"
+        android:height="100dp"
+        android:end="-75dp"
+        android:gravity="center_vertical"
+        android:start="275dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/bg_ticket_color" />
+        </shape>
+    </item>
+
+</layer-list>

@@ -4,6 +4,8 @@ import com.example.parkingqr.data.repo.auth.AuthRepository
 import com.example.parkingqr.data.repo.auth.AuthRepositoryImpl
 import com.example.parkingqr.data.repo.invoice.InvoiceRepository
 import com.example.parkingqr.data.repo.invoice.InvoiceRepositoryImpl
+import com.example.parkingqr.data.repo.monthlyticket.MonthlyTicketRepository
+import com.example.parkingqr.data.repo.monthlyticket.MonthlyTicketRepositoryImpl
 import com.example.parkingqr.data.repo.parkinglot.ParkingLotRepository
 import com.example.parkingqr.data.repo.parkinglot.ParkingLotRepositoryImpl
 import com.example.parkingqr.data.repo.user.UserRepository
@@ -39,4 +41,8 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindParkingLotRepository(repository: ParkingLotRepositoryImpl): ParkingLotRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMonthlyTicketRepository(repository: MonthlyTicketRepositoryImpl): MonthlyTicketRepository
 }

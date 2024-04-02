@@ -26,4 +26,6 @@ interface UserRepository {
 
     fun saveLocalParkingLotId(parkingLotId: String)
     fun getLocalParkingLotId(): String?
+
+    fun getCurrentUserInfo(): Flow<State<User>>
 }

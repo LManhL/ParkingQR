@@ -1,6 +1,13 @@
 package com.example.parkingqr.domain.model.vehicle
 
 class VehicleDetail() {
+
+    companion object {
+        const val CAR_TYPE = "car"
+        const val MOTORBIKE_TYPE = "motorbike"
+        const val OTHER_TYPE = "other"
+    }
+
     var id: String? = null
     var createAt: String? = null
     var userId: String? = null
@@ -62,6 +69,13 @@ class VehicleDetail() {
         } else{
             VehicleState.REFUSED
         }
+    }
+    fun getVehicleType(): String {
+        return if (type == VehicleInvoice.CAR_TYPE) {
+            "Xe hơi"
+        } else if (type == VehicleInvoice.MOTORBIKE_TYPE) {
+            "Xe máy"
+        } else "Khác"
     }
 
     enum class VehicleState{

@@ -6,21 +6,23 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 object TimeUtil {
-    const val HOUR_TO_MILISECONDS: Long = 3600000
-    const val MINUTE_TO_MILISECONDS: Long = 60000
+    const val HOUR_TO_MILLISECONDS: Long = 3600000
+    const val MINUTE_TO_MILLISECONDS: Long = 60000
     const val MINUTES_TO_HOUR: Long = 60
+    const val DAY_TO_HOURS: Long = 24
+    const val MONTH_TO_DAY: Long = 30
 
     fun convertToLocalTime(systemTime: Long, offSet: Long): Long {
-        return systemTime + HOUR_TO_MILISECONDS * offSet
+        return systemTime + HOUR_TO_MILLISECONDS * offSet
     }
 
     fun convertMilisecondsToDate(miliseconds: String): String {
-        if(miliseconds.isEmpty()) return ""
+        if (miliseconds.isEmpty()) return ""
         try {
             val res = Date(miliseconds.toLong())
             val dateFormat: DateFormat = SimpleDateFormat("HH:mm dd/MM/yyyy")
             return dateFormat.format(res)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             throw Exception(e)
         }
     }
@@ -29,7 +31,7 @@ object TimeUtil {
         return System.currentTimeMillis()
     }
 
-    fun getDateCurrentTime(): String{
+    fun getDateCurrentTime(): String {
         return convertMilisecondsToDate(getCurrentTime().toString())
     }
 
@@ -45,6 +47,7 @@ object TimeUtil {
         }
         return milliseconds.toString()
     }
+
     fun getTimeAgoString(timeInMillis: Long): String {
         val currentTime = System.currentTimeMillis()
         val timeDifference = currentTime - timeInMillis
@@ -77,5 +80,9 @@ object TimeUtil {
             return true
         }
         return false
+    }
+
+    fun getTimeAfterNumberOfMonth(month: Double): Long {
+        return getCurrentTime() + (month * MONTH_TO_DAY * DAY_TO_HOURS * HOUR_TO_MILLISECONDS).toLong()
     }
 }

@@ -155,4 +155,16 @@
         android:name="com.example.parkingqr.ui.components.location.RegisterMonthlyInvoiceFragment"
         android:label="@string/register_monthly_invoice_fragment_name">
     </fragment>
+    <fragment
+        tools:layout="@layout/fragment_choose_vehicle_monthly_ticket"
+        android:id="@+id/chooseVehicleMonthlyTicket"
+        android:name="com.example.parkingqr.ui.components.location.ChooseVehicleMonthlyTicketFragment"
+        android:label="@string/choose_vehicle_monthly_ticket_fragment_name">
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_select_qr_code_type"
+        android:id="@+id/selectQRCodeTypeFragment"
+        android:name="com.example.parkingqr.ui.components.qrcode.SelectQRCodeTypeFragment"
+        android:label="@string/select_qr_code_type_fragment_name">
+    </fragment>
 </navigation>

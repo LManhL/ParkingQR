@@ -15,11 +15,12 @@
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <TextView
+            android:id="@+id/tvChooseVehicleMonthlyInvoice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_10"
-            android:enabled="false"
             android:fontFamily="@font/source_sans_pro_semibold"
             android:gravity="center"
             android:inputType="none"
@@ -27,7 +28,9 @@
             android:text="Nhấn để chọn xe đăng ký vé tháng"
             android:textColor="@color/icon_color"
             android:textSize="@dimen/font_size_medium" />
+
         <EditText
+            android:id="@+id/edtLicensePlateRegisterMonthlyInvoice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/margin_20"
@@ -36,7 +39,7 @@
             android:enabled="false"
             android:fontFamily="@font/source_sans_pro_semibold"
             android:gravity="center"
-            android:hint="89L138851"
+            android:hint="Vui lòng chọn xe"
             android:inputType="none"
             android:maxLines="2"
             android:padding="@dimen/padding_10"
@@ -46,11 +49,12 @@
 
     <TextView
         android:id="@+id/tvLabelServicesRegisterMonthlyInvoice"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/margin_20"
-        android:layout_marginRight="@dimen/margin_20"
         android:layout_marginTop="@dimen/margin_20"
+        android:layout_marginRight="@dimen/margin_20"
         android:enabled="false"
         android:fontFamily="@font/source_sans_pro"
         android:gravity="center"
@@ -63,12 +67,11 @@
         app:layout_constraintTop_toBottomOf="@id/llContainerLicensePlateRegisterMonthlyInvoice" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:focusable="false"
-        android:background="#40787777"
         android:id="@+id/rlvListRegisterMonthlyInvoice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_10"
+        android:background="@color/white"
         app:layout_constraintTop_toBottomOf="@id/tvLabelServicesRegisterMonthlyInvoice" />
 
     <TextView
@@ -97,7 +100,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvLabelPaymentMethodRegisterMonthlyInvoice">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/crdCashUserQRCodeList"
+            android:id="@+id/crdVNPayRegisterMonthlyInvoice"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/margin_10"
@@ -113,6 +116,7 @@
                 android:orientation="horizontal">
 
                 <RadioButton
+                    android:enabled="false"
                     android:id="@+id/rdCashUserQrCodeList"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -128,50 +132,20 @@
                     android:textSize="@dimen/font_size_medium" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/crdOnlinePaymentUserQRCodeList"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/margin_10"
-            android:layout_marginRight="@dimen/margin_10"
-            android:layout_weight="5"
-            app:cardCornerRadius="@dimen/corner_radius_10">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_10"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/rdOnlinePaymentUserQrCodeList"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/black"
-                    android:textSize="@dimen/font_size_medium" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/source_sans_pro"
-                    android:text="Viettel Money"
-                    android:textSize="@dimen/font_size_medium" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
     </LinearLayout>
+
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnConfirmRegisterMonthlyInvoice"
+        android:id="@+id/btnPaymentRegisterMonthlyInvoice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/margin_40"
         android:layout_marginRight="@dimen/margin_40"
         android:layout_marginBottom="70dp"
         android:background="@drawable/rounded_button_icon_color"
-        android:text="Thanh toán"
-        android:textColor="@color/white"
-        android:textAllCaps="false"
         android:fontFamily="@font/source_sans_pro_semibold"
+        android:text="Thanh toán"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
         android:textSize="@dimen/font_size_medium"
         app:layout_constraintBottom_toBottomOf="parent" />
 

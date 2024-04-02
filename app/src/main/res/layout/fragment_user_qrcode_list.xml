@@ -9,21 +9,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/custom_action_bar"
-        android:gravity="center"
+        android:gravity="end"
         android:orientation="horizontal"
         android:paddingTop="60dp"
         android:paddingBottom="10dp"
-        android:weightSum="10"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/source_sans_pro"
-            android:text=""
-            android:textColor="@color/white"
-            android:textSize="@dimen/font_size_medium" />
+        <ImageView
+            android:id="@+id/ivSelectQRCodeTypeUserQRCodeList"
+            android:layout_marginEnd="@dimen/margin_10"
+            android:src="@drawable/setting_line"
+            android:layout_width="28dp"
+            android:layout_height="28dp"/>
     </LinearLayout>
 
     <ImageView

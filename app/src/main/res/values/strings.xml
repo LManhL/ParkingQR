@@ -21,4 +21,6 @@
     <string name="billing_type_detail_fragment_name">Chi tiết hóa đơn</string>
     <string name="billing_type_list_fragment_name">Loại hóa đơn</string>
     <string name="register_monthly_invoice_fragment_name">Mua vé tháng</string>
+    <string name="choose_vehicle_monthly_ticket_fragment_name">Chọn xe</string>
+    <string name="select_qr_code_type_fragment_name">Chọn mã QR hiển thị</string>
 </resources>

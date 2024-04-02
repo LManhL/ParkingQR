@@ -37,7 +37,7 @@ fun Account.mapToAccountFirebase(): AccountFirebase {
 }
 
 fun User.mapToUserFirebase(): UserFirebase {
-    return UserFirebase(userId = userId, account = account.mapToAccountFirebase())
+    return UserFirebase(id = id, userId = userId, account = account.mapToAccountFirebase())
 }
 
 fun UserFirebase.mapToUser(): User {

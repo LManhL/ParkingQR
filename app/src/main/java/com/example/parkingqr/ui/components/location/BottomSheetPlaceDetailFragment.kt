@@ -63,7 +63,7 @@ class BottomSheetPlaceDetailFragment : BottomSheetDialogFragment() {
         binding.tvChooseRegisterMonthlyInvoice.setOnClickListener {
             val bundle = Bundle()
             bundle.putString(PARKING_LOT_ID, locationViewModel.stateUi.value.parkingLotDetail.id)
-            findNavController().navigate(R.id.registerMonthlyInvoiceFragment)
+            findNavController().navigate(R.id.registerMonthlyInvoiceFragment, bundle)
         }
         return binding.root
     }

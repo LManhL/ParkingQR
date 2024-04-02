@@ -4,9 +4,7 @@ import android.content.Context
 import com.example.parkingqr.data.remote.BaseRemoteDataSource
 import com.example.parkingqr.data.remote.Params
 import com.example.parkingqr.data.remote.State
-import com.example.parkingqr.data.remote.dto.parkinglot.BillingTypeFirebase
-import com.example.parkingqr.data.remote.dto.parkinglot.ParkingLotFirebase
-import com.example.parkingqr.data.remote.dto.parkinglot.RateFirebase
+import com.example.parkingqr.data.remote.dto.parkinglot.*
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -93,6 +91,27 @@ class ParkingLotRemoteDataSource @Inject constructor(val context: Context) : Bas
                 .collection(Params.BILLING_TYPE_PATH_COLLECTION)
             ref.document(billingTypeFirebase.id.toString()).set(billingTypeFirebase)
             emit(State.success(true))
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
+    override fun getMonthlyTicketList(
+        parkingLotId: String,
+        vehicleType: String
+    ): Flow<State<MutableList<MonthlyTicketTypeFirebase>>> =
+        flow {
+            emit(State.loading())
+            val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+                .collection(Params.MONTHLY_TICKET_TYPE_COLLECTION)
+            val query: Query = ref.whereEqualTo("vehicleType", vehicleType).orderBy("numberOfMonth")
+            val querySnapshot = query.get().await()
+            val list = mutableListOf<MonthlyTicketTypeFirebase>()
+            for (document in querySnapshot.documents) {
+                document.toObject(MonthlyTicketTypeFirebase::class.java)?.let {
+                    list.add(it)
+                }
+            }
+            emit(State.success(list))
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)

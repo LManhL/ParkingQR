@@ -170,4 +170,24 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)
+
+    override fun getCurrentUserInfo(): Flow<State<UserFirebase>> = flow {
+        val userRef = db.collection(Params.USER_PATH_COLLECTION)
+        val query = userRef.whereEqualTo("userId", auth.uid)
+        emit(State.loading())
+        val querySnapshot = query.get().await()
+        val userList: MutableList<UserFirebase> = mutableListOf()
+        for (document in querySnapshot.documents) {
+            document.toObject(UserFirebase::class.java)?.let {
+                userList.add(it)
+            }
+        }
+        if (userList.isNotEmpty()) {
+            emit(State.success(userList.first()))
+        } else {
+            emit(State.failed("Không tìm thấy"))
+        }
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
 }
