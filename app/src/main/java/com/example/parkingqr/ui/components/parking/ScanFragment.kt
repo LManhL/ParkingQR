@@ -37,26 +37,25 @@ class ScanFragment : BaseFragment() {
 
     override fun initViewBinding(): View {
         binding = FragmentScanBinding.inflate(layoutInflater)
+        scanLine = binding.scanLine
+        cameraView = binding.sfv
+        cameraView.setZOrderMediaOverlay(true)
+        surfaceHolder = cameraView.holder
+        barcode =
+            BarcodeDetector.Builder(requireContext()).setBarcodeFormats(Barcode.QR_CODE).build()
+        cameraSource = CameraSource.Builder(requireContext(), barcode)
+            .setFacing(CameraSource.CAMERA_FACING_BACK)
+            .setRequestedFps(24F).setRequestedPreviewSize(1920, 1024).build()
+        startScanLineAnimation()
         return binding.root
     }
 
     override fun initListener() {
         showActionBar(getString(R.string.scan_fragment_name))
-        scanLine = binding.scanLine
-        startScanLineAnimation()
-
-        cameraView = binding.sfv
-        cameraView.setZOrderMediaOverlay(true)
-        surfaceHolder = cameraView.holder
-        barcode = BarcodeDetector.Builder(requireContext()).setBarcodeFormats(Barcode.QR_CODE).build()
-
         if (!barcode.isOperational) {
-            showMessage("Không thể mở màn hình quét")
-            getNavController().popBackStack()
+            showError("Không thể mở màn hình quét")
+            return
         }
-        cameraSource =
-            CameraSource.Builder(requireContext(), barcode).setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedFps(24F).setRequestedPreviewSize(1920, 1024).build()
         cameraView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 try {
@@ -67,12 +66,8 @@ class ScanFragment : BaseFragment() {
                     ) {
                         cameraSource.start(cameraView.holder)
                     }
-                    else{
-                        getNavController().popBackStack()
-                    }
                 } catch (e: IOException) {
                     Log.e("Error Scan", e.message.toString())
-                    getNavController().popBackStack()
                 }
             }
 
@@ -81,30 +76,31 @@ class ScanFragment : BaseFragment() {
                 format: Int,
                 width: Int,
                 height: Int
-            ) {}
+            ) {
+            }
 
             override fun surfaceDestroyed(holder: SurfaceHolder) {
                 cameraSource.stop();
             }
 
         })
-        barcode.setProcessor(object : Detector.Processor<Barcode>{
+        barcode.setProcessor(object : Detector.Processor<Barcode> {
             override fun release() {}
-
             override fun receiveDetections(p0: Detector.Detections<Barcode>) {
                 val barcodes: SparseArray<Barcode> = p0.detectedItems
-                if(barcodes.size() > 0){
+                if (barcodes.size() > 0) {
                     handleReceiveQRCode(barcodes)
                 }
             }
 
         })
     }
-    private fun handleReceiveQRCode(barcodes: SparseArray<Barcode>){
+
+    private fun handleReceiveQRCode(barcodes: SparseArray<Barcode>) {
         CoroutineScope(Dispatchers.Main).launch {
             Log.d("QR CODE", barcodes.valueAt(0).displayValue.toString())
             parkingViewModel.getDataFromQRCode(barcodes.valueAt(0).displayValue)
-            barcode.release();
+            barcode.release()
             getNavController().popBackStack()
         }
     }

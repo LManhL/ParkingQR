@@ -11,7 +11,6 @@ import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentSelectQrCodeTypeBinding
 import com.example.parkingqr.domain.model.parkinglot.MonthlyTicket
 import com.example.parkingqr.ui.base.BaseFragment
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -27,6 +26,10 @@ class SelectQRCodeTypeFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userMonthlyTicketAdapter = UserMonthlyTicketAdapter(monthlyTicketList)
+        viewModel.apply {
+            getIsShowMonthlyTicket()
+            getMonthlyTicketListAndSelectedId()
+        }
     }
 
     override fun observeViewModel() {
@@ -49,6 +52,25 @@ class SelectQRCodeTypeFragment : BaseFragment() {
                     }
             }
         }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.stateUi.map { it.isShowMonthlyTicket }.distinctUntilChanged()
+                    .collect { isShowMonthlyTicket ->
+                        if (isShowMonthlyTicket) showMonthlyTicketList()
+                        else hideMonthlyTicketList()
+                    }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.stateUi.map { it.selectedMonthlyTicketId }.distinctUntilChanged()
+                    .collect { id ->
+                        id.takeIf { id.isNotEmpty() }?.let {
+                            userMonthlyTicketAdapter.setSelectedMonthlyTicketId(it)
+                        }
+                    }
+            }
+        }
     }
 
     override fun initViewBinding(): View {
@@ -58,11 +80,31 @@ class SelectQRCodeTypeFragment : BaseFragment() {
             layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         }
+        userMonthlyTicketAdapter.setOnClick {
+            handleClick(it)
+        }
+        viewModel.stateUi.value.isShowMonthlyTicket.let {
+            binding.swSelectQRCodeType.isChecked = it
+        }
         return binding.root
     }
 
     override fun initListener() {
         showActionBar(getString(R.string.select_qr_code_type_fragment_name))
-        viewModel.getMonthlyTicketList()
+        binding.swSelectQRCodeType.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setIsShowMonthlyTicket(isChecked)
+        }
+    }
+
+    private fun showMonthlyTicketList() {
+        binding.rlvMonthlyTicketListSelectQRCodeType.visibility = View.VISIBLE
+    }
+
+    private fun hideMonthlyTicketList() {
+        binding.rlvMonthlyTicketListSelectQRCodeType.visibility = View.INVISIBLE
+    }
+
+    private fun handleClick(monthlyTicket: MonthlyTicket) {
+        viewModel.setSelectedMonthlyTicketId(monthlyTicket.id)
     }
 }

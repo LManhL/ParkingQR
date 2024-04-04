@@ -5,6 +5,8 @@ import com.example.parkingqr.data.local.auth.AuthLocalData
 import com.example.parkingqr.data.local.auth.AuthLocalDataSource
 import com.example.parkingqr.data.local.invoice.InvoiceLocalData
 import com.example.parkingqr.data.local.invoice.InvoiceLocalDataSource
+import com.example.parkingqr.data.local.monthlyticket.MonthlyTicketLocalData
+import com.example.parkingqr.data.local.monthlyticket.MonthlyTicketLocalDataSource
 import com.example.parkingqr.data.local.user.UserLocalData
 import com.example.parkingqr.data.local.user.UserLocalDataSource
 import com.example.parkingqr.data.local.vehicle.VehicleLocalData
@@ -34,61 +36,67 @@ import javax.inject.Singleton
 class AppModule {
     @Provides
     @Singleton
-    fun provideAuthRemoteRepository(@ApplicationContext context: Context): AuthRemoteData{
+    fun provideAuthRemoteRepository(@ApplicationContext context: Context): AuthRemoteData {
         return AuthRemoteDataSource(context)
     }
 
     @Provides
     @Singleton
-    fun provideAuthLocalRepository(@ApplicationContext context: Context): AuthLocalData{
+    fun provideAuthLocalRepository(@ApplicationContext context: Context): AuthLocalData {
         return AuthLocalDataSource(context)
     }
 
     @Provides
     @Singleton
-    fun provideInvoiceRemoteRepository(@ApplicationContext context: Context): InvoiceRemoteData{
+    fun provideInvoiceRemoteRepository(@ApplicationContext context: Context): InvoiceRemoteData {
         return InvoiceRemoteDataSource(context)
     }
 
     @Provides
     @Singleton
-    fun provideInvoiceLocalRepository(@ApplicationContext context: Context): InvoiceLocalData{
+    fun provideInvoiceLocalRepository(@ApplicationContext context: Context): InvoiceLocalData {
         return InvoiceLocalDataSource(context)
     }
 
     @Provides
     @Singleton
-    fun provideUserRemoteRepository(@ApplicationContext context: Context): UserRemoteData{
+    fun provideUserRemoteRepository(@ApplicationContext context: Context): UserRemoteData {
         return UserRemoteDataSource(context)
     }
 
     @Provides
     @Singleton
-    fun provideUserLocalRepository(@ApplicationContext context: Context): UserLocalData{
+    fun provideUserLocalRepository(@ApplicationContext context: Context): UserLocalData {
         return UserLocalDataSource(context)
     }
 
     @Provides
     @Singleton
-    fun provideVehicleRemoteRepository(@ApplicationContext context: Context): VehicleRemoteData{
+    fun provideVehicleRemoteRepository(@ApplicationContext context: Context): VehicleRemoteData {
         return VehicleRemoteDataSource(context)
     }
 
     @Provides
     @Singleton
-    fun provideVehicleLocalRepository(@ApplicationContext context: Context): VehicleLocalData{
+    fun provideVehicleLocalRepository(@ApplicationContext context: Context): VehicleLocalData {
         return VehicleLocalDataSource(context)
     }
 
     @Provides
     @Singleton
-    fun provideParkingLotRemoteRepository(@ApplicationContext context: Context): ParkingLotRemoteData{
+    fun provideParkingLotRemoteRepository(@ApplicationContext context: Context): ParkingLotRemoteData {
         return ParkingLotRemoteDataSource(context)
     }
 
     @Provides
     @Singleton
-    fun provideMonthlyTicketRemoteRepository(@ApplicationContext context: Context): MonthlyTicketRemoteData{
+    fun provideMonthlyTicketRemoteRepository(@ApplicationContext context: Context): MonthlyTicketRemoteData {
         return MonthlyTicketRemoteDataSource(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMonthlyTicketLocalRepository(@ApplicationContext context: Context): MonthlyTicketLocalData {
+        return MonthlyTicketLocalDataSource(context)
     }
 }

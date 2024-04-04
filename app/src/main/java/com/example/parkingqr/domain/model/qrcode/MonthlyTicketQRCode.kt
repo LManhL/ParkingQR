@@ -4,40 +4,40 @@ import com.example.parkingqr.utils.TimeUtil
 import com.google.gson.JsonObject
 import org.json.JSONObject
 
-class UserQRCode() : QRCode() {
+class MonthlyTicketQRCode() : QRCode() {
 
     companion object {
-        const val USER_QR_CODE_TYPE = "userQrCodeType"
-        const val LABEL_USER_ID = "userId"
+        const val MONTHLY_QR_CODE_TYPE = "monthlyTicketQrCodeType"
         const val LABEL_TIME_IN = "timeIn"
+        const val LABEL_MONTHLY_TICKET_ID = "monthlyTicketId"
 
         fun fromString(json: String): QRCode {
             val jsonObject = JSONObject(json)
-            return UserQRCode(
-                userId = jsonObject.getString(LABEL_USER_ID), timeIn = jsonObject.getString(
+            return MonthlyTicketQRCode(
+                monthlyTicketId = jsonObject.getString(LABEL_MONTHLY_TICKET_ID),
+                timeIn = jsonObject.getString(
                     LABEL_TIME_IN
                 )
             )
         }
-
     }
 
-    var userId: String? = ""
-    var timeIn: String? = ""
+    var monthlyTicketId: String = ""
+    var timeIn: String = ""
 
-    constructor(userId: String, timeIn: String) : this() {
-        this.userId = userId
+    constructor(monthlyTicketId: String, timeIn: String) : this() {
+        this.monthlyTicketId = monthlyTicketId
         this.timeIn = timeIn
     }
 
     override fun getQRCodeType(): String {
-        return USER_QR_CODE_TYPE
+        return MONTHLY_QR_CODE_TYPE
     }
 
     override fun toString(): String {
         val jsonObject = JsonObject()
         jsonObject.addProperty(LABEL_QR_CODE_TYPE, getQRCodeType())
-        jsonObject.addProperty(LABEL_USER_ID, userId)
+        jsonObject.addProperty(LABEL_MONTHLY_TICKET_ID, monthlyTicketId)
         jsonObject.addProperty(LABEL_TIME_IN, TimeUtil.getCurrentTime().toString())
         return jsonObject.toString()
     }

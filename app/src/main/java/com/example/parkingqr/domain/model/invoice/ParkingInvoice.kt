@@ -107,6 +107,9 @@ class ParkingInvoice() {
     fun isOnlinePayment(): Boolean {
         return paymentMethod == VNPAY_PAYMENT_METHOD
     }
+    fun isMonthlyTicketType(): Boolean{
+        return type == MONTH_INVOICE_TYPE
+    }
 
     fun getPaymentMethodReadable(): String {
         return if (paymentMethod == CASH_PAYMENT_METHOD) {

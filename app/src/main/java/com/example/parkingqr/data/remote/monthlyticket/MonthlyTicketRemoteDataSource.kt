@@ -5,6 +5,7 @@ import com.example.parkingqr.data.remote.BaseRemoteDataSource
 import com.example.parkingqr.data.remote.Params
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.remote.dto.parkinglot.MonthlyTicketFirebase
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -42,6 +43,23 @@ class MonthlyTicketRemoteDataSource @Inject constructor(val context: Context) :
                 ref.set(it).await()
             }
             emit(State.success(true))
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
+    override fun getMonthlyTicketById(monthlyTicketId: String): Flow<State<MonthlyTicketFirebase>> =
+        flow {
+            emit(State.loading())
+            val value =
+                db.collection(Params.MONTHLY_TICKET_COLLECTION).document(monthlyTicketId).get()
+                    .await()
+                    ?.toObject(MonthlyTicketFirebase::class.java)
+            if (value != null) {
+                emit(State.success(value))
+            } else {
+                emit(State.failed("Lỗi không xác định"))
+            }
+
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)

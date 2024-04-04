@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface MonthlyTicketRemoteData {
     fun getCurrentUserMonthlyTicketList(): Flow<State<MutableList<MonthlyTicketFirebase>>>
     fun createMonthlyTicket(monthlyTicketFirebase: MonthlyTicketFirebase): Flow<State<Boolean>>
+    fun getMonthlyTicketById(monthlyTicketId: String): Flow<State<MonthlyTicketFirebase>>
 }

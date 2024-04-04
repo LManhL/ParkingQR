@@ -21,7 +21,7 @@
         android:layout_width="300dp"
         android:layout_height="150dp"
         android:layout_gravity="center"
-        android:layout_marginTop="@dimen/margin_10"
+        android:layout_marginTop="@dimen/margin_20"
         android:background="@drawable/bg_ticket"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
@@ -83,7 +83,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="@dimen/margin_10"
+        android:layout_marginTop="@dimen/margin_20"
         android:background="#40070FAD"
         app:layout_constraintTop_toBottomOf="@id/llContainerMonthlyTicket" />
 </androidx.constraintlayout.widget.ConstraintLayout>

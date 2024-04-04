@@ -14,7 +14,8 @@ import com.example.parkingqr.utils.TimeUtil
 class UserMonthlyTicketAdapter(private val list: MutableList<MonthlyTicket>) :
     Adapter<UserMonthlyTicketAdapter.UserMonthlyTicketViewHolder>() {
 
-    private var curSelect: Int = 0
+    private var onClick: ((MonthlyTicket) -> Unit)? = null
+    private var selectedMonthlyTicketId: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserMonthlyTicketViewHolder {
         return LayoutInflater.from(parent.context)
@@ -29,15 +30,17 @@ class UserMonthlyTicketAdapter(private val list: MutableList<MonthlyTicket>) :
 
     override fun onBindViewHolder(holder: UserMonthlyTicketViewHolder, position: Int) {
         list[position].let {
-            holder.bind(it, position)
+            holder.bind(it)
         }
     }
 
-    fun selectItem(newPos: Int) {
-        val oldPos = curSelect
-        curSelect = newPos
-        notifyItemChanged(oldPos)
-        notifyItemChanged(newPos)
+    fun setOnClick(callback: ((MonthlyTicket) -> Unit)) {
+        this.onClick = callback
+    }
+
+    fun setSelectedMonthlyTicketId(id: String) {
+        this.selectedMonthlyTicketId = id
+        notifyDataSetChanged()
     }
 
     inner class UserMonthlyTicketViewHolder(val itemView: View) : ViewHolder(itemView) {
@@ -49,23 +52,23 @@ class UserMonthlyTicketAdapter(private val list: MutableList<MonthlyTicket>) :
             itemView.findViewById<TextView>(R.id.tvParkingLotNameUserMonthlyTicket)
         private val address = itemView.findViewById<TextView>(R.id.tvAddressUserMonthlyTicket)
         private var curItem: MonthlyTicket? = null
-        private var curPos: Int? = null
 
         init {
             itemView.setOnClickListener {
-                curPos?.let {
-                    selectItem(it)
+                curItem?.let {
+                    onClick?.invoke(it)
+                    setSelectedMonthlyTicketId(it.id)
                 }
             }
         }
 
-        fun bind(monthlyTicket: MonthlyTicket, position: Int) {
+        fun bind(monthlyTicket: MonthlyTicket) {
             curItem = monthlyTicket
-            curPos = position
             curItem?.apply {
-                licensePlate.text = "${vehicle.licensePlate?.uppercase()} - ${vehicle.getVehicleType()} - ${vehicle.brand?.uppercase()}"
+                licensePlate.text =
+                    "${vehicle.licensePlate?.uppercase()} - ${vehicle.getVehicleType()} - ${vehicle.brand?.uppercase()}"
                 select.visibility = View.GONE
-                curSelect.takeIf { curSelect == curPos }?.let {
+                id.takeIf { id == selectedMonthlyTicketId }?.let {
                     select.visibility = View.VISIBLE
                 }
                 parkingLotName.text = parkingLot.name

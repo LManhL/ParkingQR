@@ -7,6 +7,7 @@ import org.json.JSONObject
 class InvoiceQRCode() : QRCode() {
 
     companion object {
+        const val INVOICE_QR_CODE_TYPE = "invoiceQrCodeType"
         const val LABEL_INVOICE_ID = "invoiceId"
         const val LABEL_TIME_OUT = "timeOut"
 
