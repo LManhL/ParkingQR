@@ -5,11 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.monthlyticket.MonthlyTicketRepository
 import com.example.parkingqr.data.repo.parkinglot.ParkingLotRepository
+import com.example.parkingqr.data.repo.payment.PaymentRepository
 import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.data.repo.vehicle.VehicleRepository
 import com.example.parkingqr.domain.model.parkinglot.MonthlyTicket
 import com.example.parkingqr.domain.model.parkinglot.MonthlyTicketType
 import com.example.parkingqr.domain.model.parkinglot.ParkingLot
+import com.example.parkingqr.domain.model.payment.BankAccount
+import com.example.parkingqr.domain.model.payment.PayByTokenResponse
 import com.example.parkingqr.domain.model.user.User
 import com.example.parkingqr.domain.model.vehicle.VehicleDetail
 import com.example.parkingqr.ui.base.BaseViewModel
@@ -24,12 +27,17 @@ class RegisterMonthlyInvoiceViewModel @Inject constructor(
     private val parkingLotRepository: ParkingLotRepository,
     private val vehicleRepository: VehicleRepository,
     private val userRepository: UserRepository,
-    private val monthlyTicketRepository: MonthlyTicketRepository
+    private val monthlyTicketRepository: MonthlyTicketRepository,
+    private val paymentRepository: PaymentRepository
 ) :
     BaseViewModel() {
 
     private val _uiState = MutableStateFlow(BillingTypeDetailUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        getBankAccountList()
+    }
 
     fun getMonthlyTicketListByVehicleType() {
         uiState.value.selectedVehicle?.let { vehicle ->
@@ -110,7 +118,6 @@ class RegisterMonthlyInvoiceViewModel @Inject constructor(
                             it.copy(
                                 user = stateUser.data,
                                 parkingLot = stateParkingLot.data,
-                                isReadyToCreate = true
                             )
                         }
                     } else if (stateUser is State.Failed || stateParkingLot is State.Failed) {
@@ -190,10 +197,104 @@ class RegisterMonthlyInvoiceViewModel @Inject constructor(
         }
     }
 
+    fun payByToken() {
+        uiState.value.apply {
+            val price = selectedMonthlyTicketType?.promotionalPrice
+            val token = selectedBankAccount?.token
+            if (price == null || token == null) return
+            viewModelScope.launch {
+                paymentRepository.payByToken(price, token)
+                    .collect { state ->
+                        when (state) {
+                            is State.Loading -> {
+                                _uiState.update {
+                                    it.copy(isLoading = true)
+                                }
+                            }
+                            is State.Success -> {
+                                _uiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        payByTokenResponse = state.data
+                                    )
+                                }
+                            }
+                            is State.Failed -> {
+                                _uiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        error = state.message
+                                    )
+                                }
+                            }
+                        }
+
+                    }
+            }
+        }
+    }
+
+    fun handlePaymentSuccessful() {
+        _uiState.update {
+            it.copy(
+                isPaymentSuccessful = true
+            )
+        }
+    }
+
+    private fun getBankAccountList() {
+        viewModelScope.launch {
+            paymentRepository.getBankAccountList().collect { state ->
+                when (state) {
+                    is State.Loading -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+                    is State.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                bankAccountList = state.data.toMutableList()
+                            )
+                        }
+                    }
+                    is State.Failed -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = state.message
+                            )
+                        }
+                        Log.e("error", state.message)
+                    }
+                }
+            }
+        }
+    }
+
     fun showError() {
         _uiState.update {
             it.copy(
                 error = ""
+            )
+        }
+    }
+
+    fun showPaymentPage() {
+        _uiState.update {
+            it.copy(
+                payByTokenResponse = null
+            )
+        }
+    }
+
+    fun selectBankAccount(bankAccount: BankAccount) {
+        _uiState.update {
+            it.copy(
+                selectedBankAccount = bankAccount
             )
         }
     }
@@ -209,7 +310,10 @@ class RegisterMonthlyInvoiceViewModel @Inject constructor(
         val selectedMonthlyTicketType: MonthlyTicketType? = null,
         val parkingLot: ParkingLot? = null,
         val user: User? = null,
-        val isReadyToCreate: Boolean = false,
-        val isCreated: Boolean = false
+        val isPaymentSuccessful: Boolean = false,
+        val isCreated: Boolean = false,
+        val payByTokenResponse: PayByTokenResponse? = null,
+        val bankAccountList: List<BankAccount> = listOf(),
+        val selectedBankAccount: BankAccount? = null,
     )
 }

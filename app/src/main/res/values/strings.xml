@@ -1,4 +1,5 @@
 <resources>
+    <string name="tmn_code">WX48K3IH</string>
     <string name="my_map_api_key">AIzaSyAFcDTI-dy0WpcmpJeYDSlWmVVdhL8lEsA</string>
     <string name="app_name">ParkingQR</string>
     <string name="parking_fragment_name">Gửi trả xe</string>
@@ -23,4 +24,5 @@
     <string name="register_monthly_invoice_fragment_name">Mua vé tháng</string>
     <string name="choose_vehicle_monthly_ticket_fragment_name">Chọn xe</string>
     <string name="select_qr_code_type_fragment_name">Chọn mã QR hiển thị</string>
+    <string name="connect_bank_account_fragment_name">Tài khoản ngân hàng</string>
 </resources>

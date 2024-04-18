@@ -11,14 +11,19 @@ import com.example.parkingqr.data.local.user.UserLocalData
 import com.example.parkingqr.data.local.user.UserLocalDataSource
 import com.example.parkingqr.data.local.vehicle.VehicleLocalData
 import com.example.parkingqr.data.local.vehicle.VehicleLocalDataSource
+import com.example.parkingqr.data.remote.ServiceGenerator
 import com.example.parkingqr.data.remote.auth.AuthRemoteData
 import com.example.parkingqr.data.remote.auth.AuthRemoteDataSource
+import com.example.parkingqr.data.remote.debt.DebtRemoteData
+import com.example.parkingqr.data.remote.debt.DebtRemoteDataSource
 import com.example.parkingqr.data.remote.invoice.InvoiceRemoteData
 import com.example.parkingqr.data.remote.invoice.InvoiceRemoteDataSource
 import com.example.parkingqr.data.remote.monthlyticket.MonthlyTicketRemoteData
 import com.example.parkingqr.data.remote.monthlyticket.MonthlyTicketRemoteDataSource
 import com.example.parkingqr.data.remote.parkinglot.ParkingLotRemoteData
 import com.example.parkingqr.data.remote.parkinglot.ParkingLotRemoteDataSource
+import com.example.parkingqr.data.remote.payment.PaymentRemoteData
+import com.example.parkingqr.data.remote.payment.PaymentRemoteDataSource
 import com.example.parkingqr.data.remote.user.UserRemoteData
 import com.example.parkingqr.data.remote.user.UserRemoteDataSource
 import com.example.parkingqr.data.remote.vehicle.VehicleRemoteData
@@ -98,5 +103,26 @@ class AppModule {
     @Singleton
     fun provideMonthlyTicketLocalRepository(@ApplicationContext context: Context): MonthlyTicketLocalData {
         return MonthlyTicketLocalDataSource(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideServiceGenerator(): ServiceGenerator {
+        return ServiceGenerator()
+    }
+
+    @Provides
+    @Singleton
+    fun providePaymentRemoteData(
+        serviceGenerator: ServiceGenerator,
+        @ApplicationContext context: Context
+    ): PaymentRemoteData {
+        return PaymentRemoteDataSource(serviceGenerator, context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDebtRemoteData(@ApplicationContext context: Context): DebtRemoteData{
+        return DebtRemoteDataSource(context)
     }
 }

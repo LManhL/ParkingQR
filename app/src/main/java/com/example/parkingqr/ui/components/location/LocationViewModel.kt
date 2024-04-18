@@ -22,7 +22,10 @@ class LocationViewModel @Inject constructor(private val repository: ParkingLotRe
     )
     val stateUi: StateFlow<LocationUiState> = _stateUi.asStateFlow()
 
-    fun getParkingLotList(){
+    init {
+        getParkingLotList()
+    }
+    private fun getParkingLotList(){
         viewModelScope.launch {
             repository.getParkingLotList().collect { state ->
                 when (state) {

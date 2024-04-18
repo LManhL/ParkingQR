@@ -2,12 +2,16 @@ package com.example.parkingqr.di
 
 import com.example.parkingqr.data.repo.auth.AuthRepository
 import com.example.parkingqr.data.repo.auth.AuthRepositoryImpl
+import com.example.parkingqr.data.repo.debt.DebtRepository
+import com.example.parkingqr.data.repo.debt.DebtRepositoryImpl
 import com.example.parkingqr.data.repo.invoice.InvoiceRepository
 import com.example.parkingqr.data.repo.invoice.InvoiceRepositoryImpl
 import com.example.parkingqr.data.repo.monthlyticket.MonthlyTicketRepository
 import com.example.parkingqr.data.repo.monthlyticket.MonthlyTicketRepositoryImpl
 import com.example.parkingqr.data.repo.parkinglot.ParkingLotRepository
 import com.example.parkingqr.data.repo.parkinglot.ParkingLotRepositoryImpl
+import com.example.parkingqr.data.repo.payment.PaymentRepository
+import com.example.parkingqr.data.repo.payment.PaymentRepositoryImpl
 import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.data.repo.user.UserRepositoryImpl
 import com.example.parkingqr.data.repo.vehicle.VehicleRepository
@@ -45,4 +49,12 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindMonthlyTicketRepository(repository: MonthlyTicketRepositoryImpl): MonthlyTicketRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPaymentRepository(repository: PaymentRepositoryImpl): PaymentRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDebtRepository(repository: DebtRepositoryImpl): DebtRepository
 }

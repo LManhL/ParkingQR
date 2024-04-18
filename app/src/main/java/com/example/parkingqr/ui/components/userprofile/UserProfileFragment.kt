@@ -11,7 +11,7 @@ import com.example.parkingqr.domain.model.user.Account
 import com.example.parkingqr.ui.base.BaseFragment
 import kotlinx.coroutines.launch
 
-class UserProfileFragment: BaseFragment() {
+class UserProfileFragment : BaseFragment() {
     private lateinit var binding: FragmentMyProfileBinding
     private val userProfileViewModel: UserProfileViewModel by viewModels()
 
@@ -29,7 +29,7 @@ class UserProfileFragment: BaseFragment() {
                         userProfileViewModel.showMessage()
                     }
                     updateUI(it.account)
-                    if(it.isSignedOut){
+                    if (it.isSignedOut) {
                         getNavController().navigate(R.id.loginFragment)
                     }
                 }
@@ -50,17 +50,22 @@ class UserProfileFragment: BaseFragment() {
             getNavController().navigate(R.id.vehicleRegistrationListFragment)
             hideBottomNavigation()
         }
-        binding.tvSignOutMyProfile.setOnClickListener{
+        binding.tvSignOutMyProfile.setOnClickListener {
             userProfileViewModel.signOut()
             hideBottomNavigation()
         }
-        binding.tvHistoryMyProfile.setOnClickListener{
+        binding.tvHistoryMyProfile.setOnClickListener {
             getNavController().navigate(R.id.myinvoiceFragment)
+            hideBottomNavigation()
+        }
+        binding.tvConnectBankAccountMyProfile.setOnClickListener {
+            getNavController().navigate(R.id.connectBankAccountFragment)
             hideBottomNavigation()
         }
         userProfileViewModel.getUserInformation()
     }
-    private fun updateUI(account: Account?){
+
+    private fun updateUI(account: Account?) {
         binding.clContainerMyProfile.visibility = View.INVISIBLE
         account?.let {
             binding.clContainerMyProfile.visibility = View.VISIBLE

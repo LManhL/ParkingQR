@@ -167,4 +167,17 @@
         android:name="com.example.parkingqr.ui.components.qrcode.SelectQRCodeTypeFragment"
         android:label="@string/select_qr_code_type_fragment_name">
     </fragment>
+    <fragment
+        tools:layout="@layout/fragment_connect_bank_account"
+        android:id="@+id/connectBankAccountFragment"
+        android:name="com.example.parkingqr.ui.components.userprofile.ConnectBankAccountFragment"
+        android:label="@string/connect_bank_account_fragment_name">
+    </fragment>
+
+    <fragment
+        tools:layout="@layout/fragment_connect_bank_account"
+        android:id="@+id/chooseBankAccountFragment"
+        android:name="com.example.parkingqr.ui.components.location.ChooseBankAccountFragment"
+        android:label="@string/connect_bank_account_fragment_name">
+    </fragment>
 </navigation>

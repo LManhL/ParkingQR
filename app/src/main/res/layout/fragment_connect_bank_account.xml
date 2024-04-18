@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/llAddMoreConnectBankAccount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="@dimen/padding_10"
+        android:weightSum="10"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:fontFamily="@font/source_sans_pro"
+            android:text="Kết nối với tài khoản ngân hàng khác"
+            android:textSize="@dimen/font_size_medium" />
+
+        <LinearLayout
+            android:gravity="end"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/arrow_point_to_right" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/vDividerConnectBankAccount"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/margin_10"
+        android:background="#40070FAD"
+        app:layout_constraintTop_toBottomOf="@id/llAddMoreConnectBankAccount"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rlvListAccountConnectBankAcount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/vDividerConnectBankAccount" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,10 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentRegisterMonthlyInvoiceBinding
 import com.example.parkingqr.domain.model.parkinglot.MonthlyTicketType
+import com.example.parkingqr.domain.model.payment.BankAccount
 import com.example.parkingqr.ui.base.BaseFragment
+import com.example.parkingqr.ui.components.MainActivity
+import com.example.parkingqr.ui.components.dialog.PaymentSuccessDialog
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class RegisterMonthlyInvoiceFragment : BaseFragment() {
     private lateinit var binding: FragmentRegisterMonthlyInvoiceBinding
@@ -21,7 +25,9 @@ class RegisterMonthlyInvoiceFragment : BaseFragment() {
         R.id.registerMonthlyInvoiceFragment
     )
     private lateinit var monthlyTicketAdapter: MonthlyTicketAdapter
+    private lateinit var bankAccountAdapter: BankAccountAdapter
     private val monthTicketList: MutableList<MonthlyTicketType> = mutableListOf()
+    private val bankAccountList: MutableList<BankAccount> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,19 +35,10 @@ class RegisterMonthlyInvoiceFragment : BaseFragment() {
             registerMonthlyInvoiceViewModel.setParkingLotId(it)
         }
         monthlyTicketAdapter = MonthlyTicketAdapter(monthTicketList)
+        bankAccountAdapter = BankAccountAdapter(bankAccountList)
     }
 
     override fun observeViewModel() {
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                registerMonthlyInvoiceViewModel.uiState.collect { uiState ->
-                    if (uiState.isLoading) showLoading() else hideLoading()
-                    uiState.error.takeIf { it.isNotEmpty() }?.let { error -> showError(error) }
-                }
-            }
-        }
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 registerMonthlyInvoiceViewModel.uiState.map { it.monthlyTicketTypeList }
@@ -71,16 +68,41 @@ class RegisterMonthlyInvoiceFragment : BaseFragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 registerMonthlyInvoiceViewModel.uiState.collect { uiState ->
                     uiState.apply {
-                        isReadyToCreate.takeIf { it }?.let {
+                        if (uiState.isLoading) showLoading() else hideLoading()
+                        uiState.error.takeIf { it.isNotEmpty() }?.let { error -> showError(error) }
+                        isPaymentSuccessful.takeIf { it }?.let {
                             registerMonthlyInvoiceViewModel.createMonthlyTicket()
                         }
                         isCreated.takeIf { it }?.let {
-                            showMessage("Mua vé thành công")
-                            getNavController().popBackStack()
+                            handleCreateSuccessfully()
                         }
                     }
 
                 }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                registerMonthlyInvoiceViewModel.uiState.map { it.payByTokenResponse }
+                    .distinctUntilChanged().collect {
+                        it?.let {
+                            payByTokenWithVNPay(it.url)
+                            registerMonthlyInvoiceViewModel.showPaymentPage()
+                        }
+                    }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                registerMonthlyInvoiceViewModel.uiState.map { it.selectedBankAccount }
+                    .distinctUntilChanged().collect {
+                        it?.let {
+                            bankAccountList.clear()
+                            bankAccountList.add(it)
+                            bankAccountAdapter.notifyDataSetChanged()
+                        }
+                    }
             }
         }
     }
@@ -92,17 +114,49 @@ class RegisterMonthlyInvoiceFragment : BaseFragment() {
             layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
+        binding.rlvBankAccountRegisterMonthlyInvoice.apply {
+            adapter = bankAccountAdapter
+            layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        }
         return binding.root
     }
 
     override fun initListener() {
         showActionBar(getString(R.string.register_monthly_invoice_fragment_name))
+        hideBottomNavigation()
         binding.tvChooseVehicleMonthlyInvoice.setOnClickListener {
             getNavController().navigate(R.id.chooseVehicleMonthlyTicket)
         }
         binding.btnPaymentRegisterMonthlyInvoice.setOnClickListener {
             registerMonthlyInvoiceViewModel.selectMonthlyTicket(monthlyTicketAdapter.getSelectedMonthlyTicket())
             registerMonthlyInvoiceViewModel.getInfoToCreateMonthlyTicket()
+            registerMonthlyInvoiceViewModel.payByToken()
         }
+        binding.llChooseBankRegisterMonthlyInvoice.setOnClickListener {
+            getNavController().navigate(R.id.chooseBankAccountFragment)
+        }
+    }
+
+    private fun payByTokenWithVNPay(url: String) {
+        (requireActivity() as MainActivity).openSdk(
+            url,
+            successAction = { handlePaymentSuccessful() },
+            failBackAction = { handlePaymentFail() }
+        )
+    }
+
+    private fun handlePaymentSuccessful() {
+        registerMonthlyInvoiceViewModel.handlePaymentSuccessful()
+    }
+
+    private fun handleCreateSuccessfully() {
+        PaymentSuccessDialog(requireContext(), 3) {
+            getNavController().popBackStack()
+        }.show()
+    }
+
+    private fun handlePaymentFail() {
+        showMessage("Thanh toán không thành công vui lòng thử lại sau ít phút")
     }
 }

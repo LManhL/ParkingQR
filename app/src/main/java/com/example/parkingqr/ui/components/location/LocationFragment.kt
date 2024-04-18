@@ -2,9 +2,12 @@ package com.example.parkingqr.ui.components.location
 
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Build
 import android.util.Log
 import android.view.View
+import android.view.WindowInsetsController
 import android.widget.ArrayAdapter
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
@@ -27,8 +30,11 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.R)
 class LocationFragment : BaseFragment(), OnMapReadyCallback, OnMarkerClickListener {
 
     companion object {
@@ -50,19 +56,24 @@ class LocationFragment : BaseFragment(), OnMapReadyCallback, OnMarkerClickListen
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 locationViewModel.stateUi.collect {
-
                     if (it.isLoading) showLoading() else hideLoading()
                     if (it.error.isNotEmpty()) {
                         showError(it.error)
                         locationViewModel.showError()
                     }
-                    if (parkingLotList.isNotEmpty()) {
-                        parkingLotList.clear()
-                    }
-                    parkingLotList.addAll(it.parkingLotList)
-                    parkingLotSearchAdapter.notifyDataSetChanged()
-                    getLastLocation()
                 }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                locationViewModel.stateUi.map { it.parkingLotList }.distinctUntilChanged()
+                    .collect { list ->
+                        parkingLotList.clear()
+                        parkingLotList.addAll(list)
+                        parkingLotSearchAdapter.notifyDataSetChanged()
+                        getLastLocation()
+                    }
             }
         }
     }
@@ -84,10 +95,16 @@ class LocationFragment : BaseFragment(), OnMapReadyCallback, OnMarkerClickListen
     override fun initListener() {
         hideActionBar()
         showBottomNavigation()
-        locationViewModel.getParkingLotList()
+        requireActivity().window.decorView.windowInsetsController?.setSystemBarsAppearance(
+            WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+            WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+        )
         binding.autvSearchLocation.setOnItemClickListener { _, _, position, id ->
-            val myLocation = LatLng(parkingLotList[position].location.latitude, parkingLotList[position].location.longitude)
-            myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 20.0F))
+            val myLocation = LatLng(
+                parkingLotList[position].location.latitude,
+                parkingLotList[position].location.longitude
+            )
+            myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 15.0F))
         }
     }
 
@@ -122,6 +139,14 @@ class LocationFragment : BaseFragment(), OnMapReadyCallback, OnMarkerClickListen
                 showMessage("Quyền truy cập vị trí bị từ chối, xin vui lòng cho phép quyền truy cập vị trí")
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        requireActivity().window.decorView.windowInsetsController?.setSystemBarsAppearance(
+            0,
+            WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+        )
     }
 
     private fun getLastLocation() {
