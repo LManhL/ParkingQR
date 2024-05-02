@@ -20,9 +20,10 @@ import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentParkingBinding
 import com.example.parkingqr.domain.model.qrcode.InvoiceQRCode
 import com.example.parkingqr.ui.base.BaseFragment
+import com.example.parkingqr.ui.components.dialog.ChooseUserVehicleDialog
 import com.example.parkingqr.ui.components.dialog.ChooseVehicleTypeDialog
 import com.example.parkingqr.ui.components.dialog.InvoiceQRCodeDialog
-import com.example.parkingqr.ui.components.qrcode.Timer
+import com.example.parkingqr.ui.components.dialog.Timer
 import com.example.parkingqr.utils.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -113,29 +114,26 @@ class ParkingFragment : BaseFragment() {
                         ParkingViewModel.ParkingAction.REFRESH -> {
                             handleRefresh()
                         }
-                        ParkingViewModel.ParkingAction.CREATE_INVOICE_FOR_USER_REGISTER_VEHICLE -> {
-                            createInvoiceForUserRegisterVehicle()
+                        ParkingViewModel.ParkingAction.SHOW_INVOICE_FOR_USER_REGISTER_VEHICLE -> {
+                            showInvoiceForUserRegisterVehicle()
                         }
-                        ParkingViewModel.ParkingAction.CREATE_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE -> {
-                            createInvoiceForUserNotRegisterVehicle()
+                        ParkingViewModel.ParkingAction.SHOW_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE -> {
+                            showInvoiceForUserNotRegisterVehicle()
                         }
-                        ParkingViewModel.ParkingAction.CREATE_INVOICE_FOR_GUEST -> {
-                            createInvoiceForGuest()
+                        ParkingViewModel.ParkingAction.SHOW_INVOICE_FOR_GUEST -> {
+                            showInvoiceForGuest()
                         }
                         ParkingViewModel.ParkingAction.PROCESS_TO_COMPLETE_PARKING_INVOICE -> {
                             processToCompleteParkingInvoice()
                         }
-                        ParkingViewModel.ParkingAction.CREATE_INVOICE_FROM_MONTHLY_TICKET -> {
-                            createInvoiceFromMonthlyTicket()
+                        ParkingViewModel.ParkingAction.SHOW_INVOICE_CREATE_FROM_MONTHLY_TICKET -> {
+                            showInvoiceCreateFromMonthlyTicket()
                         }
                         ParkingViewModel.ParkingAction.GET_INVOICE_FROM_QR_CODE -> {
                             getInvoiceFromQRCode()
                         }
                         ParkingViewModel.ParkingAction.CREATE_INVOICE_FROM_USER_QR_CODE -> {
                             createInvoiceForUser()
-                        }
-                        ParkingViewModel.ParkingAction.GET_MONTHLY_TICKET_FROM_QR_CODE -> {
-                            processToGetMonthlyTicketFromQRCode()
                         }
                         else -> {}
                     }
@@ -192,28 +190,49 @@ class ParkingFragment : BaseFragment() {
                 completeInvoice()
             }
         }
+        binding.tvStopTimerParking.setOnClickListener {
+            stopTimer()
+        }
+        binding.llWrongLicensePlateParking.setOnClickListener {
+            showDialogChooseVehicle()
+        }
+    }
+
+    private fun showDialogChooseVehicle() {
+        viewModel.stateUi.value.apply {
+            ChooseUserVehicleDialog(requireContext(), vehicleList, licensePlateOfVehicleIn) {
+                viewModel.handleSelectVehicle(it)
+            }.show()
+        }
     }
 
     private fun getInvoiceFromQRCode() {
-        viewModel.searchParkingInvoiceFromQRCode()
+        viewModel.getParkingInvoiceFromQRCode()
     }
 
-    private fun createInvoiceForGuest() {
-        displayParkingInvoice()
+    private fun showInvoiceForGuest() {
+        binding.llWrongLicensePlateParking.visibility = View.GONE
         binding.tvStateMessageParking.text = "Hóa đơn gửi xe cho khách"
+        displayParkingInvoice()
     }
 
-    private fun createInvoiceForUserRegisterVehicle() {
+    private fun showInvoiceForUserRegisterVehicle() {
+        binding.llWrongLicensePlateParking.visibility = View.GONE
         binding.tvStateMessageParking.text =
-            "Hóa đơn xe có đăng ký của người dùng"
+            "Hóa đơn xe có đăng ký"
         displayParkingInvoice()
         showTimerVehicleIn()
     }
 
-    private fun createInvoiceForUserNotRegisterVehicle() {
+    private fun showInvoiceForUserNotRegisterVehicle() {
+        binding.llWrongLicensePlateParking.visibility = View.VISIBLE
         binding.tvStateMessageParking.text =
-            "Hóa đơn xe chưa đăng ký của người dùng"
+            "Người dùng chưa đăng ký xe"
         displayParkingInvoice()
+    }
+
+    private fun stopTimer() {
+        timer?.stop()
     }
 
 
@@ -233,9 +252,7 @@ class ParkingFragment : BaseFragment() {
                     }
                 }
             }
-            timer?.apply {
-                start()
-            }
+            timer?.start()
         }
     }
 
@@ -255,9 +272,7 @@ class ParkingFragment : BaseFragment() {
                     }
                 }
             }
-            timer?.apply {
-                start()
-            }
+            timer?.start()
         }
     }
 
@@ -267,11 +282,11 @@ class ParkingFragment : BaseFragment() {
                 if (licensePlateOfVehicleOut == parkingInvoice?.vehicle?.licensePlate) {
                     showMessage("Biển số xe khớp nhau: ${parkingInvoice.vehicle.licensePlate}")
                     binding.tvStateMessageParking.text = "Biển số xe khớp nhau"
-                    if (parkingInvoice.isOnlinePayment()) {
+                    if (parkingInvoice.isOnlinePayment() || parkingInvoice.isMonthlyTicketType()) {
                         showTimerVehicleOut()
                     }
                 } else {
-                    showMessage("Biển số xe không khớp nhau: ${parkingInvoice?.vehicle?.licensePlate} và $licensePlateOfVehicleOut}")
+                    showMessage("Biển số xe không khớp nhau: ${parkingInvoice?.vehicle?.licensePlate} và ${licensePlateOfVehicleOut}")
                     binding.tvStateMessageParking.text =
                         "Biển số xe không khớp nhau: ${parkingInvoice?.vehicle?.licensePlate} và ${licensePlateOfVehicleOut}"
                     binding.llTimeLeftParking.visibility = View.GONE
@@ -286,13 +301,37 @@ class ParkingFragment : BaseFragment() {
     }
 
     private fun handlePickImageCarIn() {
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(cameraIntent, PIC_CODE_CAR_IN)
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.CAMERA),
+                REQUEST_CAMERA_PERMISSION_CODE
+            )
+        } else {
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(cameraIntent, PIC_CODE_CAR_IN)
+        }
     }
 
     private fun handlePickImageCarOut() {
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(cameraIntent, PIC_CODE_CAR_OUT)
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.CAMERA),
+                REQUEST_CAMERA_PERMISSION_CODE
+            )
+        } else {
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(cameraIntent, PIC_CODE_CAR_OUT)
+        }
     }
 
     private fun showInvoiceQRCode() {
@@ -315,6 +354,7 @@ class ParkingFragment : BaseFragment() {
         binding.llContainerParking.visibility = View.INVISIBLE
         binding.llParkingInvoiceCarinParking.visibility = View.GONE
         binding.llTimeLeftParking.visibility = View.GONE
+        binding.llWrongLicensePlateParking.visibility = View.GONE
         binding.tvStateMessageParking.text = "Hóa đơn gửi xe hiện đang trống"
         timer?.apply {
             stop()
@@ -332,25 +372,7 @@ class ParkingFragment : BaseFragment() {
                 return
             }
             if (LicensePlateUtil.checkLicensePlateValid(licensePlateOfVehicleIn)) {
-                viewModel.searchUserThenSearchTheVehicleFromQRCodeThenCreateParkingInvoice()
-            } else {
-                showMessage("Biển số xe không hợp lệ: $licensePlateOfVehicleIn")
-            }
-        }
-    }
-
-    private fun processToGetMonthlyTicketFromQRCode() {
-        viewModel.stateUi.value.apply {
-            if (bmVehicleIn == null) {
-                showMessage("Chưa có ảnh xe vào")
-                return
-            }
-            if (licensePlateOfVehicleIn.isEmpty()) {
-                showMessage("Không nhận dạng dược ảnh xe vào")
-                return
-            }
-            if (LicensePlateUtil.checkLicensePlateValid(licensePlateOfVehicleIn)) {
-                viewModel.getMonthlyTicketFromQRCodeThenCheck()
+                viewModel.getDataFromQRCodeToCreateParkingInvoice()
             } else {
                 showMessage("Biển số xe không hợp lệ: $licensePlateOfVehicleIn")
             }
@@ -375,23 +397,12 @@ class ParkingFragment : BaseFragment() {
         }
     }
 
-    private fun createInvoiceFromMonthlyTicket() {
-        viewModel.stateUi.value.apply {
-            if (licensePlateOfVehicleIn.isNotEmpty()) {
-                if (licensePlateOfVehicleIn == monthlyTicket?.vehicle?.licensePlate) {
-                    binding.tvStateMessageParking.text = "Biển số xe khớp nhau"
-                    showTimerVehicleIn()
-                } else {
-                    binding.tvStateMessageParking.text =
-                        "Biển số xe không khớp nhau: ${monthlyTicket?.vehicle?.licensePlate} và ${licensePlateOfVehicleIn}"
-                    binding.llTimeLeftParking.visibility = View.GONE
-                }
-            } else {
-                binding.llTimeLeftParking.visibility = View.GONE
-            }
-            displayParkingInvoice()
-            binding.tvActionQrcodeParking.text = "Nhấn vào để xác nhận trả xe"
-        }
+    private fun showInvoiceCreateFromMonthlyTicket() {
+        binding.llWrongLicensePlateParking.visibility = View.GONE
+        binding.tvStateMessageParking.text =
+            "Hóa đơn xe gửi vé tháng"
+        displayParkingInvoice()
+        showTimerVehicleIn()
     }
 
     private fun createNewInvoice() {
@@ -421,6 +432,7 @@ class ParkingFragment : BaseFragment() {
             getNavController().navigate(R.id.scanFragment)
         }
     }
+
 
     private fun displayImageVehicleInOfParkingInvoice() {
         viewModel.stateUi.value.apply {

@@ -1,9 +1,9 @@
 package com.example.parkingqr.ui.components.parking
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.debt.DebtRepository
 import com.example.parkingqr.data.repo.invoice.InvoiceRepository
 import com.example.parkingqr.data.repo.monthlyticket.MonthlyTicketRepository
 import com.example.parkingqr.data.repo.parkinglot.ParkingLotRepository
@@ -31,12 +31,11 @@ class ParkingViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val vehicleRepository: VehicleRepository,
     private val parkingLotRepository: ParkingLotRepository,
-    private val monthlyTicketRepository: MonthlyTicketRepository
+    private val monthlyTicketRepository: MonthlyTicketRepository,
+    private val debtRepository: DebtRepository
 ) : BaseViewModel() {
 
     companion object {
-        const val SEARCH_LICENSE_PLATE = "SEARCH_LICENSE_PLATE"
-        const val SEARCH_USER = "SEARCH_USER"
         const val ADD_NEW_PARKING_INVOICE = "ADD_NEW_PARKING_INVOICE"
         const val VALIDATE_VEHICLE = "VALIDATE_VEHICLE"
     }
@@ -53,7 +52,7 @@ class ParkingViewModel @Inject constructor(
         getBillingTypeList()
     }
 
-    fun searchUserThenSearchTheVehicleFromQRCodeThenCreateParkingInvoice() {
+    fun getDataFromQRCodeToCreateParkingInvoice() {
         viewModelScope.launch {
             stateUi.value.qrcode?.let { qrcode ->
                 (qrcode as UserQRCode).userId
@@ -68,27 +67,19 @@ class ParkingViewModel @Inject constructor(
                             }
                         }
                         is State.Success -> {
-                            if (state.data.isNotEmpty()) {
-                                _stateUi.update {
-                                    it.copy(
-                                        user = state.data[0]
-                                    )
-                                }
-                                searchUserVehicleFromQRCodeThenCreateParkingInvoice()
-                            } else {
-                                // Khong tim thay user tuong ung -> Ma QR co van de
-                                _stateUi.update {
-                                    it.copy(
-                                        isLoading = false,
-                                        message = "Mã QR không hợp lệ"
-                                    )
-                                }
+                            val foundUser = state.data
+                            _stateUi.update {
+                                it.copy(
+                                    user = foundUser
+                                )
                             }
+                            findVehicleToCreateParkingInvoice(foundUser)
                         }
                         is State.Failed -> {
                             _stateUi.update {
                                 it.copy(
-                                    isLoading = false, errorMessage = it.errorMessage
+                                    isLoading = false,
+                                    errorMessage = it.errorMessage
                                 )
                             }
                         }
@@ -98,54 +89,64 @@ class ParkingViewModel @Inject constructor(
         }
     }
 
-    private fun searchUserVehicleFromQRCodeThenCreateParkingInvoice() {
-        viewModelScope.launch {
-            stateUi.value.qrcode?.let { qrcode ->
-                (qrcode as UserQRCode).userId
-            }?.let { id ->
-                invoiceRepository.searchLicensePlateByUserId(
-                    stateUi.value.licensePlateOfVehicleIn,
-                    id
-                ).collect { state ->
-                    when (state) {
-                        is State.Loading -> {
-                            _stateUi.update {
-                                it.copy(isLoading = true)
-                            }
-                        }
-                        is State.Success -> {
-                            if (state.data.isNotEmpty()) {
-                                _stateUi.update {
-                                    it.copy(
-                                        isLoading = false,
-                                        action = ParkingAction.CREATE_INVOICE_FOR_USER_REGISTER_VEHICLE,
-                                        parkingInvoice = ParkingInvoice(
-                                            id = invoiceRepository.getNewParkingInvoiceKey(),
-                                            user = it.user ?: UserInvoice(),
-                                            vehicle = state.data[0],
-                                            imageIn = ImageUtil.encodeImage(
-                                                (stateUi.value.bmVehicleIn ?: "0") as Bitmap
-                                            ),
-                                            timeIn = TimeUtil.getCurrentTime().toString()
-                                        ),
-                                    )
-                                }
-                            } else {
-                                _stateUi.update {
-                                    it.copy(
-                                        parkingInvoice = createInvoiceForUserNotRegisterVehicle(),
-                                        action = ParkingAction.CREATE_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE,
-                                    )
-                                }
-                            }
-                        }
-                        is State.Failed -> {
+    private suspend fun findVehicleToCreateParkingInvoice(user: UserInvoice) {
+        vehicleRepository.getVerifiedVehiclesOfUser(user.userId).collect { state ->
+            when (state) {
+                is State.Loading -> {
+                    _stateUi.update {
+                        it.copy(isLoading = true)
+                    }
+                }
+                is State.Success -> {
+
+                    val licensePlateOfVehicleIn = stateUi.value.licensePlateOfVehicleIn
+                    val foundVehicle =
+                        state.data.firstOrNull { it.licensePlate == licensePlateOfVehicleIn }
+
+                    // Tìm thấy xe có biển số giống xe vào
+
+                    if (foundVehicle != null) {
+
+                        // Tìm kiếm xem xe có đăng ký vé tháng không
+                        findValidMonthlyTickerByVehicleIdToCreateInvoice(foundVehicle)
+
+                        // Nếu xe không đăng ký vé tháng
+                        if (stateUi.value.action != ParkingAction.SHOW_INVOICE_CREATE_FROM_MONTHLY_TICKET) {
+                            // Gửi xe cho phương tiện có đăng ký
                             _stateUi.update {
                                 it.copy(
-                                    isLoading = false, errorMessage = it.errorMessage
+                                    isLoading = false,
+                                    action = ParkingAction.SHOW_INVOICE_FOR_USER_REGISTER_VEHICLE,
+                                    parkingInvoice = ParkingInvoice(
+                                        id = invoiceRepository.getNewParkingInvoiceKey(),
+                                        user = it.user ?: UserInvoice(),
+                                        vehicle = foundVehicle,
+                                        imageIn = ImageUtil.encodeImage(
+                                            (stateUi.value.bmVehicleIn ?: "0") as Bitmap
+                                        ),
+                                        timeIn = TimeUtil.getCurrentTime().toString()
+                                    )
                                 )
                             }
                         }
+                    }
+                    // Không tìm thấy xe nào có biển số giống xe vào -> Gửi xe cho phương tiện chưa đăng ký
+                    else {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                parkingInvoice = createInvoiceForUserNotRegisterVehicle(),
+                                action = ParkingAction.SHOW_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE,
+                                vehicleList = state.data
+                            )
+                        }
+                    }
+                }
+                is State.Failed -> {
+                    _stateUi.update {
+                        it.copy(
+                            isLoading = false, errorMessage = it.errorMessage
+                        )
                     }
                 }
             }
@@ -155,7 +156,7 @@ class ParkingViewModel @Inject constructor(
     fun createInvoiceForGuest() {
         _stateUi.update {
             it.copy(
-                action = ParkingAction.CREATE_INVOICE_FOR_GUEST,
+                action = ParkingAction.SHOW_INVOICE_FOR_GUEST,
                 parkingInvoice = ParkingInvoice(
                     id = invoiceRepository.getNewParkingInvoiceKey(),
                     user = UserInvoice(),
@@ -258,13 +259,12 @@ class ParkingViewModel @Inject constructor(
                 licensePlateOfVehicleOut = "",
                 bmVehicleIn = null,
                 bmVehicleOut = null,
-                billingTypeHashMap = mutableMapOf(),
-                monthlyTicket = null
+                vehicleList = listOf()
             )
         }
     }
 
-    fun searchParkingInvoiceFromQRCode() {
+    fun getParkingInvoiceFromQRCode() {
         searchParkingInvoiceJob?.cancel()
         searchParkingInvoiceJob = viewModelScope.launch {
             stateUi.value.qrcode.let { qrCode ->
@@ -278,28 +278,22 @@ class ParkingViewModel @Inject constructor(
                             }
                         }
                         is State.Success -> {
-                            if (state.data.isNotEmpty()) {
-                                if (state.data[0].state == "parked") {
-                                    _stateUi.update {
-                                        it.copy(
-                                            isLoading = false,
-                                            message = "Mã QR không hợp lệ"
-                                        )
-                                    }
-                                } else {
-                                    _stateUi.update {
-                                        it.copy(
-                                            isLoading = false,
-                                            action = ParkingAction.PROCESS_TO_COMPLETE_PARKING_INVOICE,
-                                            parkingInvoice = state.data[0],
-                                        )
-                                    }
+
+                            val foundInvoice = state.data
+
+                            if (foundInvoice.state == ParkingInvoice.PARKED_STATE_TYPE) {
+                                _stateUi.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        message = "Mã QR không hợp lệ"
+                                    )
                                 }
                             } else {
                                 _stateUi.update {
                                     it.copy(
                                         isLoading = false,
-                                        message = "Mã QR không hợp lệ"
+                                        action = ParkingAction.PROCESS_TO_COMPLETE_PARKING_INVOICE,
+                                        parkingInvoice = foundInvoice,
                                     )
                                 }
                             }
@@ -307,7 +301,8 @@ class ParkingViewModel @Inject constructor(
                         is State.Failed -> {
                             _stateUi.update {
                                 it.copy(
-                                    isLoading = false, errorMessage = it.message
+                                    isLoading = false,
+                                    errorMessage = it.message
                                 )
                             }
                         }
@@ -319,35 +314,12 @@ class ParkingViewModel @Inject constructor(
 
 
     fun completeParkingInvoice() {
-        updateParkingInvoiceJob?.cancel()
-        updateParkingInvoiceJob = viewModelScope.launch {
-            invoiceRepository.completeParkingInvoice(stateUi.value.parkingInvoice!!)
-                .collect { state ->
-                    when (state) {
-                        is State.Loading -> {
-                            _stateUi.update {
-                                it.copy(isLoading = true)
-                            }
-                        }
-                        is State.Success -> {
-                            _stateUi.update {
-                                it.copy(
-                                    isLoading = false,
-                                    action = ParkingAction.REFRESH,
-                                    message = "Trả hóa đơn xe thành công cho xe có biển số: ${it.parkingInvoice?.vehicle?.licensePlate}"
-                                )
-                            }
-                        }
-                        is State.Failed -> {
-                            _stateUi.update {
-                                it.copy(
-                                    isLoading = false,
-                                    errorMessage = state.message
-                                )
-                            }
-                        }
-                    }
-                }
+        stateUi.value.parkingInvoice?.let { parkingInvoice ->
+            if (parkingInvoice.isOnlinePayment()) {
+                completeParkingInvoiceForOnlinePayment(parkingInvoice)
+            } else {
+                completeParkingInvoiceForOtherPayment(parkingInvoice)
+            }
         }
     }
 
@@ -380,7 +352,6 @@ class ParkingViewModel @Inject constructor(
 
     fun getDataFromQRCode(result: String) {
         AESEncyptionUtil.decrypt(result)?.let {
-            Log.e("bugggggg", it)
             QRCodeFactory.fromString(it)
         }?.let { qrcode ->
             when (qrcode) {
@@ -396,14 +367,6 @@ class ParkingViewModel @Inject constructor(
                     _stateUi.update {
                         it.copy(
                             action = ParkingAction.GET_INVOICE_FROM_QR_CODE,
-                            qrcode = qrcode
-                        )
-                    }
-                }
-                is MonthlyTicketQRCode -> {
-                    _stateUi.update {
-                        it.copy(
-                            action = ParkingAction.GET_MONTHLY_TICKET_FROM_QR_CODE,
                             qrcode = qrcode
                         )
                     }
@@ -442,7 +405,7 @@ class ParkingViewModel @Inject constructor(
     }
 
     fun isUnregisterVehicle(): Boolean {
-        return stateUi.value.action == ParkingAction.CREATE_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE || stateUi.value.action == ParkingAction.CREATE_INVOICE_FOR_GUEST
+        return stateUi.value.action == ParkingAction.SHOW_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE || stateUi.value.action == ParkingAction.SHOW_INVOICE_FOR_GUEST
     }
 
     fun updateVehicleType(vehicleType: String) {
@@ -463,37 +426,28 @@ class ParkingViewModel @Inject constructor(
         ) ?: 0.0
     }
 
-    fun getMonthlyTicketFromQRCodeThenCheck() {
+    fun handleSelectVehicle(vehicle: VehicleInvoice) {
         viewModelScope.launch {
-            stateUi.value.qrcode?.let { qrcode ->
-                (qrcode as MonthlyTicketQRCode).monthlyTicketId.let { id ->
-                    monthlyTicketRepository.getMonthlyTicketById(id).collect { state ->
-                        when (state) {
-                            is State.Loading -> {
-                                _stateUi.update {
-                                    it.copy(isLoading = true)
-                                }
-                            }
-                            is State.Success -> {
-                                _stateUi.update {
-                                    it.copy(
-                                        isLoading = false,
-                                        monthlyTicket = state.data,
-                                    )
-                                }
-                                checkMonthlyTicketThenCreateParkingInvoice()
-                            }
-                            is State.Failed -> {
-                                _stateUi.update {
-                                    it.copy(
-                                        isLoading = false,
-                                        errorMessage = it.errorMessage
-                                    )
-                                }
-                            }
-                        }
 
-                    }
+            findValidMonthlyTickerByVehicleIdToCreateInvoice(vehicle)
+
+            // Nếu xe không đăng ký vé tháng
+            if (stateUi.value.action != ParkingAction.SHOW_INVOICE_CREATE_FROM_MONTHLY_TICKET) {
+                // Gửi xe cho phương tiện có đăng ký
+                _stateUi.update {
+                    it.copy(
+                        isLoading = false,
+                        action = ParkingAction.SHOW_INVOICE_FOR_USER_REGISTER_VEHICLE,
+                        parkingInvoice = ParkingInvoice(
+                            id = invoiceRepository.getNewParkingInvoiceKey(),
+                            user = it.user ?: UserInvoice(),
+                            vehicle = vehicle,
+                            imageIn = ImageUtil.encodeImage(
+                                (stateUi.value.bmVehicleIn ?: "0") as Bitmap
+                            ),
+                            timeIn = TimeUtil.getCurrentTime().toString()
+                        )
+                    )
                 }
             }
         }
@@ -515,56 +469,123 @@ class ParkingViewModel @Inject constructor(
         }
     }
 
-    private fun checkMonthlyTicketThenCreateParkingInvoice() {
-        stateUi.value.monthlyTicket?.apply {
-            // Xem còn hạn hay không?
-            if (expiredAt.toLong() < TimeUtil.getCurrentTime()) {
-                _stateUi.update {
-                    it.copy(
-                        errorMessage = "Vé đã hết hạn"
-                    )
+    private suspend fun findValidMonthlyTickerByVehicleIdToCreateInvoice(vehicle: VehicleInvoice) {
+        monthlyTicketRepository.getValidMonthlyTicketByVehicleId(vehicle.id).collect { state ->
+            if (state is State.Success) {
+                state.data.apply {
+                    _stateUi.update {
+                        it.copy(
+                            isLoading = false,
+                            action = ParkingAction.SHOW_INVOICE_CREATE_FROM_MONTHLY_TICKET,
+                            parkingInvoice = ParkingInvoice(
+                                id = invoiceRepository.getNewParkingInvoiceKey(),
+                                user = UserInvoice(
+                                    id = user.id,
+                                    userId = user.userId,
+                                    name = user.account.name,
+                                    phoneNumber = user.account.phoneNumber
+                                ),
+                                vehicle = vehicle,
+                                imageIn = ImageUtil.encodeImage(
+                                    (stateUi.value.bmVehicleIn ?: "") as Bitmap
+                                ),
+                                timeIn = TimeUtil.getCurrentTime().toString()
+                            ).apply {
+                                type = ParkingInvoice.MONTH_INVOICE_TYPE
+                                paymentMethod = ParkingInvoice.VNPAY_PAYMENT_METHOD
+                            },
+                        )
+                    }
                 }
-                return
             }
-            // Xem có đúng là của bãi gửi xe này hay không?
-            if (userRepository.getLocalParkingLotId() != parkingLot.id) {
-                _stateUi.update {
-                    it.copy(
-                        errorMessage = "Vé không hợp lệ"
-                    )
+        }
+    }
+
+    private fun completeParkingInvoiceForOtherPayment(parkingInvoice: ParkingInvoice) {
+        viewModelScope.launch {
+            invoiceRepository.completeParkingInvoice(parkingInvoice).zip(
+                invoiceRepository.createWaitingRate(parkingInvoice)
+            ) { invoiceState, waitingRateState ->
+                if (invoiceState is State.Success && waitingRateState is State.Success) {
+                    State.success(true)
+                } else if (invoiceState is State.Failed || waitingRateState is State.Failed) {
+                    State.failed("Lỗi không xác định")
+                } else {
+                    State.loading()
                 }
-                return
+            }.collect { state ->
+                when (state) {
+                    is State.Loading -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+                    is State.Success -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                action = ParkingAction.REFRESH,
+                                message = "Trả hóa đơn xe thành công cho xe có biển số: ${it.parkingInvoice?.vehicle?.licensePlate}"
+                            )
+                        }
+                    }
+                    is State.Failed -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = state.message
+                            )
+                        }
+                    }
+                }
+
             }
-            _stateUi.update {
-                it.copy(
-                    action = ParkingAction.CREATE_INVOICE_FROM_MONTHLY_TICKET,
-                    parkingInvoice = ParkingInvoice(
-                        id = invoiceRepository.getNewParkingInvoiceKey(),
-                        user = UserInvoice(
-                            id = user.id,
-                            userId = user.userId,
-                            name = user.account.name,
-                            phoneNumber = user.account.phoneNumber
-                        ),
-                        vehicle = VehicleInvoice(
-                            id = vehicle.id ?: "",
-                            userId = vehicle.userId ?: "",
-                            licensePlate = vehicle.licensePlate ?: "",
-                            state = vehicle.state ?: "",
-                            brand = vehicle.brand ?: "",
-                            type = vehicle.type ?: "",
-                            color = vehicle.color ?: "",
-                            ownerFullName = vehicle.ownerFullName ?: "",
-                        ),
-                        imageIn = ImageUtil.encodeImage(
-                            (stateUi.value.bmVehicleIn ?: "") as Bitmap
-                        ),
-                        timeIn = TimeUtil.getCurrentTime().toString()
-                    ).apply {
-                        type = ParkingInvoice.MONTH_INVOICE_TYPE
-                        paymentMethod = ParkingInvoice.VNPAY_PAYMENT_METHOD
-                    },
-                )
+        }
+    }
+
+    private fun completeParkingInvoiceForOnlinePayment(parkingInvoice: ParkingInvoice) {
+        viewModelScope.launch {
+            invoiceRepository.completeParkingInvoice(parkingInvoice).zip(
+                debtRepository.createDebtInvoice(parkingInvoice.apply {
+                    imageOut = ""
+                    state = ParkingInvoice.PARKED_STATE_TYPE
+                })
+            ) { invoiceState, debState ->
+                if (invoiceState is State.Success && debState is State.Success) {
+                    State.success(true)
+                } else if (invoiceState is State.Failed || debState is State.Failed) {
+                    State.failed<String>("Vui lòng thử lại")
+                } else {
+                    State.loading()
+                }
+            }.collect { state ->
+                when (state) {
+                    is State.Loading -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+                    is State.Success -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                action = ParkingAction.REFRESH,
+                                message = "Trả hóa đơn xe thành công cho xe có biển số: ${it.parkingInvoice?.vehicle?.licensePlate}"
+                            )
+                        }
+                    }
+                    is State.Failed -> {
+                        _stateUi.update {
+                            it.copy(
+                                errorMessage = state.message
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -574,16 +595,26 @@ class ParkingViewModel @Inject constructor(
             viewModelScope.launch {
                 parkingLotRepository.getBillingTypesByParkingLotId(parkingLotId).collect { state ->
                     when (state) {
-                        is State.Loading -> {}
+                        is State.Loading -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = true
+                                )
+                            }
+                        }
                         is State.Success -> {
                             _stateUi.update { viewModelState ->
-                                viewModelState.copy(billingTypeHashMap = state.data.associateBy { it.vehicleType }
-                                    .toMutableMap())
+                                viewModelState.copy(
+                                    billingTypeHashMap = state.data.associateBy { it.vehicleType }
+                                        .toMutableMap(),
+                                    isLoading = false
+                                )
                             }
                         }
                         is State.Failed -> {
                             _stateUi.update {
                                 it.copy(
+                                    isLoading = false,
                                     errorMessage = state.message
                                 )
                             }
@@ -610,15 +641,14 @@ class ParkingViewModel @Inject constructor(
         val licensePlateOfVehicleOut: String = "",
         val bmVehicleIn: Bitmap? = null,
         val bmVehicleOut: Bitmap? = null,
-        val timeLimit: Int = 5,
+        val timeLimit: Int = 3,
         val billingTypeHashMap: MutableMap<String, BillingType> = mutableMapOf(),
-        val monthlyTicket: MonthlyTicket? = null
+        val vehicleList: List<VehicleInvoice> = listOf()
     ) {
         init {
-            errorList[ParkingAction.CREATE_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE] =
+            errorList[ParkingAction.SHOW_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE] =
                 "Không tìm thấy phương tiện tương ứng có biển số"
-
-            messageList[ParkingAction.CREATE_INVOICE_FOR_USER_REGISTER_VEHICLE] =
+            messageList[ParkingAction.SHOW_INVOICE_FOR_USER_REGISTER_VEHICLE] =
                 "Tìm thấy phương tiện tương ứng có biển số"
             messageList[ParkingAction.PROCESS_TO_COMPLETE_PARKING_INVOICE] =
                 "Tìm thấy hóa đơn xe có biển số"
@@ -628,7 +658,7 @@ class ParkingViewModel @Inject constructor(
 
     enum class ParkingAction {
         REFRESH,
-        CREATE_INVOICE_FOR_USER_REGISTER_VEHICLE, CREATE_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE, CREATE_INVOICE_FOR_GUEST,
-        PROCESS_TO_COMPLETE_PARKING_INVOICE, GET_INVOICE_FROM_QR_CODE, CREATE_INVOICE_FROM_USER_QR_CODE, GET_MONTHLY_TICKET_FROM_QR_CODE, CREATE_INVOICE_FROM_MONTHLY_TICKET
+        SHOW_INVOICE_FOR_USER_REGISTER_VEHICLE, SHOW_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE, SHOW_INVOICE_FOR_GUEST,
+        PROCESS_TO_COMPLETE_PARKING_INVOICE, GET_INVOICE_FROM_QR_CODE, CREATE_INVOICE_FROM_USER_QR_CODE, SHOW_INVOICE_CREATE_FROM_MONTHLY_TICKET
     }
 }

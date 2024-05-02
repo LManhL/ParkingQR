@@ -5,7 +5,6 @@ import android.content.Context
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.example.parkingqr.R
-import com.example.parkingqr.ui.components.qrcode.Timer
 
 class PaymentSuccessDialog(context: Context, private val secondDelay: Long, private val onFinish: (() -> Unit)) {
     private val dialog = Dialog(context)

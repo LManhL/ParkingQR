@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/llHeaderDialogRate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start|center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivCancelDialogRate"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_margin="@dimen/margin_10"
+            android:src="@drawable/cancel_black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_10"
+            android:fontFamily="@font/source_sans_pro_semibold"
+            android:text="Đánh giá chất lượng dịch vụ gửi xe"
+            android:textSize="@dimen/font_size_medium" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/vDivider1DialogRate"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#40070FAD"
+        app:layout_constraintTop_toBottomOf="@id/llHeaderDialogRate" />
+
+    <LinearLayout
+        android:id="@+id/llStarsDialogRate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/vDivider1DialogRate">
+
+        <ImageView
+            android:id="@+id/ivStar1DialogRate"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="@dimen/margin_6"
+            android:src="@drawable/star_rate_full" />
+
+        <ImageView
+            android:id="@+id/ivStar2DialogRate"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="@dimen/margin_6"
+            android:src="@drawable/star_rate_full" />
+
+        <ImageView
+            android:id="@+id/ivStar3DialogRate"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="@dimen/margin_6"
+            android:src="@drawable/star_rate_full" />
+
+        <ImageView
+            android:id="@+id/ivStar4DialogRate"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="@dimen/margin_6"
+            android:src="@drawable/star_rate_full" />
+
+        <ImageView
+            android:id="@+id/ivStar5DialogRate"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="@dimen/margin_6"
+            android:src="@drawable/star_rate_full" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/edtCommentDialogRate"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="@dimen/margin_10"
+        android:autofillHints="comment"
+        android:background="@drawable/rounded_edit_text_white"
+        android:fontFamily="@font/source_sans_pro"
+        android:gravity="start"
+        android:hint="Chia sẻ cảm nhận của bạn..."
+        android:inputType="textMultiLine"
+        android:maxLines="5"
+        android:padding="@dimen/padding_10"
+        android:textSize="@dimen/font_size_medium"
+        app:layout_constraintTop_toBottomOf="@id/llStarsDialogRate" />
+
+    <View
+        android:id="@+id/vDivider2DialogRate"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="@dimen/margin_10"
+        android:background="#40070FAD"
+        app:layout_constraintTop_toBottomOf="@id/edtCommentDialogRate" />
+
+    <TextView
+        android:textSize="@dimen/font_size_large"
+        android:fontFamily="@font/source_sans_pro_semibold"
+        android:layout_margin="@dimen/margin_10"
+        android:id="@+id/tvLicensePlateDialogRate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="89L138851"
+        app:layout_constraintTop_toBottomOf="@id/vDivider2DialogRate" />
+    <TextView
+        android:textSize="@dimen/font_size_medium"
+        android:fontFamily="@font/source_sans_pro"
+        android:layout_margin="@dimen/margin_10"
+        android:text="Xe hơi - Mercedes"
+        app:layout_constraintTop_toBottomOf="@id/tvLicensePlateDialogRate"
+        android:id="@+id/tvVehicleTypeDialogRate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnSendDialogRate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_40"
+        android:layout_marginRight="@dimen/margin_40"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/rounded_button_icon_color"
+        android:fontFamily="@font/source_sans_pro_semibold"
+        android:text="Gửi đi"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_size_medium"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

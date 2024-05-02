@@ -79,4 +79,15 @@ class VehicleRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override fun getVerifiedVehiclesOfUser(userId: String): Flow<State<List<VehicleInvoice>>> {
+        return vehicleRemoteData.getVerifiedVehiclesOfUser(userId).map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.map { it.mapToVehicleInvoice() }
+                    .toList())
+                is State.Failed -> State.failed(state.message)
+            }
+        }
+    }
 }

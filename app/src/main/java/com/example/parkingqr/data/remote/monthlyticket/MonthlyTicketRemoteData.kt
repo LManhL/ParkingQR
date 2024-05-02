@@ -8,4 +8,6 @@ interface MonthlyTicketRemoteData {
     fun getCurrentUserMonthlyTicketList(): Flow<State<MutableList<MonthlyTicketFirebase>>>
     fun createMonthlyTicket(monthlyTicketFirebase: MonthlyTicketFirebase): Flow<State<Boolean>>
     fun getMonthlyTicketById(monthlyTicketId: String): Flow<State<MonthlyTicketFirebase>>
+    fun getValidMonthlyTicketByVehicleId(vehicleId: String): Flow<State<MonthlyTicketFirebase>>
+
 }

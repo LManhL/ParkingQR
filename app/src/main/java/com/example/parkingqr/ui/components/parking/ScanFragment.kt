@@ -45,8 +45,8 @@ class ScanFragment : BaseFragment() {
             BarcodeDetector.Builder(requireContext()).setBarcodeFormats(Barcode.QR_CODE).build()
         cameraSource = CameraSource.Builder(requireContext(), barcode)
             .setFacing(CameraSource.CAMERA_FACING_BACK)
-            .setRequestedFps(24F).setRequestedPreviewSize(1920, 1024).build()
-        startScanLineAnimation()
+            .setAutoFocusEnabled(true)
+            .build()
         return binding.root
     }
 
@@ -56,6 +56,7 @@ class ScanFragment : BaseFragment() {
             showError("Không thể mở màn hình quét")
             return
         }
+        startScanLineAnimation()
         cameraView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 try {
@@ -98,7 +99,6 @@ class ScanFragment : BaseFragment() {
 
     private fun handleReceiveQRCode(barcodes: SparseArray<Barcode>) {
         CoroutineScope(Dispatchers.Main).launch {
-            Log.d("QR CODE", barcodes.valueAt(0).displayValue.toString())
             parkingViewModel.getDataFromQRCode(barcodes.valueAt(0).displayValue)
             barcode.release()
             getNavController().popBackStack()

@@ -1,24 +1,36 @@
 package com.example.parkingqr.ui.components.qrcode
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.repo.debt.DebtRepository
 import com.example.parkingqr.data.repo.invoice.InvoiceRepository
 import com.example.parkingqr.data.repo.monthlyticket.MonthlyTicketRepository
+import com.example.parkingqr.data.repo.parkinglot.ParkingLotRepository
+import com.example.parkingqr.data.repo.payment.PaymentRepository
 import com.example.parkingqr.data.repo.user.UserRepository
+import com.example.parkingqr.domain.model.debt.InvoiceDebt
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.invoice.WaitingRate
 import com.example.parkingqr.domain.model.parkinglot.MonthlyTicket
+import com.example.parkingqr.domain.model.payment.BankAccount
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import okhttp3.internal.wait
 import javax.inject.Inject
 
 @HiltViewModel
 class UserQRCodeListViewModel @Inject constructor(
     private val invoiceRepository: InvoiceRepository,
     private val userRepository: UserRepository,
-    private val monthlyTicketRepository: MonthlyTicketRepository
+    private val monthlyTicketRepository: MonthlyTicketRepository,
+    private val debtRepository: DebtRepository,
+    private val paymentRepository: PaymentRepository,
+    private val parkingLotRepository: ParkingLotRepository
 ) : BaseViewModel() {
     private val _stateUi = MutableStateFlow(
         UserQRCodeListUiState()
@@ -27,8 +39,73 @@ class UserQRCodeListViewModel @Inject constructor(
 
     private var getParkingInvoiceListJob: Job? = null
 
-    init {
-        getParkingInvoiceList()
+
+    fun payInvoiceDebt() {
+        stateUi.value.invoiceDebt?.let { invoiceDebt ->
+            viewModelScope.launch {
+                debtRepository.payDebtInvoice(invoiceDebt).collect { state ->
+                    when (state) {
+                        is State.Loading -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = true
+                                )
+                            }
+                        }
+                        is State.Success -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = false,
+                                    invoiceDebt = null
+                                )
+                            }
+                        }
+                        is State.Failed -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = state.message
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun getUserInvoiceDebt() {
+        viewModelScope.launch {
+            debtRepository.getUserUnpaidDebtInvoice().collect { state ->
+                when (state) {
+                    is State.Loading -> {
+                        _stateUi.update {
+                            it.copy(
+                                invoiceDebt = null
+                            )
+                        }
+                        Log.e("CHECK", "LOADING")
+                    }
+                    is State.Success -> {
+                        _stateUi.update {
+                            it.copy(
+                                invoiceDebt = state.data
+                            )
+                        }
+                        Log.e("CHECK", "SUCCESS")
+                    }
+                    is State.Failed -> {
+                        _stateUi.update {
+                            it.copy(
+                                invoiceDebt = null,
+                            )
+                        }
+                        Log.e("CHECK", "FAIL")
+                    }
+                }
+
+            }
+        }
     }
 
     fun getParkingInvoiceList() {
@@ -44,8 +121,9 @@ class UserQRCodeListViewModel @Inject constructor(
                     is State.Success -> {
                         _stateUi.update {
                             it.copy(
+                                isLoading = false,
                                 invoiceList = state.data,
-                                isLoading = false
+                                isHideUserDialog = true,
                             )
                         }
                     }
@@ -58,38 +136,6 @@ class UserQRCodeListViewModel @Inject constructor(
                         }
                     }
                 }
-            }
-        }
-    }
-
-    fun getUserIdToShowDialog() {
-        viewModelScope.launch {
-            userRepository.getUserId().collect { state ->
-                when (state) {
-                    is State.Loading -> {
-                        _stateUi.update {
-                            it.copy(isLoading = true)
-                        }
-                    }
-                    is State.Success -> {
-                        _stateUi.update {
-                            it.copy(
-                                userId = state.data,
-                                isShowUserDialog = true,
-                                isLoading = false
-                            )
-                        }
-                    }
-                    is State.Failed -> {
-                        _stateUi.update {
-                            it.copy(
-                                isLoading = false,
-                                error = state.message
-                            )
-                        }
-                    }
-                }
-
             }
         }
     }
@@ -156,35 +202,6 @@ class UserQRCodeListViewModel @Inject constructor(
         }
     }
 
-    fun getIsShowMonthlyTicket() {
-        monthlyTicketRepository.getIsShowMonthlyTicket().let { isShowMonthlyTicket ->
-            _stateUi.update {
-                it.copy(
-                    isShowMonthlyTicket = isShowMonthlyTicket
-                )
-            }
-        }
-    }
-
-    fun setIsShowMonthlyTicket(isShow: Boolean) {
-        stateUi.value.monthLyTicketList.let { list ->
-            if (list.isNotEmpty()) {
-                monthlyTicketRepository.setIsShowMonthlyTicket(isShow)
-                _stateUi.update {
-                    it.copy(
-                        isShowMonthlyTicket = isShow
-                    )
-                }
-            } else {
-                _stateUi.update {
-                    it.copy(
-                        message = "Xin vui lòng đăng ký vé tháng trước"
-                    )
-                }
-            }
-        }
-    }
-
     fun getSelectedMonthlyTicketId() {
         monthlyTicketRepository.getSelectedMonthlyTicketId().let { value ->
             if (value == null) {
@@ -211,20 +228,8 @@ class UserQRCodeListViewModel @Inject constructor(
     }
 
     fun handleToShowQRCode() {
-        monthlyTicketRepository.getIsShowMonthlyTicket().let { isShowMonthlyTicket ->
-            if (isShowMonthlyTicket) {
-                monthlyTicketRepository.getSelectedMonthlyTicketId()?.let {
-                    getMonthlyTicketByIdToShowDialog(it)
-                }
-            } else {
-                getUserIdToShowDialog()
-            }
-        }
-    }
-
-    fun getMonthlyTicketByIdToShowDialog(id: String) {
         viewModelScope.launch {
-            monthlyTicketRepository.getMonthlyTicketById(id).collect { state ->
+            userRepository.getUserId().collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -234,12 +239,11 @@ class UserQRCodeListViewModel @Inject constructor(
                     is State.Success -> {
                         _stateUi.update {
                             it.copy(
-                                selectedMonthlyTicket = state.data,
-                                isLoading = false,
-                                isShowMonthlyTicketDialog = true
+                                userId = state.data,
+                                isShowUserDialog = true,
+                                isLoading = false
                             )
                         }
-                        getSelectedMonthlyTicketId()
                     }
                     is State.Failed -> {
                         _stateUi.update {
@@ -249,6 +253,108 @@ class UserQRCodeListViewModel @Inject constructor(
                             )
                         }
                     }
+                }
+
+            }
+        }
+    }
+
+    fun getWaitingRatesToShow() {
+        viewModelScope.launch {
+            invoiceRepository.getUnShowedWaitingRates().collect { state ->
+                when (state) {
+                    is State.Loading -> {
+                        _stateUi.update {
+                            it.copy(isLoading = true)
+                        }
+                    }
+                    is State.Success -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                waitingRateList = state.data
+                            )
+                        }
+                    }
+                    is State.Failed -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                error = state.message
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun sendWaitingRate(rate: Int, comment: String, waitingRate: WaitingRate) {
+        waitingRate.apply {
+            this.rate = rate.toDouble()
+            this.comment = comment
+        }.let {
+            viewModelScope.launch {
+                delay(100)
+                invoiceRepository.deleteWaitingRateById(waitingRate.id).collect()
+                parkingLotRepository.createRate(waitingRate).collect { state ->
+                    when (state) {
+                        is State.Loading -> {
+                            _stateUi.update {
+                                it.copy(isLoading = true)
+                            }
+                        }
+                        is State.Success -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = false,
+                                    message = "Cảm ơn bạn đã hoàn thành đánh giá"
+                                )
+                            }
+                        }
+                        is State.Failed -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = state.message
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun createWaitingRate() {
+        stateUi.value.invoiceDebt?.parkingInvoice?.let { parkingInvoice ->
+            viewModelScope.launch {
+                invoiceRepository.createWaitingRate(parkingInvoice).collect { state ->
+                    when (state) {
+                        is State.Loading -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = true
+                                )
+                            }
+                        }
+                        is State.Success -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = false
+                                )
+                            }
+                        }
+                        is State.Failed -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = it.message
+                                )
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -280,6 +386,13 @@ class UserQRCodeListViewModel @Inject constructor(
         }
     }
 
+    fun hideDialog() {
+        _stateUi.update {
+            it.copy(
+                isHideUserDialog = false
+            )
+        }
+    }
 
     data class UserQRCodeListUiState(
         val isLoading: Boolean = false,
@@ -289,9 +402,13 @@ class UserQRCodeListViewModel @Inject constructor(
         val userId: String = "",
         val isShowUserDialog: Boolean = false,
         val isShowMonthlyTicketDialog: Boolean = false,
+        val isHideUserDialog: Boolean = false,
         val monthLyTicketList: MutableList<MonthlyTicket> = mutableListOf(),
-        val isShowMonthlyTicket: Boolean = false,
         val selectedMonthlyTicketId: String = "",
-        val selectedMonthlyTicket: MonthlyTicket? = null
+        val selectedMonthlyTicket: MonthlyTicket? = null,
+        val invoiceDebt: InvoiceDebt? = null,
+        val bankAccountList: MutableList<BankAccount> = mutableListOf(),
+        val selectedBankAccount: BankAccount? = null,
+        val waitingRateList: List<WaitingRate> = listOf()
     )
 }

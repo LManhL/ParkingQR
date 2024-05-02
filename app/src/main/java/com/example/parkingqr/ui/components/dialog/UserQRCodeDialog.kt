@@ -3,12 +3,10 @@ package com.example.parkingqr.ui.components.dialog
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.example.parkingqr.R
-import com.example.parkingqr.ui.components.qrcode.Timer
 
 class UserQRCodeDialog(
     private val context: Context,

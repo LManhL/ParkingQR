@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.qrcode
+package com.example.parkingqr.ui.components.dialog
 
 interface TimerCallBack {
     fun onFinish()

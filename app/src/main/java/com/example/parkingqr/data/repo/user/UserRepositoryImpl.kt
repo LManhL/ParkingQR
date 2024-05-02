@@ -91,19 +91,17 @@ class UserRepositoryImpl @Inject constructor(
         return userRemoteData.searchUserById(userId).map { state ->
             when (state) {
                 is State.Loading -> State.loading()
-                is State.Success -> State.success(state.data.map { it.mapToUser() }
-                    .toMutableList())
+                is State.Success -> State.success(mutableListOf(state.data.mapToUser()))
                 is State.Failed -> State.failed(state.message)
             }
         }
     }
 
-    override fun searchUserInvoiceById(userId: String): Flow<State<MutableList<UserInvoice>>> {
+    override fun searchUserInvoiceById(userId: String): Flow<State<UserInvoice>> {
         return userRemoteData.searchUserById(userId).map { state ->
             when (state) {
                 is State.Loading -> State.loading()
-                is State.Success -> State.success(state.data.map { it.mapToUserInvoice() }
-                    .toMutableList())
+                is State.Success -> State.success(state.data.mapToUserInvoice())
                 is State.Failed -> State.failed(state.message)
             }
         }

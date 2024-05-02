@@ -8,7 +8,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.parkingqr.R
 import com.example.parkingqr.domain.model.parkinglot.MonthlyTicket
-import com.example.parkingqr.ui.components.qrcode.Timer
 import com.example.parkingqr.utils.TimeUtil
 
 class MonthlyTicketQRCodeDialog(

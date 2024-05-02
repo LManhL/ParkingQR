@@ -1,6 +1,7 @@
 package com.example.parkingqr.data.repo.vehicle
 
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.remote.dto.vehicle.VehicleFirebase
 import com.example.parkingqr.domain.model.vehicle.VehicleDetail
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 import kotlinx.coroutines.flow.Flow
@@ -16,4 +17,5 @@ interface VehicleRepository {
     fun pendingVehicle(vehicleDetail: VehicleDetail): Flow<State<Boolean>>
 
     fun getAllVehicleOfUserByUserId(userId: String): Flow<State<MutableList<VehicleInvoice>>>
+    fun getVerifiedVehiclesOfUser(userId: String): Flow<State<List<VehicleInvoice>>>
 }

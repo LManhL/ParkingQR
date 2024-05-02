@@ -16,4 +16,5 @@ interface VehicleRemoteData {
     fun pendingVehicle(vehicle: VehicleFirebase): Flow<State<Boolean>>
 
     fun getAllVehicleOfUserByUserId(userId: String): Flow<State<MutableList<VehicleFirebase>>>
+    fun getVerifiedVehiclesOfUser(userId: String): Flow<State<List<VehicleFirebase>>>
 }

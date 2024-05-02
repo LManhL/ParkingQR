@@ -44,6 +44,7 @@ class RateListAdapter(private val rateList: MutableList<Rate>) :
         private val createAt: TextView = itemView.findViewById(R.id.tvCreateAtRateContent)
         private val stars: LinearLayout = itemView.findViewById(R.id.llStarRateContent)
         private val comment: TextView = itemView.findViewById(R.id.tvCommentRateContent)
+        private val vehicleType: TextView = itemView.findViewById(R.id.tvVehicleTypeRateContent)
 
 
         private lateinit var curRate: Rate
@@ -59,6 +60,7 @@ class RateListAdapter(private val rateList: MutableList<Rate>) :
             name.text = rate.userRate.name
             createAt.text = TimeUtil.getTimeAgoString(curRate.createAt.toLongOrNull() ?: 0)
             comment.text = curRate.comment
+            vehicleType.text = "${rate.getReadableVehicleType()} - ${rate.brand.uppercase()}"
             bindAvatar()
             bindStars()
         }

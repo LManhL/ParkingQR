@@ -17,7 +17,7 @@ class ServiceGenerator @Inject constructor() {
         private const val contentType = "Content-Type"
         private const val contentTypeValue = "application/json"
         private const val timeoutConnect = 30
-        private const val BASE_URL = "http://192.168.1.6:8080"
+        private const val BASE_URL = "http://192.168.113.153:8080"
     }
 
     private val okHttpBuilder: OkHttpClient.Builder = OkHttpClient.Builder()

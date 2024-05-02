@@ -6,6 +6,7 @@ import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import kotlinx.coroutines.flow.Flow
 
 interface DebtRepository {
-    fun getUserUnpaidDebtInvoice(): Flow<State<List<InvoiceDebt>>>
+    fun getUserUnpaidDebtInvoice(): Flow<State<InvoiceDebt>>
     fun createDebtInvoice(parkingInvoice: ParkingInvoice): Flow<State<Boolean>>
+    fun payDebtInvoice(invoiceDebt: InvoiceDebt): Flow<State<Boolean>>
 }

@@ -20,7 +20,7 @@ interface UserRepository {
     fun activeAccount(id: String): Flow<State<Boolean>>
     fun searchUserById(userId: String): Flow<State<MutableList<User>>>
 
-    fun searchUserInvoiceById(userId: String): Flow<State<MutableList<UserInvoice>>>
+    fun searchUserInvoiceById(userId: String): Flow<State<UserInvoice>>
     fun getUserId(): Flow<State<String>>
     fun getParkingLotManagerById(parkingLotManagerId: String): Flow<State<ParkingLotManager>>
 

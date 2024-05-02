@@ -15,7 +15,6 @@ class UserMonthlyTicketAdapter(private val list: MutableList<MonthlyTicket>) :
     Adapter<UserMonthlyTicketAdapter.UserMonthlyTicketViewHolder>() {
 
     private var onClick: ((MonthlyTicket) -> Unit)? = null
-    private var selectedMonthlyTicketId: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserMonthlyTicketViewHolder {
         return LayoutInflater.from(parent.context)
@@ -39,7 +38,6 @@ class UserMonthlyTicketAdapter(private val list: MutableList<MonthlyTicket>) :
     }
 
     fun setSelectedMonthlyTicketId(id: String) {
-        this.selectedMonthlyTicketId = id
         notifyDataSetChanged()
     }
 
@@ -47,7 +45,6 @@ class UserMonthlyTicketAdapter(private val list: MutableList<MonthlyTicket>) :
         private val licensePlate =
             itemView.findViewById<TextView>(R.id.tvLicensePlateUserMonthlyTicket)
         private val status = itemView.findViewById<TextView>(R.id.tvExpireDateUserMonthlyTicket)
-        private val select = itemView.findViewById<ImageView>(R.id.ivSelectMonthlyTicket)
         private val parkingLotName =
             itemView.findViewById<TextView>(R.id.tvParkingLotNameUserMonthlyTicket)
         private val address = itemView.findViewById<TextView>(R.id.tvAddressUserMonthlyTicket)
@@ -67,10 +64,6 @@ class UserMonthlyTicketAdapter(private val list: MutableList<MonthlyTicket>) :
             curItem?.apply {
                 licensePlate.text =
                     "${vehicle.licensePlate?.uppercase()} - ${vehicle.getVehicleType()} - ${vehicle.brand?.uppercase()}"
-                select.visibility = View.GONE
-                id.takeIf { id == selectedMonthlyTicketId }?.let {
-                    select.visibility = View.VISIBLE
-                }
                 parkingLotName.text = parkingLot.name
                 address.text = parkingLot.address
                 if (expiredAt.toLong() > TimeUtil.getCurrentTime()) {

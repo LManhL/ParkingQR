@@ -111,7 +111,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginBottom="@dimen/margin_10"
-                android:fontFamily="@font/source_sans_pro_semibold"
+                android:fontFamily="@font/source_sans_pro"
                 android:gravity="center"
                 android:text="Hóa đơn gửi xe hiện đang trống"
                 android:textColor="@color/black"
@@ -125,30 +125,50 @@
                 android:background="@color/icon_color" />
 
             <LinearLayout
-                android:visibility="gone"
-                android:layout_marginTop="@dimen/margin_10"
-                android:gravity="center"
-                android:layout_marginRight="60dp"
                 android:id="@+id/llTimeLeftParking"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/vDividerParking"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/time_left" />
+                android:layout_marginTop="@dimen/margin_10"
+                android:layout_marginRight="60dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:weightSum="10">
 
                 <TextView
-                    android:id="@+id/tvTimeleftParking"
-                    android:layout_marginLeft="@dimen/margin_10"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tvStopTimerParking"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:fontFamily="@font/source_sans_pro_semibold"
-                    android:text="00:03s"
-                    android:textColor="@color/light_red"
+                    android:gravity="center"
+                    android:text="Dừng bộ đếm"
+                    android:textColor="@color/icon_color"
                     android:textSize="@dimen/font_size_medium" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="6"
+                    android:gravity="start"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/time_left" />
+
+                    <TextView
+                        android:id="@+id/tvTimeleftParking"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/margin_10"
+                        android:fontFamily="@font/source_sans_pro_semibold"
+                        android:text="00:03s"
+                        android:textColor="@color/light_red"
+                        android:textSize="@dimen/font_size_medium" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -246,9 +266,9 @@
                             android:id="@+id/llContainerParking"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:visibility="invisible"
                             android:layout_margin="5dp"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:visibility="invisible">
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
@@ -284,14 +304,12 @@
                                 android:layout_gravity="center"
                                 android:layout_marginTop="@dimen/margin_10"
                                 android:gravity="center"
-                                android:orientation="horizontal"
-                                android:weightSum="5">
+                                android:orientation="vertical">
 
                                 <EditText
                                     android:id="@+id/edtLicensePlateParking"
-                                    android:layout_width="0dp"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="5"
                                     android:background="@android:color/transparent"
                                     android:enabled="false"
                                     android:fontFamily="@font/source_sans_pro_semibold"
@@ -300,6 +318,33 @@
                                     android:text="516-99999"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/font_size_extra_large" />
+
+                                <LinearLayout
+                                    android:id="@+id/llWrongLicensePlateParking"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="@dimen/margin_6"
+                                    android:gravity="center"
+                                    android:orientation="horizontal"
+                                    android:visibility="gone">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="@dimen/margin_10"
+                                        android:fontFamily="@font/source_sans_pro"
+                                        android:text="Sai biển số?"
+                                        android:textColor="@color/light_grey"
+                                        android:textSize="14sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/source_sans_pro_semibold"
+                                        android:text="Chọn biển khác"
+                                        android:textColor="@color/icon_color"
+                                        android:textSize="14sp" />
+                                </LinearLayout>
                             </LinearLayout>
 
                             <View

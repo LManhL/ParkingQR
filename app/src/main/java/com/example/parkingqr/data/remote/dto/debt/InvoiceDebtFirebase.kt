@@ -5,7 +5,7 @@ import com.example.parkingqr.data.remote.dto.invoice.ParkingInvoiceFirebase
 data class InvoiceDebtFirebase(
     val id: String? = null,
     val createAt: String? = null,
-    val parkingInvoiceFirebase: ParkingInvoiceFirebase? = null,
+    val parkingInvoice: ParkingInvoiceFirebase? = null,
     val status: String? = null
 ){
     companion object{

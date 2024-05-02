@@ -3,8 +3,11 @@ package com.example.parkingqr.data.mapper
 import com.example.parkingqr.data.remote.dto.invoice.ParkingInvoiceFirebase
 import com.example.parkingqr.data.remote.dto.invoice.UserInvoiceFirebase
 import com.example.parkingqr.data.remote.dto.invoice.VehicleInvoiceFirebase
+import com.example.parkingqr.data.remote.dto.invoice.WaitingRateFirebase
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.invoice.UserInvoice
+import com.example.parkingqr.domain.model.invoice.WaitingRate
+import com.example.parkingqr.domain.model.parkinglot.UserRate
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 
 fun ParkingInvoice.mapToParkingInvoiceFirebase(): ParkingInvoiceFirebase {
@@ -86,5 +89,38 @@ fun VehicleInvoiceFirebase.mapToVehicleInvoice(): VehicleInvoice {
         ownerFullName = ownerFullName ?: "",
     )
 }
+
+fun WaitingRateFirebase.mapToWaitingRate(): WaitingRate {
+    return WaitingRate(
+        id = id ?: "",
+        parkingLotId = parkingLotId ?: "",
+        parkingInvoiceId = parkingInvoiceId ?: "",
+        rate = rate ?: 0.0,
+        comment = comment ?: "",
+        createAt = createAt ?: "",
+        user = user?.mapToUserRate() ?: UserRate(),
+        showed = showed ?: false,
+        licensePlate = licensePlate ?: "",
+        brand = brand ?: "",
+        vehicleType = vehicleType ?: "",
+    )
+}
+
+fun WaitingRate.mapToWaitingRateFirebase(): WaitingRateFirebase {
+    return WaitingRateFirebase(
+        id = id,
+        parkingLotId = parkingLotId,
+        parkingInvoiceId = parkingInvoiceId,
+        rate = rate,
+        comment = comment,
+        createAt = createAt,
+        user = user.mapToUserRateFirebase(),
+        showed = showed,
+        licensePlate = licensePlate,
+        brand = brand,
+        vehicleType = vehicleType,
+    )
+}
+
 
 

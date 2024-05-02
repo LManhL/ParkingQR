@@ -132,7 +132,7 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
         emit(State.success(true))
     }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
 
-    override fun searchUserById(userId: String): Flow<State<MutableList<UserFirebase>>> =
+    override fun searchUserById(userId: String): Flow<State<UserFirebase>> =
         flow {
             val userRef = db.collection(Params.USER_PATH_COLLECTION)
             val query = userRef.whereEqualTo("userId", userId)
@@ -144,7 +144,12 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
                     userList.add(it)
                 }
             }
-            emit(State.success(userList))
+            val foundUser = userList.firstOrNull()
+            if (foundUser != null) {
+                emit(State.success(foundUser))
+            } else {
+                emit(State.failed("Không tìm thấy người dùng tương ứng"))
+            }
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)

@@ -20,7 +20,7 @@ interface UserRemoteData {
     fun deleteAccount(id: String): Flow<State<Boolean>>
     fun blockAccount(id: String): Flow<State<Boolean>>
     fun activeAccount(id: String): Flow<State<Boolean>>
-    fun searchUserById(userId: String): Flow<State<MutableList<UserFirebase>>>
+    fun searchUserById(userId: String): Flow<State<UserFirebase>>
 
     fun getUserID(): Flow<State<String>>
     fun getParkingLotManagerById(parkingLotManagerId: String): Flow<State<ParkingLotManagerFirebase>>

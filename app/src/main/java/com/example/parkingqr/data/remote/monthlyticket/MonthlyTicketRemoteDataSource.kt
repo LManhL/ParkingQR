@@ -1,10 +1,12 @@
 package com.example.parkingqr.data.remote.monthlyticket
 
 import android.content.Context
+import android.util.Log
 import com.example.parkingqr.data.remote.BaseRemoteDataSource
 import com.example.parkingqr.data.remote.Params
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.remote.dto.parkinglot.MonthlyTicketFirebase
+import com.example.parkingqr.utils.TimeUtil
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -60,6 +62,27 @@ class MonthlyTicketRemoteDataSource @Inject constructor(val context: Context) :
                 emit(State.failed("Lỗi không xác định"))
             }
 
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
+    override fun getValidMonthlyTicketByVehicleId(vehicleId: String): Flow<State<MonthlyTicketFirebase>> =
+        flow<State<MonthlyTicketFirebase>> {
+            emit(State.loading())
+            db.collection(Params.MONTHLY_TICKET_COLLECTION).whereEqualTo("vehicle.id", vehicleId)
+                .whereGreaterThan("expiredAt", TimeUtil.getCurrentTime().toString()).get().await()
+                .let { querySnapshots ->
+                    val list = mutableListOf<MonthlyTicketFirebase>()
+                    querySnapshots.forEach { snapshot ->
+                        list.add(snapshot.toObject(MonthlyTicketFirebase::class.java))
+                    }
+                    val foundVehicle = list.firstOrNull()
+                    if (foundVehicle != null) {
+                        emit(State.success(foundVehicle))
+                    } else {
+                        emit(State.failed("Không tìm thấy"))
+                    }
+                }
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)

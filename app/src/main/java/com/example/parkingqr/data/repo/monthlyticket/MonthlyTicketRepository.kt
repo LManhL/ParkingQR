@@ -1,6 +1,7 @@
 package com.example.parkingqr.data.repo.monthlyticket
 
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.remote.dto.parkinglot.MonthlyTicketFirebase
 import com.example.parkingqr.domain.model.parkinglot.MonthlyTicket
 import kotlinx.coroutines.flow.Flow
 
@@ -13,4 +14,5 @@ interface MonthlyTicketRepository {
     fun getSelectedMonthlyTicketId(): String?
     fun setSelectedMonthlyTicketId(monthlyTicketId: String)
     fun getMonthlyTicketById(monthlyTicketId: String): Flow<State<MonthlyTicket>>
+    fun getValidMonthlyTicketByVehicleId(vehicleId: String): Flow<State<MonthlyTicket>>
 }

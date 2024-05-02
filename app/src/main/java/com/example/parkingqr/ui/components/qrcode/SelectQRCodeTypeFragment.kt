@@ -27,7 +27,6 @@ class SelectQRCodeTypeFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
         userMonthlyTicketAdapter = UserMonthlyTicketAdapter(monthlyTicketList)
         viewModel.apply {
-            getIsShowMonthlyTicket()
             getMonthlyTicketListAndSelectedId()
         }
     }
@@ -54,15 +53,6 @@ class SelectQRCodeTypeFragment : BaseFragment() {
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.stateUi.map { it.isShowMonthlyTicket }.distinctUntilChanged()
-                    .collect { isShowMonthlyTicket ->
-                        if (isShowMonthlyTicket) showMonthlyTicketList()
-                        else hideMonthlyTicketList()
-                    }
-            }
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.stateUi.map { it.selectedMonthlyTicketId }.distinctUntilChanged()
                     .collect { id ->
                         id.takeIf { id.isNotEmpty() }?.let {
@@ -83,25 +73,12 @@ class SelectQRCodeTypeFragment : BaseFragment() {
         userMonthlyTicketAdapter.setOnClick {
             handleClick(it)
         }
-        viewModel.stateUi.value.isShowMonthlyTicket.let {
-            binding.swSelectQRCodeType.isChecked = it
-        }
         return binding.root
     }
 
     override fun initListener() {
         showActionBar(getString(R.string.select_qr_code_type_fragment_name))
-        binding.swSelectQRCodeType.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.setIsShowMonthlyTicket(isChecked)
-        }
-    }
-
-    private fun showMonthlyTicketList() {
-        binding.rlvMonthlyTicketListSelectQRCodeType.visibility = View.VISIBLE
-    }
-
-    private fun hideMonthlyTicketList() {
-        binding.rlvMonthlyTicketListSelectQRCodeType.visibility = View.INVISIBLE
+        hideBottomNavigation()
     }
 
     private fun handleClick(monthlyTicket: MonthlyTicket) {

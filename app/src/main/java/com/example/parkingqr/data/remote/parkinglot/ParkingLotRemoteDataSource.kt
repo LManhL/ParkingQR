@@ -4,7 +4,9 @@ import android.content.Context
 import com.example.parkingqr.data.remote.BaseRemoteDataSource
 import com.example.parkingqr.data.remote.Params
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.remote.dto.invoice.WaitingRateFirebase
 import com.example.parkingqr.data.remote.dto.parkinglot.*
+import com.example.parkingqr.utils.TimeUtil
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -115,5 +117,32 @@ class ParkingLotRemoteDataSource @Inject constructor(val context: Context) : Bas
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)
+
+    override fun createRate(waitingRateFirebase: WaitingRateFirebase): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION)
+            .document(waitingRateFirebase.parkingLotId ?: "0")
+            .collection(Params.RATE_PATH_COLLECTION).document()
+        RateFirebase(
+            id = ref.id,
+            parkingLotId = waitingRateFirebase.parkingLotId,
+            parkingInvoiceId = waitingRateFirebase.id,
+            rate = waitingRateFirebase.rate,
+            comment = waitingRateFirebase.comment,
+            createAt = TimeUtil.getCurrentTime().toString(),
+            user = waitingRateFirebase.user?.apply {
+                avatar =
+                    "https://media.npr.org/assets/img/2023/12/12/gettyimages-1054147940-f05675101c3cea817f5ecbb4a7b0cc827f0d9a10-s1100-c50.jpg"
+            },
+            licensePlate = waitingRateFirebase.licensePlate,
+            brand = waitingRateFirebase.brand,
+            vehicleType = waitingRateFirebase.vehicleType
+        ).let {
+            ref.set(it).await()
+            emit(State.success(true))
+        }
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
 
 }

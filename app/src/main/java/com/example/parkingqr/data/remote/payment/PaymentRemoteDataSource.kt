@@ -18,7 +18,7 @@ class PaymentRemoteDataSource @Inject constructor(
             auth.uid!!,
             amount,
             "pay order",
-            "1001713194174hgkjueDCnbSL0iMDPOU1RFSgq37ckubc3ebeNlyMDLWwLXERl03"
+            token
         ).let {
             service.payByToken(it)
         }

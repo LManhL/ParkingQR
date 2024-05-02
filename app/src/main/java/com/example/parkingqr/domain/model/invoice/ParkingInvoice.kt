@@ -11,6 +11,10 @@ class ParkingInvoice() {
         const val PARKING_STATE_TYPE = "parking"
         const val PARKED_STATE_TYPE = "parked"
         const val REFUSED_STATE_TYPE = "refused"
+        const val UNPAID_STATE_TYPE = "unpaid"
+        const val PAID_STATE_TYPE = "paid"
+        const val RATED_STATE_TYPE = "rated"
+        const val UN_RATED_STATE_TYPE = "unrated"
         const val CASH_PAYMENT_METHOD = "cash"
         const val VNPAY_PAYMENT_METHOD = "vnpay"
         const val HOUR_INVOICE_TYPE = "hourType"
@@ -99,15 +103,25 @@ class ParkingInvoice() {
             ParkingState.PARKING
         } else if (state == PARKED_STATE_TYPE) {
             ParkingState.PARKED
+        } else if (state == UNPAID_STATE_TYPE) {
+            ParkingState.UNPAID
+        } else if (state == PAID_STATE_TYPE) {
+            ParkingState.PAID
+        } else if (state == RATED_STATE_TYPE) {
+            ParkingState.RATED
+        } else if (state == UN_RATED_STATE_TYPE) {
+            ParkingState.UNRATED
         } else {
             ParkingState.REFUSED
         }
     }
 
     fun isOnlinePayment(): Boolean {
+        if (isMonthlyTicketType()) return false
         return paymentMethod == VNPAY_PAYMENT_METHOD
     }
-    fun isMonthlyTicketType(): Boolean{
+
+    fun isMonthlyTicketType(): Boolean {
         return type == MONTH_INVOICE_TYPE
     }
 
@@ -128,6 +142,6 @@ class ParkingInvoice() {
     }
 
     enum class ParkingState {
-        PARKING, PARKED, REFUSED
+        PARKING, PARKED, REFUSED, PAID, UNPAID, RATED, UNRATED
     }
 }

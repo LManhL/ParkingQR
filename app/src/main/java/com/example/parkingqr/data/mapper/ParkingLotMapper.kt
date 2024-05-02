@@ -31,14 +31,18 @@ fun ParkingLot.mapToParkingLotFirebase(): ParkingLotFirebase {
     )
 }
 
-fun RateFirebase.mapToRate(): Rate {
+fun RateFirebase.mapToWaitingRate(): Rate {
     return Rate(
         id = id ?: "",
         parkingLotId = parkingLotId ?: "",
+        parkingInvoiceId = parkingInvoiceId ?: "",
         rate = rate ?: 0.0,
         comment = comment ?: "",
         createAt = createAt ?: "",
-        userRate = user?.mapToUserRate() ?: UserRate()
+        userRate = user?.mapToUserRate() ?: UserRate(),
+        licensePlate = licensePlate ?: "",
+        brand = brand ?: "",
+        vehicleType = vehicleType ?: "",
     )
 }
 
@@ -47,6 +51,14 @@ fun UserRateFirebase.mapToUserRate(): UserRate {
         userId = userId ?: "",
         name = name ?: "",
         avatar = avatar ?: ""
+    )
+}
+
+fun UserRate.mapToUserRateFirebase(): UserRateFirebase {
+    return UserRateFirebase(
+        userId = userId,
+        name = name,
+        avatar = avatar
     )
 }
 

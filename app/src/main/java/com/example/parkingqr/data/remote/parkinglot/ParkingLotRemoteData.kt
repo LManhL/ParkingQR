@@ -1,6 +1,7 @@
 package com.example.parkingqr.data.remote.parkinglot
 
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.remote.dto.invoice.WaitingRateFirebase
 import com.example.parkingqr.data.remote.dto.parkinglot.*
 import kotlinx.coroutines.flow.Flow
 
@@ -12,4 +13,5 @@ interface ParkingLotRemoteData {
     fun updateBillingType(parkingLotId: String, billingTypeFirebase: BillingTypeFirebase): Flow<State<Boolean>>
     fun getMonthlyTicketList(parkingLotId: String, vehicleType: String): Flow<State<MutableList<MonthlyTicketTypeFirebase>>>
 
+    fun createRate(waitingRateFirebase: WaitingRateFirebase): Flow<State<Boolean>>
 }

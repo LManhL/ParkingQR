@@ -42,7 +42,9 @@ class BillingType(
         var total = 0.0
         val totalTimeInMinutes =
             ((timeOutDate.time - timeInDate.time) / 1000 / TimeUtil.MINUTES_TO_HOUR).toDouble()
-        total += firstBlockPrice + ((totalTimeInMinutes - firstBlock * TimeUtil.MINUTES_TO_HOUR) / TimeUtil.MINUTES_TO_HOUR).toInt() * afterFirstBlockPrice
+        val priceForAfterFirstBlockPrice =
+            ((totalTimeInMinutes - firstBlock * TimeUtil.MINUTES_TO_HOUR) / TimeUtil.MINUTES_TO_HOUR).toInt() * afterFirstBlockPrice
+        total += firstBlockPrice + if (priceForAfterFirstBlockPrice > 0) priceForAfterFirstBlockPrice else 0.0
         if (totalTimeInMinutes % TimeUtil.MINUTES_TO_HOUR > roundedMinutesToOneHour) total += afterFirstBlockPrice
 
         val hourMinuteTimeIn = formatHourMinutes.format(timeInDate)

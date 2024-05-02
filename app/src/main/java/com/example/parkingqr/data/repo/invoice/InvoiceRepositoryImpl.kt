@@ -1,12 +1,11 @@
 package com.example.parkingqr.data.repo.invoice
 
 import com.example.parkingqr.data.local.invoice.InvoiceLocalData
-import com.example.parkingqr.data.mapper.mapToParkingInvoice
-import com.example.parkingqr.data.mapper.mapToParkingInvoiceFirebase
-import com.example.parkingqr.data.mapper.mapToVehicleInvoice
+import com.example.parkingqr.data.mapper.*
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.remote.invoice.InvoiceRemoteData
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
+import com.example.parkingqr.domain.model.invoice.WaitingRate
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -34,12 +33,11 @@ class InvoiceRepositoryImpl @Inject constructor(
         return invoiceRemoteData.addNewParkingInvoice(parkingInvoice.mapToParkingInvoiceFirebase())
     }
 
-    override fun searchParkingInvoiceById(id: String): Flow<State<MutableList<ParkingInvoice>>> {
+    override fun searchParkingInvoiceById(id: String): Flow<State<ParkingInvoice>> {
         return invoiceRemoteData.searchParkingInvoiceById(id).map { state ->
             when (state) {
                 is State.Loading -> State.loading()
-                is State.Success -> State.success(state.data.map { it.mapToParkingInvoice() }
-                    .toMutableList())
+                is State.Success -> State.success(state.data.mapToParkingInvoice())
                 is State.Failed -> State.failed(state.message)
             }
         }
@@ -94,15 +92,19 @@ class InvoiceRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun searchParkingInvoiceParkingLot(licensePlate: String, parkingLotId: String): Flow<State<MutableList<ParkingInvoice>>> {
-        return invoiceRemoteData.searchParkingInvoiceParkingLot(licensePlate, parkingLotId).map { state ->
-            when (state) {
-                is State.Loading -> State.loading()
-                is State.Success -> State.success(state.data.map { it.mapToParkingInvoice() }
-                    .toMutableList())
-                is State.Failed -> State.failed(state.message)
+    override fun searchParkingInvoiceParkingLot(
+        licensePlate: String,
+        parkingLotId: String
+    ): Flow<State<MutableList<ParkingInvoice>>> {
+        return invoiceRemoteData.searchParkingInvoiceParkingLot(licensePlate, parkingLotId)
+            .map { state ->
+                when (state) {
+                    is State.Loading -> State.loading()
+                    is State.Success -> State.success(state.data.map { it.mapToParkingInvoice() }
+                        .toMutableList())
+                    is State.Failed -> State.failed(state.message)
+                }
             }
-        }
     }
 
     override fun getParkingLotInvoiceList(parkingLotId: String): Flow<State<MutableList<ParkingInvoice>>> {
@@ -154,5 +156,27 @@ class InvoiceRepositoryImpl @Inject constructor(
                     is State.Failed -> State.failed(state.message)
                 }
             }
+    }
+
+    override fun createWaitingRate(parkingInvoice: ParkingInvoice): Flow<State<Boolean>> {
+        return invoiceRemoteData.createWaitingRate(parkingInvoice.mapToParkingInvoiceFirebase())
+    }
+
+    override fun getUnShowedWaitingRates(): Flow<State<List<WaitingRate>>> {
+        return invoiceRemoteData.getUnShowedWaitingRates().map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.Success(state.data.map { it.mapToWaitingRate() })
+                is State.Failed -> State.failed(state.message)
+            }
+        }
+    }
+
+    override fun updateShowedStateWaitingRate(waitingRate: WaitingRate): Flow<State<Boolean>> {
+        return invoiceRemoteData.updateShowedStateWaitingRate(waitingRate.mapToWaitingRateFirebase())
+    }
+
+    override fun deleteWaitingRateById(id: String): Flow<State<Boolean>> {
+        return invoiceRemoteData.deleteWaitingRateById(id)
     }
 }
