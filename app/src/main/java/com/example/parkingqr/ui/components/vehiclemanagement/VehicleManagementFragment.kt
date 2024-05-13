@@ -36,9 +36,6 @@ class VehicleManagementFragment : BaseFragment() {
                         showError(it.error)
                         vehicleManagementViewModel.showError()
                     }
-                    if(it.isSignedOut){
-                        getNavController().navigate(R.id.loginFragment)
-                    }
                     if (registrationList.isEmpty()) registrationList.addAll(it.registrationList)
                     else {
                         registrationList.clear()
@@ -66,10 +63,6 @@ class VehicleManagementFragment : BaseFragment() {
     override fun initListener() {
         hideActionBar()
 
-        binding.ivApplication.setOnClickListener {
-            handleShowMenu()
-        }
-
         getNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
             ACTION_PASS_BACK
         )?.observe(
@@ -83,34 +76,6 @@ class VehicleManagementFragment : BaseFragment() {
             )
         }
 
-    }
-
-    private fun handleShowMenu(){
-        val options = arrayOf("Quản lý tài khoản", "Quản lý đăng ký xe", "Đăng xuất")
-
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Chọn tính năng")
-        builder.setItems(options) { dialog, which ->
-            when (which) {
-                0 -> {
-                    getNavController().navigate(R.id.userManagementFragment)
-                }
-                1 -> {
-                    getNavController().navigate(R.id.vehicleManagementFragment)
-                }
-                2->{
-                    handleSignOut()
-                }
-            }
-        }
-        builder.setNegativeButton("Hủy") { dialog, which ->
-            dialog.dismiss()
-        }
-        builder.create().show()
-    }
-
-    private fun handleSignOut(){
-        vehicleManagementViewModel.signOut()
     }
 
     private fun onClickItem(vehicleDetail: VehicleDetail) {

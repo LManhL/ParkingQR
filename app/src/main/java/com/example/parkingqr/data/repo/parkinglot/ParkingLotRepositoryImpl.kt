@@ -88,4 +88,76 @@ class ParkingLotRepositoryImpl @Inject constructor(
         return remoteData.createRate(waitingRate.mapToWaitingRateFirebase())
     }
 
+    override fun createParkingLot(parkingLot: ParkingLot): Flow<State<String>> {
+        return remoteData.createParkingLot(parkingLot.mapToParkingLotFirebase())
+    }
+
+    override fun createBillingType(
+        parkingLotId: String,
+        billingType: BillingType
+    ): Flow<State<Boolean>> {
+        return remoteData.createBillingType(parkingLotId, billingType.mapToBillingTypeFirebase())
+    }
+
+    override fun getAllMonthlyTicketTypeList(parkingLotId: String): Flow<State<List<MonthlyTicketType>>> {
+        return remoteData.getAllMonthlyTicketTypeList(parkingLotId).map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.map { it.mapToMonthlyTicket() })
+                is State.Failed -> State.failed(state.message)
+            }
+        }
+    }
+
+    override fun updateMonthlyTicketType(
+        parkingLotId: String,
+        monthlyTicketType: MonthlyTicketType
+    ): Flow<State<Boolean>> {
+        return remoteData.updateMonthlyTicketType(
+            parkingLotId,
+            monthlyTicketType.mapToMonthlyTicketFirebase()
+        )
+    }
+
+    override fun deleteMonthlyTicketType(
+        parkingLotId: String,
+        monthlyTicketType: MonthlyTicketType
+    ): Flow<State<Boolean>> {
+        return remoteData.deleteMonthlyTicketType(
+            parkingLotId,
+            monthlyTicketType.mapToMonthlyTicketFirebase()
+        )
+    }
+
+    override fun acceptParkingLotById(parkingLotId: String): Flow<State<Boolean>> {
+        return remoteData.acceptParkingLotById(parkingLotId)
+    }
+
+    override fun declineParkingLotById(parkingLotId: String): Flow<State<Boolean>> {
+        return remoteData.declineParkingLotById(parkingLotId)
+    }
+
+    override fun createMonthlyTicketType(
+        parkingLotId: String,
+        monthlyTicketType: MonthlyTicketType
+    ): Flow<State<Boolean>> {
+        return remoteData.createMonthlyTicketType(
+            parkingLotId,
+            monthlyTicketType.mapToMonthlyTicketFirebase()
+        )
+    }
+
+    override fun deleteParkingLotById(parkingLotId: String): Flow<State<Boolean>> {
+        return remoteData.deleteParkingLotById(parkingLotId)
+    }
+
+    override fun searchParkingLotByName(name: String): Flow<State<List<ParkingLot>>> {
+        return remoteData.searchParkingLotByName(name).map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.map { it.mapToParkingLot() })
+                is State.Failed -> State.failed(state.message)
+            }
+        }
+    }
 }

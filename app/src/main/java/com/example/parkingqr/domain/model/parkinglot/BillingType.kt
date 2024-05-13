@@ -30,6 +30,42 @@ class BillingType(
         const val CAR_TYPE_READABLE = "Xe hơi"
         const val MOTORBIKE_TYPE_READABLE = "Xe máy"
         const val OTHER_TYPE_READABLE = "Xe khác"
+
+        fun createBillingTypeForMotor(): BillingType {
+            return BillingType().apply {
+                id = "0"
+                firstBlockPrice = 3000.0
+                afterFirstBlockPrice = 500.0
+                firstBlock = 5.0
+                roundedMinutesToOneHour = 30.0
+                nightSurcharge = 500.0
+                startDaylightTime = "05:00"
+                endDaylightTime = "22:00"
+                startNightTime = "22:00"
+                endNightTime = "05:00"
+                type = HOUR_INVOICE_TYPE
+                vehicleType = MOTORBIKE_TYPE
+                surcharge = 0.0
+            }
+        }
+
+        fun createBillingTypeForCar(): BillingType {
+            return BillingType().apply {
+                id = "0"
+                firstBlockPrice = 10000.0
+                afterFirstBlockPrice = 1000.0
+                firstBlock = 5.0
+                roundedMinutesToOneHour = 30.0
+                nightSurcharge = 1000.0
+                startDaylightTime = "05:00"
+                endDaylightTime = "22:00"
+                startNightTime = "22:00"
+                endNightTime = "05:00"
+                type = HOUR_INVOICE_TYPE
+                vehicleType = CAR_TYPE
+                surcharge = 0.0
+            }
+        }
     }
 
 

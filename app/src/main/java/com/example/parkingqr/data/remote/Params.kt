@@ -15,5 +15,6 @@ object Params{
     const val BILLING_TYPE_PATH_COLLECTION = "billingTypes"
     const val VEHICLE_REGISTRATION_STORAGE_PATH = "registration_vehicle"
     const val PARKING_INVOICE_STORAGE_PATH = "parking_invoice_image"
+    const val PARKING_LOT_STORAGE_PATH = "parking_lot_image"
     const val MONTHLY_TICKET_COLLECTION = "monthlyTicketList"
 }

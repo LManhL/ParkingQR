@@ -3,6 +3,7 @@ package com.example.parkingqr.data.repo.user
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.remote.dto.user.ParkingLotManagerFirebase
 import com.example.parkingqr.domain.model.invoice.UserInvoice
+import com.example.parkingqr.domain.model.parkinglot.ParkingLot
 import com.example.parkingqr.domain.model.user.*
 import kotlinx.coroutines.flow.Flow
 
@@ -28,4 +29,12 @@ interface UserRepository {
     fun getLocalParkingLotId(): String?
 
     fun getCurrentUserInfo(): Flow<State<User>>
+    fun getParkingLotManagerByParkingLotId(parkingLotId: String): Flow<State<ParkingLotManager>>
+    fun getParkingLotManager(): Flow<State<ParkingLotManager>>
+
+    fun updateParkingLotIdForParkingLotManager(
+        parkingLotManagerId: String,
+        parkingLotId: String
+    ): Flow<State<Boolean>>
+
 }

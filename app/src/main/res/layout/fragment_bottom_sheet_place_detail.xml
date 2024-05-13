@@ -32,6 +32,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:weightSum="10">
 
@@ -68,42 +69,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="10">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="2"
-                        android:gravity="center">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/capacity" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/tvCapacityBottomSheetPlaceDetail"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="7"
-                        android:fontFamily="@font/source_sans_pro"
-                        android:text="200 xe ô tô (dưới 7 chỗ) và 300 xe máy"
-                        android:textSize="@dimen/font_size_medium" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="@dimen/margin_20"
-                    android:layout_marginBottom="@dimen/margin_20"
-                    android:background="#40070FAD" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:weightSum="10">
 
@@ -140,6 +106,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:weightSum="10">
 
@@ -177,7 +144,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/margin_10"
-                    android:gravity="center"
+                    android:gravity="start|center_vertical"
                     android:orientation="horizontal"
                     android:weightSum="10">
 
@@ -198,6 +165,7 @@
                         android:weightSum="9">
 
                         <TextView
+                            android:id="@+id/tvPendingMotorBottomSheetPlaceDetail"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="4"
@@ -217,6 +185,7 @@
                             android:textSize="@dimen/font_size_extra_large" />
 
                         <TextView
+                            android:id="@+id/tvCapaMotorBottomSheetPlaceDetail"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="4"
@@ -225,23 +194,13 @@
                             android:text="20"
                             android:textSize="@dimen/font_size_extra_large" />
                     </LinearLayout>
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="3"
-                        android:fontFamily="@font/source_sans_pro_semibold"
-                        android:gravity="center"
-                        android:text="Đặt chỗ ngay"
-                        android:textColor="@color/icon_color"
-                        android:textSize="@dimen/font_size_medium" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/margin_10"
-                    android:gravity="center"
+                    android:gravity="start|center_vertical"
                     android:orientation="horizontal"
                     android:weightSum="10">
 
@@ -262,6 +221,7 @@
                         android:weightSum="9">
 
                         <TextView
+                            android:id="@+id/tvPendingCarBottomSheetPlaceDetail"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="4"
@@ -281,6 +241,7 @@
                             android:textSize="@dimen/font_size_extra_large" />
 
                         <TextView
+                            android:id="@+id/tvCapaCarBottomSheetPlaceDetail"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="4"
@@ -290,15 +251,6 @@
                             android:textSize="@dimen/font_size_extra_large" />
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="3"
-                        android:fontFamily="@font/source_sans_pro_semibold"
-                        android:gravity="center"
-                        android:text="Đặt chỗ ngay"
-                        android:textColor="@color/icon_color"
-                        android:textSize="@dimen/font_size_medium" />
                 </LinearLayout>
 
                 <View

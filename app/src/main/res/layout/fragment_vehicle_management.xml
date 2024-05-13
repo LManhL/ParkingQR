@@ -23,7 +23,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content">
         </LinearLayout>
-
         <TextView
             android:layout_weight="6"
             android:id="@+id/tv_actionbar_title_main"
@@ -34,18 +33,6 @@
             android:text="@string/vehicle_management_fragment_name"
             android:textColor="@color/white"
             android:textSize="@dimen/font_size_16" />
-        <LinearLayout
-            android:gravity="end"
-            android:layout_gravity="center"
-            android:layout_weight="2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/ivApplication"
-                android:background="@drawable/application"
-                android:layout_width="32dp"
-                android:layout_height="32dp"/>
-        </LinearLayout>
     </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rlvVehicleListVehicleManagement"

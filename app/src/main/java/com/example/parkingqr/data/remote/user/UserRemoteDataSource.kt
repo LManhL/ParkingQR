@@ -36,14 +36,12 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
 
     override fun createNewUser(user: UserFirebase): Flow<State<Boolean>> = flow {
         emit(State.loading())
-        val userAuth = auth.currentUser
         val accountRef = db.collection(Params.ACCOUNT_PATH_COLLECTION)
         val userRef = db.collection(Params.USER_PATH_COLLECTION)
         val keyAccount = accountRef.document().id
         val keyUser = userRef.document().id
 
         user.id = keyUser
-        user.userId = userAuth?.uid
         user.account?.id = keyAccount
 
         accountRef.document(user.account?.id ?: "").set(user.account ?: AccountFirebase()).await()
@@ -54,9 +52,24 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
         emit(State.failed(it.message.toString()))
     }.flowOn(Dispatchers.IO)
 
-    override fun createNewParkingLotManager(parkingLotManagerFirebase: ParkingLotManagerFirebase): Flow<State<Boolean>> {
-        TODO("Not yet implemented")
-    }
+    override fun createNewParkingLotManager(parkingLotManagerFirebase: ParkingLotManagerFirebase): Flow<State<Boolean>> =
+        flow {
+            emit(State.loading())
+            val accountRef = db.collection(Params.ACCOUNT_PATH_COLLECTION).document()
+            val parkingLotManagerRef =
+                db.collection(Params.PARKING_LOT_MANAGER_PATH_COLLECTION).document()
+            val keyAccount = accountRef.id
+            val keyParkingLotManager = parkingLotManagerRef.id
+
+            parkingLotManagerFirebase.id = keyParkingLotManager
+            parkingLotManagerFirebase.account?.id = keyAccount
+
+            accountRef.set(parkingLotManagerFirebase.account!!).await()
+            parkingLotManagerRef.set(parkingLotManagerFirebase).await()
+            emit(State.success(true))
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
 
     override fun createNewParkingAttendant(parkingAttendantFirebase: ParkingAttendantFirebase): Flow<State<Boolean>> {
         TODO("Not yet implemented")
@@ -154,6 +167,25 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)
 
+    override fun getParkingLotManager(): Flow<State<ParkingLotManagerFirebase>> =
+        flow<State<ParkingLotManagerFirebase>> {
+            val ref = db.collection(Params.PARKING_LOT_MANAGER_PATH_COLLECTION)
+            val query = ref.whereEqualTo("parkingLotManagerId", auth.uid)
+            emit(State.loading())
+            query.get().await().let { querySnapshots ->
+                val accountList: MutableList<ParkingLotManagerFirebase> = mutableListOf()
+                for (document in querySnapshots) {
+                    document.toObject(ParkingLotManagerFirebase::class.java).let {
+                        accountList.add(it)
+                    }
+                }
+                if (accountList.isNotEmpty()) emit(State.success(accountList.first()))
+                else emit(State.failed("Không tìm thấy"))
+            }
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
     override fun getUserID(): Flow<State<String>> = flow {
         emit(State.success(auth.uid ?: ""))
     }.flowOn(Dispatchers.IO)
@@ -192,6 +224,41 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
         } else {
             emit(State.failed("Không tìm thấy"))
         }
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun getParkingLotManagerByParkingLotId(parkingLotId: String): Flow<State<ParkingLotManagerFirebase>> =
+        flow<State<ParkingLotManagerFirebase>> {
+            emit(State.loading())
+            val userRef = db.collection(Params.PARKING_LOT_MANAGER_PATH_COLLECTION)
+            val query = userRef.whereEqualTo("parkingLotId", parkingLotId)
+            query.get().await().let { snapshots ->
+                val list = mutableListOf<ParkingLotManagerFirebase>()
+                for (snapshot in snapshots) {
+                    list.add(
+                        snapshot.toObject(ParkingLotManagerFirebase::class.java)
+                    )
+                }
+                val res = list.firstOrNull()
+                if (res != null) {
+                    emit(State.success(res))
+                } else {
+                    emit(State.failed("Không tìm thấy"))
+                }
+            }
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
+    override fun updateParkingLotIdForParkingLotManager(
+        parkingLotManagerId: String,
+        parkingLotId: String
+    ): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_MANAGER_PATH_COLLECTION)
+        ref.document(parkingLotManagerId).update("parkingLotId", parkingLotId).await()
+        emit(State.success(true))
     }.catch {
         emit(State.failed(it.message.toString()))
     }.flowOn(Dispatchers.IO)

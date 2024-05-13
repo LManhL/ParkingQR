@@ -69,7 +69,6 @@ class VehicleManagementViewModel @Inject constructor(private val vehicleReposito
                         _stateUi.update {
                             it.copy(
                                 isLoading = false,
-                                isSignedOut = true
                             )
                         }
                     }
@@ -106,7 +105,6 @@ class VehicleManagementViewModel @Inject constructor(private val vehicleReposito
         val isLoading: Boolean = false,
         val error: String = "",
         val message: String = "",
-        val isSignedOut: Boolean = false,
         val registrationList: MutableList<VehicleDetail> = mutableListOf()
     )
 }

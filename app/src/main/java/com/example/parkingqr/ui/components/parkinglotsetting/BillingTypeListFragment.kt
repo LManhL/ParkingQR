@@ -20,7 +20,7 @@ class BillingTypeListFragment : BaseFragment() {
     override fun initListener() {
         showActionBar(getString(R.string.billing_type_list_fragment_name))
         binding.crdMonthTypeBillingTypeList.setOnClickListener {
-
+            getNavController().navigate(R.id.monthlyTicketTypeFragment)
         }
         binding.crdHourTypeBillingTypeList.setOnClickListener {
             getNavController().navigate(R.id.billingTypeDetailFragment)

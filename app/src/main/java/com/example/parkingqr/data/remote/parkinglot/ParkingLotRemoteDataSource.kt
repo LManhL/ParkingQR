@@ -1,19 +1,24 @@
 package com.example.parkingqr.data.remote.parkinglot
 
 import android.content.Context
+import android.graphics.Bitmap
+import androidx.core.net.toUri
 import com.example.parkingqr.data.remote.BaseRemoteDataSource
 import com.example.parkingqr.data.remote.Params
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.remote.dto.invoice.WaitingRateFirebase
 import com.example.parkingqr.data.remote.dto.parkinglot.*
+import com.example.parkingqr.domain.model.parkinglot.ParkingLot
+import com.example.parkingqr.utils.ImageUtil
 import com.example.parkingqr.utils.TimeUtil
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.snapshots
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 class ParkingLotRemoteDataSource @Inject constructor(val context: Context) : BaseRemoteDataSource(),
@@ -21,15 +26,15 @@ class ParkingLotRemoteDataSource @Inject constructor(val context: Context) : Bas
     override fun getParkingLotList(): Flow<State<MutableList<ParkingLotFirebase>>> = flow {
         emit(State.loading())
         val parkingInvoiceRef = db.collection(Params.PARKING_LOT_PATH_COLLECTION)
-        val query: Query = parkingInvoiceRef
-        val querySnapshot = query.get().await()
-        val parkingLotList = mutableListOf<ParkingLotFirebase>()
-        for (document in querySnapshot.documents) {
-            document.toObject(ParkingLotFirebase::class.java)?.let {
-                parkingLotList.add(it)
+        parkingInvoiceRef.orderBy("status").snapshots().map { querySnapshots ->
+            val parkingLotList = mutableListOf<ParkingLotFirebase>()
+            for (document in querySnapshots) {
+                document.toObject(ParkingLotFirebase::class.java).let {
+                    parkingLotList.add(it)
+                }
             }
-        }
-        emit(State.success(parkingLotList))
+            emit(State.success(parkingLotList))
+        }.collect()
     }.catch {
         emit(State.failed(it.message.toString()))
     }.flowOn(Dispatchers.IO)
@@ -145,4 +150,151 @@ class ParkingLotRemoteDataSource @Inject constructor(val context: Context) : Bas
         emit(State.failed(it.message.toString()))
     }.flowOn(Dispatchers.IO)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun createParkingLot(parkingLot: ParkingLotFirebase): Flow<State<String>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document()
+        parkingLot.id = ref.id
+
+        // Upload file to fire store
+        val storageRef = storage.reference
+        val uriList = mutableListOf<String>()
+        parkingLot.images.asFlow().flatMapMerge { filePath ->
+            flow {
+                val file = filePath.toUri()
+                val vehicleRegisterRef =
+                    storageRef.child("${Params.PARKING_LOT_STORAGE_PATH}/${parkingLot.id}/${file.lastPathSegment}")
+                vehicleRegisterRef.putFile(file).await()
+                val url = vehicleRegisterRef.downloadUrl.await()
+                emit(url.toString())
+            }
+        }.collect {
+            uriList.add(it)
+        }
+        parkingLot.images.apply {
+            clear()
+            addAll(uriList)
+        }
+
+        ref.set(parkingLot).await()
+        emit(State.success(parkingLot.id ?: "0"))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun createBillingType(
+        parkingLotId: String,
+        billingTypeFirebase: BillingTypeFirebase
+    ): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+            .collection(Params.BILLING_TYPE_PATH_COLLECTION).document()
+        billingTypeFirebase.id = ref.id
+        ref.set(billingTypeFirebase)
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun getAllMonthlyTicketTypeList(parkingLotId: String): Flow<State<List<MonthlyTicketTypeFirebase>>> =
+        flow {
+            emit(State.loading())
+            db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+                .collection(Params.MONTHLY_TICKET_TYPE_COLLECTION).orderBy("numberOfMonth")
+                .snapshots()
+                .map { querySnapshots ->
+                    val list = mutableListOf<MonthlyTicketTypeFirebase>()
+                    for (document in querySnapshots) {
+                        document.toObject(MonthlyTicketTypeFirebase::class.java).let {
+                            list.add(it)
+                        }
+                    }
+                    emit(State.success(list.toList()))
+                }.collect()
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
+    override fun updateMonthlyTicketType(
+        parkingLotId: String,
+        monthlyTicketTypeFirebase: MonthlyTicketTypeFirebase
+    ): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+            .collection(Params.MONTHLY_TICKET_TYPE_COLLECTION)
+            .document(monthlyTicketTypeFirebase.id.toString()).set(monthlyTicketTypeFirebase)
+            .await()
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun deleteMonthlyTicketType(
+        parkingLotId: String,
+        monthlyTicketTypeFirebase: MonthlyTicketTypeFirebase
+    ): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+            .collection(Params.MONTHLY_TICKET_TYPE_COLLECTION)
+            .document(monthlyTicketTypeFirebase.id.toString()).delete()
+            .await()
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun createMonthlyTicketType(
+        parkingLotId: String,
+        monthlyTicketTypeFirebase: MonthlyTicketTypeFirebase
+    ): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+            .collection(Params.MONTHLY_TICKET_TYPE_COLLECTION).document()
+        monthlyTicketTypeFirebase.id = ref.id
+        ref.set(monthlyTicketTypeFirebase).await()
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun acceptParkingLotById(parkingLotId: String): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+        ref.update("status", ParkingLotFirebase.ACCEPTED_STATUS).await()
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun declineParkingLotById(parkingLotId: String): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+        ref.update("status", ParkingLotFirebase.DECLINED_STATUS).await()
+        emit(State.success(true))
+    }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
+
+    override fun deleteParkingLotById(parkingLotId: String): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+        ref.delete().await()
+        emit(State.success(true))
+    }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
+
+    override fun searchParkingLotByName(name: String): Flow<State<List<ParkingLotFirebase>>> =
+        flow {
+            emit(State.loading())
+            val query: Query = db.collection(Params.PARKING_LOT_PATH_COLLECTION)
+                .whereGreaterThanOrEqualTo("name", name)
+                .whereLessThanOrEqualTo("name", "${name}~")
+            query.get().await().let { querySnapshots ->
+                val res = mutableListOf<ParkingLotFirebase>()
+                for (snapshot in querySnapshots) {
+                    res.add(snapshot.toObject(ParkingLotFirebase::class.java))
+                }
+                emit(State.success(res.toList()))
+            }
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
 }
+

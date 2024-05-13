@@ -9,10 +9,7 @@ import com.example.parkingqr.ui.base.BaseViewModel
 import com.example.parkingqr.utils.FormatCurrencyUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -156,12 +153,52 @@ class BillingTypeDetailViewModel @Inject constructor(
         }
     }
 
+    fun createBillingType() {
+        viewModelScope.launch {
+            val billingTypeList = mutableListOf(
+                BillingType.createBillingTypeForMotor(),
+                BillingType.createBillingTypeForCar()
+            )
+            parkingLotRepository.createBillingType(
+                userRepository.getLocalParkingLotId().toString(),
+                billingTypeList[0]
+            ).zip(
+                parkingLotRepository.createBillingType(
+                    userRepository.getLocalParkingLotId().toString(),
+                    billingTypeList[1]
+                )
+            ) { state1, state2 ->
+                if (state1 is State.Success && state2 is State.Success) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                        )
+                    }
+                    getBillingTypeList()
+                } else if (state1 is State.Failed && state2 is State.Failed) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = state1.message + state2.message
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                        )
+                    }
+                }
+            }.collect()
+        }
+    }
+
     data class BillingTypeDetailUiState(
         val isLoading: Boolean = false,
         val error: String = "",
         val message: String = "",
         val billingTypeList: MutableList<BillingType> = mutableListOf(),
         val chooseItem: BillingType? = null,
-        val isUpdated: Boolean = false
+        val isUpdated: Boolean = false,
     )
 }

@@ -55,11 +55,15 @@ class Account() {
         }
     }
 
-    fun setActive(){
+    fun setActive() {
         this.status = ACTIVE
     }
 
     fun setUserRole() {
         role = USER_ROLE
+    }
+
+    fun setParkingLotManagerRole() {
+        role = PARKING_LOT_MANAGER_ROLE
     }
 }

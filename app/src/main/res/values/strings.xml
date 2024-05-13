@@ -26,4 +26,10 @@
     <string name="select_qr_code_type_fragment_name">Danh sách vé tháng</string>
     <string name="connect_bank_account_fragment_name">Tài khoản ngân hàng</string>
     <string name="pay_online_fragment_name">Thanh toán</string>
+    <string name="admin_home_fragment_name">Trang chủ Admin</string>
+    <string name="create_parking_lot_fragment_name">Tạo bãi gửi xe</string>
+    <string name="monthly_ticket_type_fragment_name">Loại vé tháng</string>
+    <string name="parking_lot_list_fragment_name">Bãi gửi xe</string>
+    <string name="choose_location_fragment_name">Chọn vị trí</string>
+
 </resources>

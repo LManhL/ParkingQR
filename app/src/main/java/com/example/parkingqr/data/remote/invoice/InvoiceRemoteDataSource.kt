@@ -52,6 +52,8 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
                 storageRef.child("${parkingInvoice.parkingLotId}/${Params.PARKING_INVOICE_STORAGE_PATH}/${parkingInvoice.id}/${TimeUtil.getCurrentTime()}")
             var uploadTask = vehicleRegisterRef.putBytes(data).await()
             val url = vehicleRegisterRef.downloadUrl.await()
+
+
             parkingInvoice.imageIn = url.toString()
             parkingInvoiceRef.document(parkingInvoice.id!!).set(parkingInvoice).await()
             emit(State.success("${parkingInvoiceRef.path}/${parkingInvoice.id!!}"))
@@ -342,4 +344,22 @@ class InvoiceRemoteDataSource @Inject constructor(val context: Context) : BaseRe
         emit(State.failed(it.message.toString()))
     }.flowOn(Dispatchers.IO)
 
+    override fun getAllPendingInvoiceByParkingLotId(parkingLotId: String): Flow<State<List<ParkingInvoiceFirebase>>> =
+        flow {
+            emit(State.loading())
+            val parkingInvoiceRef = db.collection(Params.PARKING_INVOICE_PATH_COLLECTION)
+            val query: Query = parkingInvoiceRef.whereEqualTo("parkingLotId", parkingLotId)
+                .whereEqualTo("state", "parking")
+            query.get().await().let { querySnapshots ->
+                val parkingInvoiceList = mutableListOf<ParkingInvoiceFirebase>()
+                for (document in querySnapshots.documents) {
+                    document.toObject(ParkingInvoiceFirebase::class.java)?.let {
+                        parkingInvoiceList.add(it)
+                    }
+                }
+                emit(State.success(parkingInvoiceList.toList()))
+            }
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
 }

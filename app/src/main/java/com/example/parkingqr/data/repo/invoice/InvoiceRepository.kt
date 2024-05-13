@@ -5,6 +5,7 @@ import com.example.parkingqr.data.remote.dto.invoice.ParkingInvoiceFirebase
 import com.example.parkingqr.data.remote.dto.user.ParkingLotManagerFirebase
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.invoice.WaitingRate
+import com.example.parkingqr.domain.model.parkinglot.ParkingLot
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 import kotlinx.coroutines.flow.Flow
 
@@ -32,4 +33,5 @@ interface InvoiceRepository {
     fun getUnShowedWaitingRates(): Flow<State<List<WaitingRate>>>
     fun updateShowedStateWaitingRate(waitingRate: WaitingRate): Flow<State<Boolean>>
     fun deleteWaitingRateById(id: String): Flow<State<Boolean>>
+    fun getAllPendingInvoiceByParkingLotId(parkingLotId: String): Flow<State<List<ParkingInvoice>>>
 }

@@ -16,6 +16,14 @@ class ParkingLotManager() : Person() {
         this.account = account
     }
 
+    constructor(
+        parkingLotManagerId: String,
+        account: Account
+    ) : this() {
+        this.parkingLotManagerId = parkingLotManagerId
+        this.account = account
+    }
+
     override fun getRole(): AccountRole {
         return AccountRole.PARKING_LOT_MANAGER
     }

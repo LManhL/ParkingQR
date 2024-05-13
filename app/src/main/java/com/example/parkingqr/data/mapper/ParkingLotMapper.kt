@@ -11,10 +11,17 @@ fun ParkingLotFirebase.mapToParkingLot(): ParkingLot {
         name = name ?: "",
         location = LatLng(location?.latitude ?: 0.0, location?.longitude ?: 0.0),
         phoneNumber = phoneNumber ?: "",
-        capacity = capacity ?: "",
         description = description ?: "",
         address = address ?: "",
         area = area ?: 0.0,
+        carCapacity = carCapacity ?: 0.0,
+        motorCapacity = motorCapacity ?: 0.0,
+        images = images,
+        status = when (status) {
+            ParkingLotFirebase.PENDING_STATUS -> ParkingLot.ParkingLotStatus.PENDING_STATUS
+            ParkingLotFirebase.ACCEPTED_STATUS -> ParkingLot.ParkingLotStatus.ACCEPTED_STATUS
+            else -> ParkingLot.ParkingLotStatus.DECLINED_STATUS
+        }
     )
 }
 
@@ -24,10 +31,17 @@ fun ParkingLot.mapToParkingLotFirebase(): ParkingLotFirebase {
         name = name,
         location = GeoPoint(location.latitude, location.longitude),
         phoneNumber = phoneNumber,
-        capacity = capacity,
         description = description,
         address = address,
         area = area,
+        carCapacity = carCapacity,
+        motorCapacity = motorCapacity,
+        images = images,
+        status = when (status) {
+            ParkingLot.ParkingLotStatus.PENDING_STATUS -> ParkingLotFirebase.PENDING_STATUS
+            ParkingLot.ParkingLotStatus.ACCEPTED_STATUS -> ParkingLotFirebase.ACCEPTED_STATUS
+            else -> ParkingLotFirebase.DECLINED_STATUS
+        }
     )
 }
 

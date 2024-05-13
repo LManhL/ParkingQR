@@ -66,3 +66,12 @@ fun ParkingLotManagerFirebase.mapToParkingLotManager(): ParkingLotManager {
 
     )
 }
+
+fun ParkingLotManager.mapToParkingLotManagerFirebase(): ParkingLotManagerFirebase {
+    return ParkingLotManagerFirebase(
+        id = id,
+        parkingLotManagerId = parkingLotManagerId,
+        parkingLotId = parkingLotId,
+        account = account.mapToAccountFirebase()
+    )
+}

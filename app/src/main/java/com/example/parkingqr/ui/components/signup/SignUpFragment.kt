@@ -6,7 +6,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentSignupBinding
 import com.example.parkingqr.domain.model.user.Account
 import com.example.parkingqr.ui.base.BaseFragment
@@ -29,7 +28,7 @@ class SignUpFragment : BaseFragment() {
                         showMessage(it.message)
                         signUpViewModel.showMessage()
                     }
-                    if (it.user != null && it.isCreatedUser) {
+                    if ( it.isSignedUp) {
                         showMessage("Đăng ký thành công")
                         getNavController().popBackStack()
                     }
@@ -59,27 +58,27 @@ class SignUpFragment : BaseFragment() {
         val phoneNumber = binding.edtPhoneSignUp.text.toString()
 
         if (email.isEmpty()) {
-            binding.edtEmailSignUp.setError("Email không được rỗng")
+            binding.edtEmailSignUp.error = ("Email không được rỗng")
             return
         }
         if (!validateEmail(email)) {
-            binding.edtEmailSignUp.setError("Email không đúng định dạng")
+            binding.edtEmailSignUp.error = ("Email không đúng định dạng")
             return
         }
         if (password.isEmpty()) {
-            binding.edtPasswordSignUp.setError("Mật khẩu không được rỗng")
+            binding.edtPasswordSignUp.error = ("Mật khẩu không được rỗng")
             return
         }
         if (name.isEmpty()) {
-            binding.edtNameSignUp.setError("Tên không được rỗng")
+            binding.edtNameSignUp.error = "Tên không được rỗng"
             return
         }
         if (phoneNumber.isEmpty()) {
-            binding.edtPhoneSignUp.setError("Số điện thoại không được rỗng")
+            binding.edtPhoneSignUp.error = ("Số điện thoại không được rỗng")
             return
         }
         if (!validatePhoneNumber(phoneNumber)) {
-            binding.edtPhoneSignUp.setError("Số điện thoại không dúng định dạng")
+            binding.edtPhoneSignUp.error = ("Số điện thoại không dúng định dạng")
             return
         }
 
@@ -87,7 +86,12 @@ class SignUpFragment : BaseFragment() {
         account.email = email
         account.name = name
         account.phoneNumber = phoneNumber
-        account.setUserRole()
+
+        if (binding.rdUserRoleSignUp.isChecked) {
+            account.setUserRole()
+        } else {
+            account.setParkingLotManagerRole()
+        }
 
         signUpViewModel.doSignUp(email, password, account)
 

@@ -5,6 +5,7 @@ import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.auth.AuthRepository
 import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.domain.model.user.Account
+import com.example.parkingqr.domain.model.user.ParkingLotManager
 import com.example.parkingqr.domain.model.user.User
 import com.example.parkingqr.ui.base.BaseViewModel
 import com.google.firebase.auth.FirebaseUser
@@ -44,11 +45,14 @@ class SignUpViewModel @Inject constructor(
                         if (state.data != null) {
                             _stateUi.update {
                                 it.copy(
-                                    user = state.data,
                                     isLoading = false
                                 )
                             }
-                            createUser(account)
+                            if (account.role == Account.USER_ROLE) {
+                                createUser(account, state.data)
+                            } else {
+                                createParkingLotManager(account, state.data)
+                            }
                         } else {
                             _stateUi.update {
                                 it.copy(
@@ -71,8 +75,10 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun createUser(account: Account) {
-        val user = User(account)
+    private fun createUser(account: Account, userAuth: FirebaseUser) {
+        val user = User(account).apply {
+            userId = userAuth.uid
+        }
         viewModelScope.launch {
             userRepository.createNewUser(user).collect { state ->
                 when (state) {
@@ -85,7 +91,42 @@ class SignUpViewModel @Inject constructor(
                         _stateUi.update {
                             it.copy(
                                 isLoading = false,
-                                isCreatedUser = true
+                                isSignedUp = true
+                            )
+                        }
+
+                    }
+                    is State.Failed -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                error = "Đăng ký không thành công"
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun createParkingLotManager(account: Account, userAuth: FirebaseUser) {
+        val parkingLotManager = ParkingLotManager(
+            account = account,
+            parkingLotManagerId = userAuth.uid
+        )
+        viewModelScope.launch {
+            userRepository.createNewParkingLotManager(parkingLotManager).collect { state ->
+                when (state) {
+                    is State.Loading -> {
+                        _stateUi.update {
+                            it.copy(isLoading = true)
+                        }
+                    }
+                    is State.Success -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                isSignedUp = true
                             )
                         }
 
@@ -122,8 +163,8 @@ class SignUpViewModel @Inject constructor(
 
     data class SignupStateViewModel(
         val isLoading: Boolean = false,
-        val isCreatedUser: Boolean = false,
-        val user: FirebaseUser? = null,
+        val isSignedUp: Boolean = false,
+        val userAuth: FirebaseUser? = null,
         val error: String = "",
         val message: String = "",
     )

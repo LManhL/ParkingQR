@@ -179,4 +179,16 @@ class InvoiceRepositoryImpl @Inject constructor(
     override fun deleteWaitingRateById(id: String): Flow<State<Boolean>> {
         return invoiceRemoteData.deleteWaitingRateById(id)
     }
+
+    override fun getAllPendingInvoiceByParkingLotId(parkingLotId: String): Flow<State<List<ParkingInvoice>>> {
+        return invoiceRemoteData.getAllPendingInvoiceByParkingLotId(parkingLotId).map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.map { it.mapToParkingInvoice() }
+                    .toMutableList())
+                is State.Failed -> State.failed(state.message)
+            }
+        }
+    }
+
 }

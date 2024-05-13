@@ -10,12 +10,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentBottomSheetPlaceDetailBinding
 import com.example.parkingqr.domain.model.parkinglot.ParkingLot
 import com.example.parkingqr.domain.model.parkinglot.Rate
+import com.example.parkingqr.utils.FormatCurrencyUtil
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class BottomSheetPlaceDetailFragment : BottomSheetDialogFragment() {
@@ -29,20 +31,6 @@ class BottomSheetPlaceDetailFragment : BottomSheetDialogFragment() {
     private lateinit var rateListAdapter: RateListAdapter
     private lateinit var rateList: MutableList<Rate>
     private val locationViewModel: LocationViewModel by hiltNavGraphViewModels(R.id.locationFragment)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                locationViewModel.stateUi.collect {
-                    rateList.clear()
-                    rateList.addAll(it.rates)
-                    rateListAdapter.notifyDataSetChanged()
-                    bindView(it.parkingLotDetail)
-                }
-            }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,17 +50,45 @@ class BottomSheetPlaceDetailFragment : BottomSheetDialogFragment() {
         }
         binding.tvChooseRegisterMonthlyInvoice.setOnClickListener {
             val bundle = Bundle()
-            bundle.putString(PARKING_LOT_ID, locationViewModel.stateUi.value.parkingLotDetail.id)
+            bundle.putString(PARKING_LOT_ID, locationViewModel.uiState.value.parkingLotDetail.id)
             findNavController().navigate(R.id.registerMonthlyInvoiceFragment, bundle)
         }
+        observerViewModel()
         return binding.root
     }
 
+    private fun observerViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                locationViewModel.uiState.map { it.rates }.distinctUntilChanged().collect {
+                    rateList.clear()
+                    rateList.addAll(it)
+                    rateListAdapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                locationViewModel.uiState.map { it.parkingLotDetail }.distinctUntilChanged()
+                    .collect {
+                        bindView(it)
+                    }
+            }
+        }
+    }
+
     private fun bindView(parkingLot: ParkingLot) {
-        binding.tvAreaBottomSheetPlaceDetail.text = "${parkingLot.area} m2"
-        binding.tvCapacityBottomSheetPlaceDetail.text = parkingLot.capacity
+        binding.tvAreaBottomSheetPlaceDetail.text =
+            "${FormatCurrencyUtil.formatNumberCeil(parkingLot.area)} m2"
         binding.tvInformationBottomSheetPlaceDetail.text = parkingLot.description
         binding.tvPhoneNumberBottomSheetPlaceDetail.text = parkingLot.phoneNumber
+        binding.tvCapaCarBottomSheetPlaceDetail.text = parkingLot.carCapacity.toInt().toString()
+        binding.tvCapaMotorBottomSheetPlaceDetail.text = parkingLot.motorCapacity.toInt().toString()
+        binding.tvPendingMotorBottomSheetPlaceDetail.text =
+            locationViewModel.getPendingMotor().toString()
+        binding.tvPendingCarBottomSheetPlaceDetail.text =
+            locationViewModel.getPendingCar().toString()
     }
 
     private fun handleClickItem(rate: Rate) {

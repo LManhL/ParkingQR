@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cslContainerHome"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -64,14 +65,15 @@
 
     <TextView
         android:id="@+id/tvSignOutHome"
-        android:layout_margin="@dimen/margin_10"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/llHeaderInvoiceList"
-        android:fontFamily="@font/source_sans_pro"
-        android:textColor="@color/white"
-        android:text="Đăng xuất"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10"
+        android:fontFamily="@font/source_sans_pro"
+        android:text="Đăng xuất"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_size_medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llHeaderInvoiceList" />
 
     <View
         android:id="@+id/v_container_home"
@@ -224,6 +226,7 @@
         app:layout_constraintTop_toTopOf="@+id/barBottomHeaderHome" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/crdStatisticHome"
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_margin="@dimen/margin_20"
@@ -447,5 +450,29 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="llSecurityCameraHome,llInvoiceListHome,llParkingHome,llSetttingHome" />
 
+    <ImageView
+        android:id="@+id/ivCreateParkingLotHome"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_margin="@dimen/margin_10"
+        android:src="@drawable/create_icon"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvRegisterHome"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/source_sans_pro_semibold"
+        android:text="Nhấn để đăng ký bãi gửi xe"
+        android:textColor="@color/icon_color"
+        android:textSize="@dimen/font_size_medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivCreateParkingLotHome" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

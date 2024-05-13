@@ -7,11 +7,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentLoginBinding
+import com.example.parkingqr.domain.model.user.Account
 import com.example.parkingqr.domain.model.user.AccountRole
 import com.example.parkingqr.ui.base.BaseFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class LoginFragment : BaseFragment() {
@@ -33,22 +36,19 @@ class LoginFragment : BaseFragment() {
                         showMessage(it.message)
                         loginViewModel.showMessage()
                     }
-
-                    it.user?.let { user ->
-                        loginViewModel.findUserRole(user.email ?: "")
-                    }
-                    it.role?.let {
-                        loginViewModel.getDetailAccountInfo()
-                    }
-                    it.person?.let { person ->
-                        if (!it.isReady) loginViewModel.saveAccountInfo()
-                    }
-                    if (it.isReady) {
-                        it.role?.let { role ->
-                            handleNavigate(role)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                loginViewModel.stateUi.map { it.isReady to it.account }.distinctUntilChanged()
+                    .collect { (isReady, account) ->
+                        if (isReady) {
+                            account?.let {
+                                handleNavigate(account)
+                            }
                         }
                     }
-                }
             }
         }
     }
@@ -94,8 +94,8 @@ class LoginFragment : BaseFragment() {
         return email.matches(emailRegex.toRegex())
     }
 
-    private fun handleNavigate(accountRole: AccountRole) {
-        when (accountRole) {
+    private fun handleNavigate(account: Account) {
+        when (account.getAccountRole()) {
             AccountRole.PARKING_LOT_MANAGER -> {
                 getNavController().navigate(R.id.homeFragment)
             }
@@ -106,7 +106,7 @@ class LoginFragment : BaseFragment() {
                 getNavController().navigate(R.id.userQRCodeListFragment)
             }
             AccountRole.ADMIN -> {
-                getNavController().navigate(R.id.userManagementFragment)
+                getNavController().navigate(R.id.adminHomeFragment)
             }
         }
     }

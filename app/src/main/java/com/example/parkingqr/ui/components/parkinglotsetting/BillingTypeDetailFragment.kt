@@ -18,6 +18,7 @@ import com.example.parkingqr.databinding.FragmentBillingTypeDetailBinding
 import com.example.parkingqr.domain.model.parkinglot.BillingType
 import com.example.parkingqr.ui.base.BaseFragment
 import com.example.parkingqr.utils.FormatCurrencyUtil
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class BillingTypeDetailFragment : BaseFragment() {
@@ -36,7 +37,7 @@ class BillingTypeDetailFragment : BaseFragment() {
                 billingTypeDetailViewModel.uiState.collect { state ->
                     state.apply {
                         if (isLoading) {
-                            binding.llContainerBillingTypeDetail.visibility = View.INVISIBLE
+                            binding.rltvContainerBillingTypeDetail.visibility = View.INVISIBLE
                             showLoading()
                         } else hideLoading()
                         error.takeIf { it.isNotEmpty() }?.let { error -> showError(error) }
@@ -44,6 +45,17 @@ class BillingTypeDetailFragment : BaseFragment() {
                         chooseItem?.let { billingType ->
                             showBillingTypeDetail(billingType)
                         }
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                billingTypeDetailViewModel.uiState.map { it.billingTypeList }.collect { list ->
+                    if (list.isEmpty()) {
+                        binding.tvCreateBillingTypeDetail.visibility = View.VISIBLE
+                    } else {
+                        binding.tvCreateBillingTypeDetail.visibility = View.GONE
                     }
                 }
             }
@@ -70,6 +82,9 @@ class BillingTypeDetailFragment : BaseFragment() {
         }
         binding.flbtnSaveBillingTypeDetail.setOnClickListener {
             handleSaveBillingType()
+        }
+        binding.tvCreateBillingTypeDetail.setOnClickListener {
+            billingTypeDetailViewModel.createBillingType()
         }
     }
 
@@ -137,7 +152,7 @@ class BillingTypeDetailFragment : BaseFragment() {
 
     private fun showBillingTypeDetail(billingType: BillingType) {
         binding.apply {
-            llContainerBillingTypeDetail.visibility = View.VISIBLE
+            rltvContainerBillingTypeDetail.visibility = View.VISIBLE
             with(billingType) {
                 edtTypeBillingTypeDetail.setText(getVehicleTypeReadable())
                 edtfirstBlockBillingTypeDetail.setText(firstBlock.toInt().toString())

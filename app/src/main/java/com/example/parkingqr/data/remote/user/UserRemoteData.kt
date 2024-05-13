@@ -26,5 +26,11 @@ interface UserRemoteData {
     fun getParkingLotManagerById(parkingLotManagerId: String): Flow<State<ParkingLotManagerFirebase>>
 
     fun getCurrentUserInfo(): Flow<State<UserFirebase>>
+    fun getParkingLotManagerByParkingLotId(parkingLotId: String): Flow<State<ParkingLotManagerFirebase>>
 
+    fun getParkingLotManager(): Flow<State<ParkingLotManagerFirebase>>
+    fun updateParkingLotIdForParkingLotManager(
+        parkingLotManagerId: String,
+        parkingLotId: String
+    ): Flow<State<Boolean>>
 }
