@@ -9,8 +9,7 @@
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
-        />
+        android:layout_marginBottom="50dp" />
 
     <EditText
         android:id="@+id/edtSearchLocation"
@@ -37,5 +36,22 @@
         android:layout_marginEnd="@dimen/margin_20"
         android:maxHeight="560dp"
         app:layout_constraintTop_toBottomOf="@id/edtSearchLocation" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnFindCloseDistanceLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginBottom="70dp"
+        android:background="@drawable/rounded_button_icon_color"
+        android:fontFamily="@font/source_sans_pro"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:text="Bãi xe gần đây"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_size_medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,13 +10,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.parkingqr.R
-import com.example.parkingqr.databinding.FragmentParkingLotDetailBinding
 import com.example.parkingqr.databinding.FragmentParkingLotDetailHomeBinding
 import com.example.parkingqr.domain.model.parkinglot.ParkingLot
-import com.example.parkingqr.domain.model.user.ParkingLotManager
 import com.example.parkingqr.ui.base.BaseFragment
 import com.example.parkingqr.ui.components.location.LocationFragment
-import com.example.parkingqr.ui.components.location.MarkerInfoWindowAdapter
+import com.example.parkingqr.ui.components.location.MarkerInfoWindowCustomAdapter
 import com.example.parkingqr.utils.FormatCurrencyUtil
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -24,7 +22,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -89,7 +86,7 @@ class ParkingLotDetailFragment : BaseFragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         myMap = googleMap
-        myMap.setInfoWindowAdapter(MarkerInfoWindowAdapter(requireActivity()))
+        myMap.setInfoWindowAdapter(MarkerInfoWindowCustomAdapter(requireActivity()))
         currentLocation.let { myLocation ->
             myMap.addMarker(MarkerOptions().position(myLocation).title("Location"))
             myMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 15.0F))

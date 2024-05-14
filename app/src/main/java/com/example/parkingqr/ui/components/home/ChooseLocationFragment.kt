@@ -1,16 +1,11 @@
 package com.example.parkingqr.ui.components.home
 
-import android.content.pm.PackageManager
-import android.location.Location
 import android.view.View
-import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentChooseLocationBinding
 import com.example.parkingqr.ui.base.BaseFragment
-import com.example.parkingqr.ui.components.location.LocationFragment
-import com.example.parkingqr.ui.components.location.MarkerInfoWindowAdapter
-import com.google.android.gms.location.FusedLocationProviderClient
+import com.example.parkingqr.ui.components.location.MarkerInfoWindowCustomAdapter
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -49,7 +44,7 @@ class ChooseLocationFragment : BaseFragment(), OnMapReadyCallback {
         myMap.setOnMapClickListener {
             addMarker(it)
         }
-        myMap.setInfoWindowAdapter(MarkerInfoWindowAdapter(requireActivity()))
+        myMap.setInfoWindowAdapter(MarkerInfoWindowCustomAdapter(requireActivity()))
         viewModel.uiState.value.curMarker?.let {
             addMarker(it.position)
             myMap.moveCamera(CameraUpdateFactory.newLatLngZoom(it.position, 15.0F))

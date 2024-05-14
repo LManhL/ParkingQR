@@ -18,7 +18,6 @@ import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentCreateParkingLotBinding
 import com.example.parkingqr.ui.base.BaseFragment
 import com.example.parkingqr.ui.components.location.LocationFragment
-import com.example.parkingqr.ui.components.location.MarkerInfoWindowAdapter
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -113,7 +112,6 @@ class CreateParkingLotFragment : BaseFragment(), OnMapReadyCallback {
         myMap.setOnMapClickListener {
             getNavController().navigate(R.id.chooseLocationFragment)
         }
-        myMap.setInfoWindowAdapter(MarkerInfoWindowAdapter(requireActivity()))
         val storedMarker = viewModel.uiState.value.curMarker
         if (storedMarker != null) {
             addMarker(storedMarker.position)

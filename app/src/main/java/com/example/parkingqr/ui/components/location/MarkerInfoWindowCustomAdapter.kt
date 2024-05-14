@@ -5,24 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import com.example.parkingqr.R
-import com.example.parkingqr.domain.model.parkinglot.ParkingLot
+import com.example.parkingqr.domain.model.parkinglot.ParkingLotClusterItem
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 
-class MarkerInfoWindowAdapter(private val context: Context) : GoogleMap.InfoWindowAdapter {
+class MarkerInfoWindowCustomAdapter(private val context: Context) : GoogleMap.InfoWindowAdapter {
     override fun getInfoContents(marker: Marker): View? {
-        // 1. Get tag
-        val place = marker.tag as? ParkingLot ?: return null
-        // 2. Inflate view and set title, address, and rating
+        val place = marker.tag as? ParkingLotClusterItem ?: return null
         val view = LayoutInflater.from(context).inflate(
             R.layout.item_marker_info_content, null
         )
         view.findViewById<TextView>(
             R.id.tvTitleMarkerInfoContent
-        ).text = place.name
-        view.findViewById<TextView>(
-            R.id.tvAddressMarkerInfoContent
-        ).text = place.address
+        ).text = place.data.name
 
         return view
     }

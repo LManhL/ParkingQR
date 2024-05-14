@@ -16,5 +16,6 @@
     <color name="light_grey">#787777</color>
     <string name="icon_color">#070FAD</string>
     <color name="icon_color">#070FAD</color>
+    <color name="icon_color_transparent">#40070FAD</color>
     <color name="bg_ticket_color">#EFEDED</color>
 </resources>

@@ -10,6 +10,7 @@ import android.view.View
 import android.view.WindowInsetsController
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentLocationBinding
 import com.example.parkingqr.domain.model.parkinglot.ParkingLot
+import com.example.parkingqr.domain.model.parkinglot.ParkingLotClusterItem
 import com.example.parkingqr.ui.base.BaseFragment
 import com.example.parkingqr.utils.BitmapUtil
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -27,19 +29,18 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
+import com.google.maps.android.clustering.ClusterManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 @RequiresApi(Build.VERSION_CODES.R)
-class LocationFragment : BaseFragment(), OnMapReadyCallback, OnMarkerClickListener {
+class LocationFragment : BaseFragment(), OnMapReadyCallback {
 
     companion object {
         const val FINE_PERMISSION_CODE = 123
+        const val METERS_TO_KILOMETERS = 1000
     }
 
     private lateinit var binding: FragmentLocationBinding
@@ -50,10 +51,9 @@ class LocationFragment : BaseFragment(), OnMapReadyCallback, OnMarkerClickListen
     private lateinit var suggestionParkingLotAdapter: SuggestionParkingLotAdapter
     private lateinit var parkingLotList: MutableList<ParkingLot>
     private val locationViewModel: LocationViewModel by hiltNavGraphViewModels(R.id.locationFragment)
-    private val parkingLocationIcon: BitmapDescriptor by lazy {
-        BitmapUtil.vectorToBitmap(requireActivity(), R.drawable.parking_location)
-    }
+    private var circle: Circle? = null
     private var searchJob: Job? = null
+    private var radiusCircle: Double = 5000.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,6 +118,24 @@ class LocationFragment : BaseFragment(), OnMapReadyCallback, OnMarkerClickListen
                     }
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                locationViewModel.uiState.map { it.isShowNearbyParkingLots }.distinctUntilChanged()
+                    .collect {
+                        if (it) {
+                            BottomSheetRecentDistanceListFragment().show(
+                                childFragmentManager,
+                                BottomSheetRecentDistanceListFragment.TAG
+                            )
+                            locationViewModel.showNearbyParkingLots()
+                        }
+
+                    }
+            }
+        }
+
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 locationViewModel.uiState.map { it.isShowParkingLotDetail }.distinctUntilChanged()
@@ -168,19 +186,22 @@ class LocationFragment : BaseFragment(), OnMapReadyCallback, OnMarkerClickListen
         binding.edtSearchLocation.setOnClickListener {
             showSearchList(true)
         }
+        binding.btnFindCloseDistanceLocation.setOnClickListener {
+            handleFindNearbyParkingLot()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         myMap = googleMap
-        myMap.setInfoWindowAdapter(MarkerInfoWindowAdapter(requireActivity()))
-        myMap.setOnMarkerClickListener(this)
         myMap.setOnMapClickListener {
             showSearchList(false)
+            removeCircle()
         }
-        val myLocation = LatLng(currentLocation.latitude, currentLocation.longitude)
-        myMap.addMarker(MarkerOptions().position(myLocation).title("My location"))
-        myMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 15.0F))
-        showParkingLotList()
+        LatLng(currentLocation.latitude, currentLocation.longitude).let {
+            myMap.addMarker(MarkerOptions().position(it).title("My location"))
+            myMap.moveCamera(CameraUpdateFactory.newLatLngZoom(it, 15.0F))
+        }
+        addClusterMarkers(googleMap)
     }
 
     override fun onDestroyView() {
@@ -191,10 +212,58 @@ class LocationFragment : BaseFragment(), OnMapReadyCallback, OnMarkerClickListen
         )
     }
 
-    override fun onMarkerClick(marker: Marker): Boolean {
-        val place = marker.tag as? ParkingLot ?: return false
-        locationViewModel.getParkingLotInfo(place.id)
-        return false
+    private fun handleFindNearbyParkingLot() {
+        addCircle()
+        locationViewModel.getNearbyParkingLot(
+            LatLng(
+                currentLocation.latitude,
+                currentLocation.longitude
+            ), radiusCircle / METERS_TO_KILOMETERS
+        )
+    }
+
+    private fun onMarkerClick(item: ParkingLotClusterItem) {
+        locationViewModel.getParkingLotInfo(item.data.id)
+    }
+
+    private fun addClusterMarkers(googleMap: GoogleMap) {
+        val clusterManager = ClusterManager<ParkingLotClusterItem>(requireContext(), googleMap)
+        clusterManager.renderer = ParkingLotRenderer(requireContext(), googleMap, clusterManager)
+        clusterManager.markerCollection.setInfoWindowAdapter(
+            MarkerInfoWindowCustomAdapter(
+                requireContext()
+            )
+        )
+        googleMap.setOnCameraIdleListener(clusterManager)
+        clusterManager.setOnClusterItemClickListener { item ->
+            onMarkerClick(item)
+            return@setOnClusterItemClickListener false
+        }
+        clusterManager.addItems(parkingLotList.map { ParkingLotClusterItem(it) })
+        clusterManager.cluster()
+    }
+
+    private fun addCircle() {
+        circle?.remove()
+        circle = myMap.addCircle(
+            CircleOptions().center(LatLng(currentLocation.latitude, currentLocation.longitude))
+                .radius(radiusCircle)
+                .strokeColor(ContextCompat.getColor(requireContext(), R.color.icon_color))
+                .strokeWidth(2.0F)
+                .fillColor(ContextCompat.getColor(requireContext(), R.color.icon_color_transparent))
+        )
+        myMap.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    currentLocation.latitude,
+                    currentLocation.longitude
+                ), 12.0F
+            )
+        )
+    }
+
+    private fun removeCircle() {
+        circle?.remove()
     }
 
     private fun showSearchList(isShow: Boolean) {
@@ -242,18 +311,6 @@ class LocationFragment : BaseFragment(), OnMapReadyCallback, OnMarkerClickListen
         task.addOnSuccessListener { location ->
             currentLocation = location
             mapFragment.getMapAsync(this)
-        }
-    }
-
-    private fun showParkingLotList() {
-        parkingLotList.forEach { place ->
-            val marker = myMap.addMarker(
-                MarkerOptions()
-                    .title(place.name)
-                    .position(place.location)
-                    .icon(parkingLocationIcon)
-            )
-            marker?.tag = place
         }
     }
 

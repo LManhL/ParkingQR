@@ -85,6 +85,8 @@ class BottomSheetPlaceDetailFragment : BottomSheetDialogFragment() {
         binding.tvPhoneNumberBottomSheetPlaceDetail.text = parkingLot.phoneNumber
         binding.tvCapaCarBottomSheetPlaceDetail.text = parkingLot.carCapacity.toInt().toString()
         binding.tvCapaMotorBottomSheetPlaceDetail.text = parkingLot.motorCapacity.toInt().toString()
+        binding.tvNameBottomSheetPlaceDetail.text = parkingLot.name
+        binding.tvAddressBottomSheetPlaceDetail.text = parkingLot.address
         binding.tvPendingMotorBottomSheetPlaceDetail.text =
             locationViewModel.getPendingMotor().toString()
         binding.tvPendingCarBottomSheetPlaceDetail.text =
