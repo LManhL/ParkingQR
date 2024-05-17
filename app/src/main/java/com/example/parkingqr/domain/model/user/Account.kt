@@ -7,8 +7,8 @@ class Account() {
         const val PARKING_ATTENDANT_ROLE = "parkingAttendant"
         const val USER_ROLE = "user"
         const val ADMIN_ROLE = "admin"
-        const val ACTIVE = "active"
-        const val BLOCK = "blocked"
+        const val ACTIVE_STATUS = "active"
+        const val BLOCKED_STATUS = "blocked"
     }
 
     var id: String = ""
@@ -56,7 +56,7 @@ class Account() {
     }
 
     fun setActive() {
-        this.status = ACTIVE
+        this.status = ACTIVE_STATUS
     }
 
     fun setUserRole() {

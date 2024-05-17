@@ -262,4 +262,42 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
     }.catch {
         emit(State.failed(it.message.toString()))
     }.flowOn(Dispatchers.IO)
+
+    override fun blockUser(id: String): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.USER_PATH_COLLECTION)
+        ref.document(id).update("account.status", "blocked").await()
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun activeUser(id: String): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.USER_PATH_COLLECTION)
+        ref.document(id).update("account.status", "active").await()
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun getUserById(userId: String): Flow<State<UserFirebase>> =
+        flow<State<UserFirebase>> {
+            emit(State.loading())
+            db.collection(Params.USER_PATH_COLLECTION).whereEqualTo("userId", userId).get().await()
+                .let { querySnapshots ->
+                    val res = mutableListOf<UserFirebase>()
+                    querySnapshots.forEach {
+                        res.add(it.toObject(UserFirebase::class.java))
+                    }
+                    val foundUser = res.firstOrNull()
+                    if (foundUser != null) {
+                        emit(State.success(foundUser))
+                    } else {
+                        emit(State.failed("Không tìm thấy"))
+                    }
+                }
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
 }

@@ -71,11 +71,11 @@ class UserQRCodeListFragment : BaseFragment() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.stateUi.map { it.isShowUserDialog to it.userId }
+                viewModel.stateUi.map { it.isShowUserDialog to it.user }
                     .distinctUntilChanged()
-                    .collect { (isShowUserDialog, userId) ->
+                    .collect { (isShowUserDialog, user) ->
                         if (isShowUserDialog) {
-                            handleShowUserQRCodeDialog(userId)
+                            handleShowUserQRCodeDialog(user?.userId.toString())
                             viewModel.showDialog()
                         }
                     }
@@ -212,6 +212,7 @@ class UserQRCodeListFragment : BaseFragment() {
                         PayOnlineFragment.SUCCESS_RESULT -> {
                             viewModel.createWaitingRate()
                             viewModel.payInvoiceDebt()
+                            viewModel.activeUser()
                         }
                         PayOnlineFragment.FAIL_RESULT -> {
 

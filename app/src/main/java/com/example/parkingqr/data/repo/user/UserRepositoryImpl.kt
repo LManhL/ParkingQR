@@ -168,4 +168,22 @@ class UserRepositoryImpl @Inject constructor(
             parkingLotId
         )
     }
+
+    override fun getUserById(userId: String): Flow<State<User>> {
+        return userRemoteData.getUserById(userId).map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.mapToUser())
+                is State.Failed -> State.failed(state.message)
+            }
+        }
+    }
+
+    override fun blockUser(id: String): Flow<State<Boolean>> {
+        return userRemoteData.blockUser(id)
+    }
+
+    override fun activeUser(id: String): Flow<State<Boolean>> {
+        return userRemoteData.activeUser(id)
+    }
 }

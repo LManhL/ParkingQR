@@ -36,5 +36,7 @@ interface UserRepository {
         parkingLotManagerId: String,
         parkingLotId: String
     ): Flow<State<Boolean>>
-
+    fun getUserById(userId: String): Flow<State<User>>
+    fun blockUser(id: String): Flow<State<Boolean>>
+    fun activeUser(id: String): Flow<State<Boolean>>
 }

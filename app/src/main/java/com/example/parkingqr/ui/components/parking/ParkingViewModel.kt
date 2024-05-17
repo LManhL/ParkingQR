@@ -12,8 +12,9 @@ import com.example.parkingqr.data.repo.vehicle.VehicleRepository
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.invoice.UserInvoice
 import com.example.parkingqr.domain.model.parkinglot.BillingType
-import com.example.parkingqr.domain.model.parkinglot.MonthlyTicket
 import com.example.parkingqr.domain.model.qrcode.*
+import com.example.parkingqr.domain.model.user.Account
+import com.example.parkingqr.domain.model.user.User
 import com.example.parkingqr.domain.model.vehicle.VehicleInvoice
 import com.example.parkingqr.ui.base.BaseViewModel
 import com.example.parkingqr.utils.AESEncyptionUtil
@@ -41,7 +42,6 @@ class ParkingViewModel @Inject constructor(
     }
 
     private var addParkingInvoiceJob: Job? = null
-    private var updateParkingInvoiceJob: Job? = null
     private var searchParkingInvoiceJob: Job? = null
     private val _stateUi = MutableStateFlow(
         ParkingViewModelState()
@@ -56,9 +56,9 @@ class ParkingViewModel @Inject constructor(
         viewModelScope.launch {
             stateUi.value.qrcode?.let { qrcode ->
                 (qrcode as UserQRCode).userId
-            }?.let { id ->
-                userRepository.searchUserInvoiceById(
-                    id
+            }?.let { userIdFromQRCode ->
+                userRepository.getUserById(
+                    userIdFromQRCode
                 ).collect { state ->
                     when (state) {
                         is State.Loading -> {
@@ -68,12 +68,28 @@ class ParkingViewModel @Inject constructor(
                         }
                         is State.Success -> {
                             val foundUser = state.data
-                            _stateUi.update {
-                                it.copy(
-                                    user = foundUser
-                                )
+
+                            if (foundUser.account.status == Account.BLOCKED_STATUS) {
+                                _stateUi.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        message = "Người dùng bị chặn",
+                                    )
+                                }
+                            } else {
+                                _stateUi.update {
+                                    it.copy(
+                                        userInvoice = UserInvoice().apply {
+                                            id = foundUser.id
+                                            userId = foundUser.userId
+                                            name = foundUser.account.name
+                                            phoneNumber = foundUser.account.phoneNumber
+                                        },
+                                        userDetail = foundUser
+                                    )
+                                }
+                                findVehicleToCreateParkingInvoice(foundUser)
                             }
-                            findVehicleToCreateParkingInvoice(foundUser)
                         }
                         is State.Failed -> {
                             _stateUi.update {
@@ -89,7 +105,7 @@ class ParkingViewModel @Inject constructor(
         }
     }
 
-    private suspend fun findVehicleToCreateParkingInvoice(user: UserInvoice) {
+    private suspend fun findVehicleToCreateParkingInvoice(user: User) {
         vehicleRepository.getVerifiedVehiclesOfUser(user.userId).collect { state ->
             when (state) {
                 is State.Loading -> {
@@ -119,7 +135,7 @@ class ParkingViewModel @Inject constructor(
                                     action = ParkingAction.SHOW_INVOICE_FOR_USER_REGISTER_VEHICLE,
                                     parkingInvoice = ParkingInvoice(
                                         id = invoiceRepository.getNewParkingInvoiceKey(),
-                                        user = it.user ?: UserInvoice(),
+                                        user = it.userInvoice ?: UserInvoice(),
                                         vehicle = foundVehicle,
                                         imageIn = ImageUtil.encodeImage(
                                             (stateUi.value.bmVehicleIn ?: "0") as Bitmap
@@ -171,7 +187,7 @@ class ParkingViewModel @Inject constructor(
     private fun createInvoiceForUserNotRegisterVehicle(): ParkingInvoice {
         return ParkingInvoice(
             id = invoiceRepository.getNewParkingInvoiceKey(),
-            user = stateUi.value.user ?: UserInvoice(),
+            user = stateUi.value.userInvoice ?: UserInvoice(),
             vehicle = VehicleInvoice(stateUi.value.licensePlateOfVehicleIn),
             imageIn = ImageUtil.encodeImage(stateUi.value.bmVehicleIn!!),
             timeIn = TimeUtil.getCurrentTime().toString()
@@ -250,7 +266,7 @@ class ParkingViewModel @Inject constructor(
                 isLoading = false,
                 errorMessage = "",
                 message = "",
-                user = null,
+                userInvoice = null,
                 vehicle = null,
                 parkingInvoice = null,
                 action = null,
@@ -440,7 +456,7 @@ class ParkingViewModel @Inject constructor(
                         action = ParkingAction.SHOW_INVOICE_FOR_USER_REGISTER_VEHICLE,
                         parkingInvoice = ParkingInvoice(
                             id = invoiceRepository.getNewParkingInvoiceKey(),
-                            user = it.user ?: UserInvoice(),
+                            user = it.userInvoice ?: UserInvoice(),
                             vehicle = vehicle,
                             imageIn = ImageUtil.encodeImage(
                                 (stateUi.value.bmVehicleIn ?: "0") as Bitmap
@@ -554,6 +570,7 @@ class ParkingViewModel @Inject constructor(
                 })
             ) { invoiceState, debState ->
                 if (invoiceState is State.Success && debState is State.Success) {
+                    userRepository.blockUser(parkingInvoice.user.id).collect()
                     State.success(true)
                 } else if (invoiceState is State.Failed || debState is State.Failed) {
                     State.failed<String>("Vui lòng thử lại")
@@ -630,7 +647,8 @@ class ParkingViewModel @Inject constructor(
         val isLoading: Boolean = false,
         val errorMessage: String = "",
         val message: String = "",
-        val user: UserInvoice? = null,
+        val userInvoice: UserInvoice? = null,
+        val userDetail: User? = null,
         val vehicle: VehicleInvoice? = null,
         val parkingInvoice: ParkingInvoice? = null,
         val action: ParkingAction? = null,

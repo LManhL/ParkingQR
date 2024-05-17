@@ -14,6 +14,7 @@ import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.invoice.WaitingRate
 import com.example.parkingqr.domain.model.parkinglot.MonthlyTicket
 import com.example.parkingqr.domain.model.payment.BankAccount
+import com.example.parkingqr.domain.model.user.User
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -29,7 +30,6 @@ class UserQRCodeListViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val monthlyTicketRepository: MonthlyTicketRepository,
     private val debtRepository: DebtRepository,
-    private val paymentRepository: PaymentRepository,
     private val parkingLotRepository: ParkingLotRepository
 ) : BaseViewModel() {
     private val _stateUi = MutableStateFlow(
@@ -229,7 +229,7 @@ class UserQRCodeListViewModel @Inject constructor(
 
     fun handleToShowQRCode() {
         viewModelScope.launch {
-            userRepository.getUserId().collect { state ->
+            userRepository.getCurrentUserInfo().collect { state ->
                 when (state) {
                     is State.Loading -> {
                         _stateUi.update {
@@ -239,7 +239,7 @@ class UserQRCodeListViewModel @Inject constructor(
                     is State.Success -> {
                         _stateUi.update {
                             it.copy(
-                                userId = state.data,
+                                user = state.data,
                                 isShowUserDialog = true,
                                 isLoading = false
                             )
@@ -360,6 +360,14 @@ class UserQRCodeListViewModel @Inject constructor(
         }
     }
 
+    fun activeUser() {
+        viewModelScope.launch {
+            stateUi.value.user?.id?.let {
+                userRepository.activeUser(it).collect()
+            }
+        }
+    }
+
 
     fun showDialog() {
         _stateUi.update {
@@ -399,7 +407,7 @@ class UserQRCodeListViewModel @Inject constructor(
         val error: String = "",
         val message: String = "",
         val invoiceList: MutableList<ParkingInvoice> = mutableListOf(),
-        val userId: String = "",
+        val user: User? = null,
         val isShowUserDialog: Boolean = false,
         val isShowMonthlyTicketDialog: Boolean = false,
         val isHideUserDialog: Boolean = false,
