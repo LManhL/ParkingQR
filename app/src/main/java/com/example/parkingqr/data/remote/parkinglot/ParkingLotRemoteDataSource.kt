@@ -296,5 +296,108 @@ class ParkingLotRemoteDataSource @Inject constructor(val context: Context) : Bas
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)
+
+    override fun addCamera(
+        parkingLotId: String,
+        securityCameraFirebase: SecurityCameraFirebase
+    ): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+            .collection(Params.CAMERA_PATH_COLLECTION).document()
+        securityCameraFirebase.id = ref.id
+        ref.set(securityCameraFirebase).await()
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun updateCamera(
+        parkingLotId: String,
+        securityCameraFirebase: SecurityCameraFirebase
+    ): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+            .collection(Params.CAMERA_PATH_COLLECTION)
+            .document(securityCameraFirebase.id.toString())
+        ref.set(securityCameraFirebase).await()
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun deleteCameraById(
+        parkingLotId: String,
+        securityCameraId: String
+    ): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        val ref = db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+            .collection(Params.CAMERA_PATH_COLLECTION).document(securityCameraId)
+        ref.delete().await()
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun getCameraIn(parkingLotId: String): Flow<State<SecurityCameraFirebase>> =
+        flow<State<SecurityCameraFirebase>> {
+            emit(State.loading())
+            db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+                .collection(Params.CAMERA_PATH_COLLECTION)
+                .whereEqualTo("type", SecurityCameraFirebase.TYPE_CAM_IN).get().await()
+                .let { snapshots ->
+                    val res = mutableListOf<SecurityCameraFirebase>()
+                    snapshots.forEach {
+                        res.add(
+                            it.toObject(SecurityCameraFirebase::class.java)
+                        )
+                    }
+                    val data = res.firstOrNull()
+                    if (data != null) {
+                        emit(State.success(data))
+                    } else {
+                        emit(State.failed("Không tìm thấy"))
+                    }
+                }
+        }.catch {
+            emit(State.failed(it.message.toString()))
+        }.flowOn(Dispatchers.IO)
+
+    override fun getCameraOut(parkingLotId: String): Flow<State<SecurityCameraFirebase>> =
+        flow<State<SecurityCameraFirebase>> {
+            emit(State.loading())
+            db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+                .collection(Params.CAMERA_PATH_COLLECTION)
+                .whereEqualTo("type", SecurityCameraFirebase.TYPE_CAM_OUT).get().await()
+                .let { snapshots ->
+                    val res = mutableListOf<SecurityCameraFirebase>()
+                    snapshots.forEach {
+                        res.add(
+                            it.toObject(SecurityCameraFirebase::class.java)
+                        )
+                    }
+                    val data = res.firstOrNull()
+                    if (data != null) {
+                        emit(State.success(data))
+                    } else {
+                        emit(State.failed("Không tìm thấy"))
+                    }
+                }
+        }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
+
+    override fun getAllCameras(parkingLotId: String): Flow<State<List<SecurityCameraFirebase>>> =
+        flow {
+            emit(State.loading())
+            db.collection(Params.PARKING_LOT_PATH_COLLECTION).document(parkingLotId)
+                .collection(Params.CAMERA_PATH_COLLECTION).get().await()
+                .let { snapshots ->
+                    val res = mutableListOf<SecurityCameraFirebase>()
+                    snapshots.forEach {
+                        res.add(
+                            it.toObject(SecurityCameraFirebase::class.java)
+                        )
+                    }
+                    emit(State.success(res.toList()))
+                }
+        }.catch { emit(State.failed(it.message.toString())) }.flowOn(Dispatchers.IO)
 }
 

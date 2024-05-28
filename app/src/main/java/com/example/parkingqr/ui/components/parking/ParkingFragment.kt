@@ -5,29 +5,40 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
+import android.view.PixelCopy
+import android.view.SurfaceView
 import android.view.View
+import androidx.annotation.OptIn
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.rtsp.RtspMediaSource
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentParkingBinding
 import com.example.parkingqr.domain.model.qrcode.InvoiceQRCode
 import com.example.parkingqr.ui.base.BaseFragment
-import com.example.parkingqr.ui.components.dialog.ChooseUserVehicleDialog
-import com.example.parkingqr.ui.components.dialog.ChooseVehicleTypeDialog
-import com.example.parkingqr.ui.components.dialog.InvoiceQRCodeDialog
-import com.example.parkingqr.ui.components.dialog.Timer
+import com.example.parkingqr.ui.components.dialog.*
 import com.example.parkingqr.utils.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -43,6 +54,8 @@ class ParkingFragment : BaseFragment() {
 
     private lateinit var binding: FragmentParkingBinding
     private lateinit var auth: FirebaseAuth
+    private lateinit var playerForCameraIn: ExoPlayer
+    private lateinit var playerForCameraOut: ExoPlayer
     private var timer: Timer? = null
     private val viewModel: ParkingViewModel by hiltNavGraphViewModels(R.id.parkingFragment)
 
@@ -51,15 +64,25 @@ class ParkingFragment : BaseFragment() {
         if (requestCode == PIC_CODE_CAR_IN && resultCode == RESULT_OK) {
             val bm = data?.extras!!["data"] as Bitmap?
             bm?.let {
-                viewModel.processImageVehicleIn(it)
+                viewModel.processImageVehicleIn(it) {
+
+                }
             }
         }
         if (requestCode == PIC_CODE_CAR_OUT && resultCode == RESULT_OK) {
             val bm = data?.extras!!["data"] as Bitmap?
             bm?.let {
-                viewModel.processImageVehicleOut(it)
+                viewModel.processImageVehicleOut(it) {
+
+                }
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        playerForCameraIn = ExoPlayer.Builder(requireContext()).build()
+        playerForCameraOut = ExoPlayer.Builder(requireContext()).build()
     }
 
     override fun observeViewModel() {
@@ -109,6 +132,44 @@ class ParkingFragment : BaseFragment() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.stateUi.map { it.cameraIn }.distinctUntilChanged()
+                    .collect {
+                        if (it != null && it.uri.isNotEmpty()) {
+                            binding.ivPhotoCarInParking.visibility = View.GONE
+                            binding.plvCarInParking.visibility = View.VISIBLE
+                            binding.plvCarInParking.player = playerForCameraIn
+                            if (!playerForCameraIn.isPlaying) {
+                                prepareToShowCamera(playerForCameraIn, it.uri)
+                            }
+                        } else {
+                            binding.ivPhotoCarInParking.visibility = View.VISIBLE
+                            binding.plvCarInParking.visibility = View.GONE
+                        }
+                    }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.stateUi.map { it.cameraOut }.distinctUntilChanged()
+                    .collect {
+                        if (it != null && it.uri.isNotEmpty()) {
+                            binding.ivPhotoCarOutParking.visibility = View.GONE
+                            binding.plvCarOutParking.visibility = View.VISIBLE
+                            binding.plvCarOutParking.player = playerForCameraOut
+                            if (!playerForCameraOut.isPlaying) {
+                                prepareToShowCamera(playerForCameraOut, it.uri)
+                            }
+                        } else {
+                            binding.ivPhotoCarOutParking.visibility = View.VISIBLE
+                            binding.plvCarOutParking.visibility = View.GONE
+                        }
+                    }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.stateUi.map { it.action }.distinctUntilChanged().collect { action ->
                     when (action) {
                         ParkingViewModel.ParkingAction.REFRESH -> {
@@ -133,7 +194,10 @@ class ParkingFragment : BaseFragment() {
                             getInvoiceFromQRCode()
                         }
                         ParkingViewModel.ParkingAction.CREATE_INVOICE_FROM_USER_QR_CODE -> {
-                            createInvoiceForUser()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                delay(100)
+                                createInvoiceForUser()
+                            }
                         }
                         else -> {}
                     }
@@ -145,6 +209,7 @@ class ParkingFragment : BaseFragment() {
     override fun initViewBinding(): View {
         auth = Firebase.auth
         binding = FragmentParkingBinding.inflate(layoutInflater)
+        viewModel.getCameras()
         return binding.root
     }
 
@@ -195,6 +260,78 @@ class ParkingFragment : BaseFragment() {
         }
         binding.llWrongLicensePlateParking.setOnClickListener {
             showDialogChooseVehicle()
+        }
+        binding.ivSettingCameraParking.setOnClickListener {
+            handleUpdateCamera()
+        }
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        playerForCameraIn.release()
+        playerForCameraOut.release()
+    }
+
+    private fun handleUpdateCamera() {
+        val cameraIn = viewModel.stateUi.value.cameraIn
+        val cameraOut = viewModel.stateUi.value.cameraOut
+
+        AddCameraInOutDialog(
+            requireContext(),
+            cameraIn?.uri ?: "",
+            cameraOut?.uri ?: ""
+        ) { camInUri, camOutUri ->
+            viewModel.updateCameraIn(camInUri)
+            viewModel.updateCameraOut(camOutUri)
+        }.show()
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun prepareToShowCamera(exoPlayer: ExoPlayer, uri: String) {
+        try {
+            CoroutineScope(Dispatchers.Main).launch {
+                if (uri.contains("rtsp")) {
+                    val mediaSource =
+                        RtspMediaSource.Factory()
+                            .createMediaSource(MediaItem.fromUri(uri))
+                    exoPlayer.setMediaSource(mediaSource)
+                } else {
+                    exoPlayer.setMediaItem(MediaItem.fromUri(uri))
+                }
+                exoPlayer.prepare()
+                exoPlayer.play()
+            }
+        } catch (e: Exception) {
+            Log.e("TAG", "Error : $e");
+        }
+    }
+
+
+    private fun takeScreenshotWithPixelCopy(videoView: SurfaceView, callback: (Bitmap?) -> Unit) {
+        val bitmap: Bitmap = Bitmap.createBitmap(
+            512,
+            512,
+            Bitmap.Config.ARGB_8888
+        )
+        try {
+            val handlerThread = HandlerThread("PixelCopier")
+            handlerThread.start()
+            PixelCopy.request(
+                videoView, bitmap,
+                { copyResult ->
+                    if (copyResult == PixelCopy.SUCCESS) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            callback(bitmap)
+                        }
+                    }
+                    handlerThread.quitSafely()
+                },
+                Handler(handlerThread.looper)
+            )
+        } catch (e: IllegalArgumentException) {
+            callback(null)
+            e.printStackTrace()
         }
     }
 
@@ -276,7 +413,49 @@ class ParkingFragment : BaseFragment() {
         }
     }
 
+    @OptIn(UnstableApi::class)
     private fun processToCompleteParkingInvoice() {
+        if (viewModel.stateUi.value.cameraOut != null) {
+            processToCompleteInvoiceIfHaveCamera()
+        } else {
+            processToCompleteInvoiceIfNotHaveCamera()
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun processToCompleteInvoiceIfHaveCamera() {
+        binding.plvCarOutParking.videoSurfaceView?.let {
+            takeScreenshotWithPixelCopy(it as SurfaceView) { bitmap ->
+                bitmap?.let { data ->
+                    viewModel.processImageVehicleOut(data) {
+                        viewModel.stateUi.value.apply {
+                            if (licensePlateOfVehicleOut.isNotEmpty()) {
+                                if (licensePlateOfVehicleOut == parkingInvoice?.vehicle?.licensePlate) {
+                                    showMessage("Biển số xe khớp nhau: ${parkingInvoice.vehicle.licensePlate}")
+                                    binding.tvStateMessageParking.text = "Biển số xe khớp nhau"
+                                    if (parkingInvoice.isOnlinePayment() || parkingInvoice.isMonthlyTicketType()) {
+                                        showTimerVehicleOut()
+                                    }
+                                } else {
+                                    showMessage("Biển số xe không khớp nhau: ${parkingInvoice?.vehicle?.licensePlate} và ${licensePlateOfVehicleOut}")
+                                    binding.tvStateMessageParking.text =
+                                        "Biển số xe không khớp nhau: ${parkingInvoice?.vehicle?.licensePlate} và ${licensePlateOfVehicleOut}"
+                                    binding.llTimeLeftParking.visibility = View.GONE
+                                }
+                            } else {
+                                showMessage("${messageList[action]}: ${parkingInvoice?.vehicle?.licensePlate}")
+                                binding.llTimeLeftParking.visibility = View.GONE
+                            }
+                            displayParkingInvoice()
+                            binding.tvActionQrcodeParking.text = "Nhấn vào để xác nhận trả xe"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun processToCompleteInvoiceIfNotHaveCamera() {
         viewModel.stateUi.value.apply {
             if (licensePlateOfVehicleOut.isNotEmpty()) {
                 if (licensePlateOfVehicleOut == parkingInvoice?.vehicle?.licensePlate) {
@@ -361,7 +540,42 @@ class ParkingFragment : BaseFragment() {
         }
     }
 
+    @OptIn(UnstableApi::class)
     private fun createInvoiceForUser() {
+        if (viewModel.stateUi.value.cameraIn != null) {
+            createInvoiceForUserIfHaveCamera()
+        } else {
+            createInvoiceForUserIfNotHaveCamera()
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun createInvoiceForUserIfHaveCamera() {
+        binding.plvCarInParking.videoSurfaceView?.let {
+            takeScreenshotWithPixelCopy(it as SurfaceView) { bitmap ->
+                bitmap?.let { data ->
+                    viewModel.processImageVehicleIn(data) {
+                        viewModel.stateUi.value.apply {
+                            if (licensePlateOfVehicleIn.isEmpty()) {
+                                showMessage("Không nhận dạng dược ảnh xe vào")
+                                return@apply
+                            }
+                            if (LicensePlateUtil.checkLicensePlateValid(
+                                    licensePlateOfVehicleIn
+                                )
+                            ) {
+                                viewModel.getDataFromQRCodeToCreateParkingInvoice()
+                            } else {
+                                showMessage("Biển số xe không hợp lệ: $licensePlateOfVehicleIn")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun createInvoiceForUserIfNotHaveCamera() {
         viewModel.stateUi.value.apply {
             if (bmVehicleIn == null) {
                 showMessage("Chưa có ảnh xe vào")
@@ -379,7 +593,50 @@ class ParkingFragment : BaseFragment() {
         }
     }
 
+    @OptIn(UnstableApi::class)
     private fun handleCreateInvoiceForGuest() {
+        if (viewModel.stateUi.value.cameraIn != null) {
+            createInvoiceForGuestIfHaveCamera()
+        } else {
+            createInvoiceForGuestIfNotHaveCamera()
+        }
+    }
+
+    private fun showInvoiceCreateFromMonthlyTicket() {
+        binding.llWrongLicensePlateParking.visibility = View.GONE
+        binding.tvStateMessageParking.text =
+            "Hóa đơn xe gửi vé tháng"
+        displayParkingInvoice()
+        showTimerVehicleIn()
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun createInvoiceForGuestIfHaveCamera() {
+        binding.plvCarInParking.videoSurfaceView?.let {
+            takeScreenshotWithPixelCopy(it as SurfaceView) { bitmap ->
+                bitmap?.let { data ->
+                    viewModel.processImageVehicleIn(data) {
+                        viewModel.stateUi.value.apply {
+                            if (licensePlateOfVehicleIn.isEmpty()) {
+                                showMessage("Không nhận dạng dược ảnh xe vào")
+                                return@apply
+                            }
+                            if (LicensePlateUtil.checkLicensePlateValid(
+                                    licensePlateOfVehicleIn
+                                )
+                            ) {
+                                viewModel.createInvoiceForGuest()
+                            } else {
+                                showMessage("Biển số xe không hợp lệ: $licensePlateOfVehicleIn")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun createInvoiceForGuestIfNotHaveCamera() {
         viewModel.stateUi.value.apply {
             if (bmVehicleIn == null) {
                 showMessage("Chưa có ảnh xe vào")
@@ -395,14 +652,6 @@ class ParkingFragment : BaseFragment() {
                 showMessage("Biển số xe không hợp lệ: $licensePlateOfVehicleIn")
             }
         }
-    }
-
-    private fun showInvoiceCreateFromMonthlyTicket() {
-        binding.llWrongLicensePlateParking.visibility = View.GONE
-        binding.tvStateMessageParking.text =
-            "Hóa đơn xe gửi vé tháng"
-        displayParkingInvoice()
-        showTimerVehicleIn()
     }
 
     private fun createNewInvoice() {

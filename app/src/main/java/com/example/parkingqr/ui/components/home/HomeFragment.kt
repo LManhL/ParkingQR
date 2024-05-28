@@ -76,7 +76,7 @@ class HomeFragment : BaseFragment() {
             }
         }
         binding.ivSecurityCameraHome.setOnClickListener {
-            showMessage("Ứng dụng hiện chưa hỗ trợ tính năng này")
+            getNavController().navigate(R.id.securityCameraFragment)
         }
         binding.tvSignOutHome.setOnClickListener {
             Firebase.auth.signOut()

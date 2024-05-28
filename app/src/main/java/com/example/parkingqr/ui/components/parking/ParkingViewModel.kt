@@ -12,6 +12,7 @@ import com.example.parkingqr.data.repo.vehicle.VehicleRepository
 import com.example.parkingqr.domain.model.invoice.ParkingInvoice
 import com.example.parkingqr.domain.model.invoice.UserInvoice
 import com.example.parkingqr.domain.model.parkinglot.BillingType
+import com.example.parkingqr.domain.model.parkinglot.SecurityCamera
 import com.example.parkingqr.domain.model.qrcode.*
 import com.example.parkingqr.domain.model.user.Account
 import com.example.parkingqr.domain.model.user.User
@@ -398,7 +399,7 @@ class ParkingViewModel @Inject constructor(
         }
     }
 
-    fun processImageVehicleIn(bm: Bitmap) {
+    fun processImageVehicleIn(bm: Bitmap, successCallback: (() -> Unit)) {
         TextRecognizerUtil.invoke(bm) { licensePlate ->
             _stateUi.update {
                 it.copy(
@@ -406,10 +407,11 @@ class ParkingViewModel @Inject constructor(
                     bmVehicleIn = bm
                 )
             }
+            successCallback.invoke()
         }
     }
 
-    fun processImageVehicleOut(bm: Bitmap) {
+    fun processImageVehicleOut(bm: Bitmap, successCallback: () -> Unit) {
         TextRecognizerUtil.invoke(bm) { licensePlate ->
             _stateUi.update {
                 it.copy(
@@ -417,6 +419,7 @@ class ParkingViewModel @Inject constructor(
                     bmVehicleOut = bm
                 )
             }
+            successCallback.invoke()
         }
     }
 
@@ -464,6 +467,71 @@ class ParkingViewModel @Inject constructor(
                             timeIn = TimeUtil.getCurrentTime().toString()
                         )
                     )
+                }
+            }
+        }
+    }
+
+    fun getCameras() {
+        viewModelScope.launch {
+            userRepository.getLocalParkingLotId()?.let { parkingLotId ->
+                parkingLotRepository.getCameraIn(parkingLotId).collect { state ->
+                    if (state is State.Success) {
+                        _stateUi.update {
+                            it.copy(
+                                cameraIn = state.data
+                            )
+                        }
+                    }
+                }
+                parkingLotRepository.getCameraOut(parkingLotId).collect() { state ->
+                    if (state is State.Success) {
+                        _stateUi.update {
+                            it.copy(
+                                cameraOut = state.data
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateCameraIn(uri: String) {
+        viewModelScope.launch {
+            val cameraIn = stateUi.value.cameraIn
+            if (cameraIn != null) {
+                userRepository.getLocalParkingLotId()?.let { parkingLotId ->
+                    parkingLotRepository.updateCamera(parkingLotId, cameraIn.apply {
+                        this.uri = uri
+                    }).collect()
+                }
+            } else {
+                userRepository.getLocalParkingLotId()?.let { parkingLotId ->
+                    parkingLotRepository.addCamera(parkingLotId, SecurityCamera().apply {
+                        this.uri = uri
+                        this.type = SecurityCamera.TYPE.TYPE_CAM_IN
+                    }).collect()
+                }
+            }
+        }
+    }
+
+    fun updateCameraOut(uri: String) {
+        viewModelScope.launch {
+            val cameraOut = stateUi.value.cameraOut
+            if (cameraOut != null) {
+                userRepository.getLocalParkingLotId()?.let { parkingLotId ->
+                    parkingLotRepository.updateCamera(parkingLotId, cameraOut.apply {
+                        this.uri = uri
+                    }).collect()
+                }
+            } else {
+                userRepository.getLocalParkingLotId()?.let { parkingLotId ->
+                    parkingLotRepository.addCamera(parkingLotId, SecurityCamera().apply {
+                        this.uri = uri
+                        this.type = SecurityCamera.TYPE.TYPE_CAM_OUT
+                    }).collect()
                 }
             }
         }
@@ -661,7 +729,9 @@ class ParkingViewModel @Inject constructor(
         val bmVehicleOut: Bitmap? = null,
         val timeLimit: Int = 3,
         val billingTypeHashMap: MutableMap<String, BillingType> = mutableMapOf(),
-        val vehicleList: List<VehicleInvoice> = listOf()
+        val vehicleList: List<VehicleInvoice> = listOf(),
+        val cameraIn: SecurityCamera? = null,
+        val cameraOut: SecurityCamera? = null
     ) {
         init {
             errorList[ParkingAction.SHOW_INVOICE_FOR_USER_NOT_REGISTER_VEHICLE] =

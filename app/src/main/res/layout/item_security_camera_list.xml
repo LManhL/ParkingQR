@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <TextView
+            android:id="@+id/tvUrlSecurityCamera"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:fontFamily="@font/source_sans_pro"
+            android:text="Link url"
+            android:textSize="@dimen/font_size_medium" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/ivDelSecurityCamera"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/cancel_black" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10"
+        app:cardCornerRadius="@dimen/corner_radius_10">
+
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/plvItemSecurityCamera"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:resize_mode="fill"
+            app:surface_type="surface_view" />
+    </androidx.cardview.widget.CardView>
+
+    <View
+        android:layout_marginTop="@dimen/margin_10"
+        android:background="#40070FAD"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"/>
+</LinearLayout>

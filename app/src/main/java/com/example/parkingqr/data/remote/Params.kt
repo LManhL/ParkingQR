@@ -9,6 +9,7 @@ object Params{
     const val PARKING_INVOICE_PATH_COLLECTION = "parkingInvoices"
     const val PARKING_LOT_PATH_COLLECTION = "parkinglots"
     const val RATE_PATH_COLLECTION = "rates"
+    const val CAMERA_PATH_COLLECTION = "cameras"
     const val WAITING_RATE_PATH_COLLECTION = "waitingRates"
     const val DEBT_INVOICE_PATH_COLLECTION = "debtInvoices"
     const val MONTHLY_TICKET_TYPE_COLLECTION = "monthlyTicket"

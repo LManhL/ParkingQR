@@ -133,3 +133,23 @@ fun MonthlyTicketType.mapToMonthlyTicketFirebase(): MonthlyTicketTypeFirebase {
         vehicleType = vehicleType
     )
 }
+
+fun SecurityCamera.mapToSecurityCameraFirebase(): SecurityCameraFirebase {
+    return SecurityCameraFirebase(
+        id = id,
+        uri = uri,
+        type = if (type == SecurityCamera.TYPE.TYPE_CAM_IN) SecurityCameraFirebase.TYPE_CAM_IN
+        else if (type == SecurityCamera.TYPE.TYPE_CAME_NORMAL) SecurityCameraFirebase.TYPE_CAM_NORMAL
+        else SecurityCameraFirebase.TYPE_CAM_OUT
+    )
+}
+
+fun SecurityCameraFirebase.mapToSecurityCamera(): SecurityCamera {
+    return SecurityCamera(
+        id = id ?: "",
+        uri = uri ?: "",
+        type = if (type == SecurityCameraFirebase.TYPE_CAM_IN) SecurityCamera.TYPE.TYPE_CAM_IN
+        else if (type == SecurityCameraFirebase.TYPE_CAM_NORMAL) SecurityCamera.TYPE.TYPE_CAME_NORMAL
+        else SecurityCamera.TYPE.TYPE_CAM_OUT
+    )
+}

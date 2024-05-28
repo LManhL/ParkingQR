@@ -199,4 +199,9 @@
         android:name="com.example.parkingqr.ui.components.home.ChooseLocationFragment"
         android:label="@string/admin_home_fragment_name"
         tools:layout="@layout/fragment_choose_location" />
+    <fragment
+        android:id="@+id/securityCameraFragment"
+        android:name="com.example.parkingqr.ui.components.securitycamera.SecurityCameraFragment"
+        android:label="@string/admin_home_fragment_name"
+        tools:layout="@layout/fragment_security_camera" />
 </navigation>

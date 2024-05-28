@@ -1,6 +1,7 @@
 package com.example.parkingqr.data.repo.parkinglot
 
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.remote.dto.parkinglot.SecurityCameraFirebase
 import com.example.parkingqr.domain.model.invoice.WaitingRate
 import com.example.parkingqr.domain.model.parkinglot.*
 import kotlinx.coroutines.flow.Flow
@@ -42,5 +43,22 @@ interface ParkingLotRepository {
     fun deleteParkingLotById(parkingLotId: String): Flow<State<Boolean>>
 
     fun searchParkingLotByName(name: String): Flow<State<List<ParkingLot>>>
+    fun setUriCameraIn(uri: String)
+    fun setUriCameraOut(uri: String)
+    fun getUriCameraIn(): String?
+    fun getUriCameraOut(): String?
+    fun addCamera(
+        parkingLotId: String,
+        securityCamera: SecurityCamera
+    ): Flow<State<Boolean>>
 
+    fun updateCamera(
+        parkingLotId: String,
+        securityCamera: SecurityCamera
+    ): Flow<State<Boolean>>
+
+    fun deleteCameraById(parkingLotId: String, securityCameraId: String): Flow<State<Boolean>>
+    fun getCameraIn(parkingLotId: String): Flow<State<SecurityCamera>>
+    fun getCameraOut(parkingLotId: String): Flow<State<SecurityCamera>>
+    fun getAllCameras(parkingLotId: String): Flow<State<List<SecurityCamera>>>
 }

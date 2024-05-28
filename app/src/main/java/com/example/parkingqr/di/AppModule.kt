@@ -7,6 +7,8 @@ import com.example.parkingqr.data.local.invoice.InvoiceLocalData
 import com.example.parkingqr.data.local.invoice.InvoiceLocalDataSource
 import com.example.parkingqr.data.local.monthlyticket.MonthlyTicketLocalData
 import com.example.parkingqr.data.local.monthlyticket.MonthlyTicketLocalDataSource
+import com.example.parkingqr.data.local.parkinglot.ParkingLotLocalData
+import com.example.parkingqr.data.local.parkinglot.ParkingLotLocalDataSource
 import com.example.parkingqr.data.local.user.UserLocalData
 import com.example.parkingqr.data.local.user.UserLocalDataSource
 import com.example.parkingqr.data.local.vehicle.VehicleLocalData
@@ -77,6 +79,12 @@ class AppModule {
 
     @Provides
     @Singleton
+    fun provideParkingLotLocalRepository(@ApplicationContext context: Context): ParkingLotLocalData {
+        return ParkingLotLocalDataSource(context)
+    }
+
+    @Provides
+    @Singleton
     fun provideVehicleRemoteRepository(@ApplicationContext context: Context): VehicleRemoteData {
         return VehicleRemoteDataSource(context)
     }
@@ -122,7 +130,7 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideDebtRemoteData(@ApplicationContext context: Context): DebtRemoteData{
+    fun provideDebtRemoteData(@ApplicationContext context: Context): DebtRemoteData {
         return DebtRemoteDataSource(context)
     }
 }

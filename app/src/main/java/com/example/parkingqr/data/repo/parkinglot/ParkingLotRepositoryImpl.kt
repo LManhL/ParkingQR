@@ -1,7 +1,9 @@
 package com.example.parkingqr.data.repo.parkinglot
 
+import com.example.parkingqr.data.local.parkinglot.ParkingLotLocalData
 import com.example.parkingqr.data.mapper.*
 import com.example.parkingqr.data.remote.State
+import com.example.parkingqr.data.remote.dto.parkinglot.SecurityCameraFirebase
 import com.example.parkingqr.data.remote.parkinglot.ParkingLotRemoteData
 import com.example.parkingqr.domain.model.invoice.WaitingRate
 import com.example.parkingqr.domain.model.parkinglot.*
@@ -10,7 +12,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ParkingLotRepositoryImpl @Inject constructor(
-    private val remoteData: ParkingLotRemoteData
+    private val remoteData: ParkingLotRemoteData,
+    private val localData: ParkingLotLocalData
 ) : ParkingLotRepository {
     override fun getParkingLotList(): Flow<State<MutableList<ParkingLot>>> {
         return remoteData.getParkingLotList().map { state ->
@@ -18,6 +21,7 @@ class ParkingLotRepositoryImpl @Inject constructor(
                 is State.Loading -> State.loading()
                 is State.Success -> State.success(state.data.map { it.mapToParkingLot() }
                     .toMutableList())
+
                 is State.Failed -> State.failed(state.message)
             }
         }
@@ -29,6 +33,7 @@ class ParkingLotRepositoryImpl @Inject constructor(
                 is State.Loading -> State.loading()
                 is State.Success -> State.success(state.data.map { it.mapToWaitingRate() }
                     .toMutableList())
+
                 is State.Failed -> State.failed(state.message)
             }
         }
@@ -51,6 +56,7 @@ class ParkingLotRepositoryImpl @Inject constructor(
                 is State.Success -> State.success(state.data.map {
                     it.mapToBillingType()
                 }.toMutableList())
+
                 is State.Failed -> State.failed(state.message)
             }
         }
@@ -79,6 +85,7 @@ class ParkingLotRepositoryImpl @Inject constructor(
                 is State.Loading -> State.loading()
                 is State.Success -> State.success(state.data.map { it.mapToMonthlyTicket() }
                     .toMutableList())
+
                 is State.Failed -> State.failed(state.message)
             }
         }
@@ -158,6 +165,74 @@ class ParkingLotRepositoryImpl @Inject constructor(
                 is State.Success -> State.success(state.data.map { it.mapToParkingLot() })
                 is State.Failed -> State.failed(state.message)
             }
+        }
+    }
+
+    override fun setUriCameraIn(uri: String) {
+        return localData.setUriCameraIn(uri)
+    }
+
+    override fun setUriCameraOut(uri: String) {
+        return localData.setUriCameraOut(uri)
+    }
+
+    override fun getUriCameraIn(): String? {
+        return localData.getUriCameraIn()
+    }
+
+    override fun getUriCameraOut(): String? {
+        return localData.getUriCameraOut()
+    }
+
+    override fun addCamera(
+        parkingLotId: String,
+        securityCamera: SecurityCamera
+    ): Flow<State<Boolean>> {
+        return remoteData.addCamera(parkingLotId, securityCamera.mapToSecurityCameraFirebase())
+    }
+
+    override fun updateCamera(
+        parkingLotId: String,
+        securityCamera: SecurityCamera
+    ): Flow<State<Boolean>> {
+        return remoteData.updateCamera(parkingLotId, securityCamera.mapToSecurityCameraFirebase())
+    }
+
+    override fun deleteCameraById(
+        parkingLotId: String,
+        securityCameraId: String
+    ): Flow<State<Boolean>> {
+        return remoteData.deleteCameraById(parkingLotId, securityCameraId)
+    }
+
+    override fun getCameraIn(parkingLotId: String): Flow<State<SecurityCamera>> {
+        return remoteData.getCameraIn(parkingLotId).map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.mapToSecurityCamera())
+                is State.Failed -> State.failed(state.message)
+            }
+        }
+    }
+
+    override fun getCameraOut(parkingLotId: String): Flow<State<SecurityCamera>> {
+        return remoteData.getCameraOut(parkingLotId).map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.mapToSecurityCamera())
+                is State.Failed -> State.failed(state.message)
+            }
+        }
+    }
+
+    override fun getAllCameras(parkingLotId: String): Flow<State<List<SecurityCamera>>> {
+        return remoteData.getAllCameras(parkingLotId).map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.map { it.mapToSecurityCamera() })
+                is State.Failed -> State.failed(state.message)
+            }
+
         }
     }
 }

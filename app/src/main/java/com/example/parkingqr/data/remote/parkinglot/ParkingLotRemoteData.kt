@@ -49,4 +49,18 @@ interface ParkingLotRemoteData {
     fun declineParkingLotById(parkingLotId: String): Flow<State<Boolean>>
     fun deleteParkingLotById(parkingLotId: String): Flow<State<Boolean>>
     fun searchParkingLotByName(name: String): Flow<State<List<ParkingLotFirebase>>>
+    fun addCamera(
+        parkingLotId: String,
+        securityCameraFirebase: SecurityCameraFirebase
+    ): Flow<State<Boolean>>
+
+    fun updateCamera(
+        parkingLotId: String,
+        securityCameraFirebase: SecurityCameraFirebase
+    ): Flow<State<Boolean>>
+
+    fun deleteCameraById(parkingLotId: String, securityCameraId: String): Flow<State<Boolean>>
+    fun getCameraIn(parkingLotId: String): Flow<State<SecurityCameraFirebase>>
+    fun getCameraOut(parkingLotId: String): Flow<State<SecurityCameraFirebase>>
+    fun getAllCameras(parkingLotId: String): Flow<State<List<SecurityCameraFirebase>>>
 }

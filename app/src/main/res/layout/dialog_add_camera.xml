@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding_20"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/margin_10"
+        android:gravity="start"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/source_sans_pro_semibold"
+            android:gravity="start|center_vertical"
+            android:text="Link camera vào: "
+            android:textSize="@dimen/font_size_16" />
+
+        <EditText
+            android:id="@+id/edtCamInDialogAddCamera"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edit_text_white"
+            android:fontFamily="@font/source_sans_pro"
+            android:hint="rtsp://192.168.1.2:8554/"
+            android:inputType="text"
+            android:maxLines="2"
+            android:padding="@dimen/padding_10"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_size_medium" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/margin_10"
+        android:gravity="start"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/source_sans_pro_semibold"
+            android:gravity="start|center_vertical"
+            android:text="Link camera ra: "
+            android:textSize="@dimen/font_size_16" />
+
+        <EditText
+            android:id="@+id/edtCamOutDialogAddCamera"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edit_text_white"
+            android:fontFamily="@font/source_sans_pro"
+            android:hint="rtsp://192.168.1.2:8554/"
+            android:inputType="text"
+            android:maxLines="2"
+            android:padding="@dimen/padding_10"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_size_medium" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnSaveDialogAddCamera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_40"
+        android:layout_marginRight="@dimen/margin_40"
+        android:layout_marginBottom="@dimen/margin_20"
+        android:background="@drawable/rounded_button_icon_color"
+        android:fontFamily="@font/source_sans_pro_semibold"
+        android:text="Lưu thông tin"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_size_medium"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</LinearLayout>
