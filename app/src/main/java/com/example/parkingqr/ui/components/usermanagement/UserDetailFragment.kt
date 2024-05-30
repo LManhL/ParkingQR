@@ -12,7 +12,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentUserDetailBinding
+import com.example.parkingqr.domain.model.user.Account
+import com.example.parkingqr.domain.model.user.User
 import com.example.parkingqr.ui.base.BaseFragment
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,38 +26,39 @@ class UserDetailFragment : BaseFragment() {
     private lateinit var binding: FragmentUserDetailBinding
     private val userDetailViewModel: UserDetailViewModel by viewModels()
     private var id: String? = null
-    private val calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        id = arguments?.getString(UserManagementFragment.USER_DETAIL_KEY)
-//        id?.let {
-//            userDetailViewModel.getUserById(it)
-//        }
+        id = arguments?.getString(UserManagementFragment.USER_DETAIL_KEY)
+        id?.let {
+            userDetailViewModel.getUserById(it)
+        }
     }
 
     override fun observeViewModel() {
-//        lifecycleScope.launch {
-//            repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                userDetailViewModel.stateUi.collect {
-//                    if (it.isLoading) showLoading() else hideLoading()
-//                    if (it.error.isNotEmpty()) {
-//                        showError(it.error)
-//                        userDetailViewModel.showError()
-//                    }
-//                    if (it.message.isNotEmpty()) {
-//                        showMessage(it.message)
-//                    }
-//                    if (it.userDetail == null) binding.llContainerUserDetail.visibility = View.GONE
-//                    it.userDetail?.let { userDetail ->
-//                        showUserDetail(userDetail)
-//                    }
-//                    if (it.isSaved) {
-//                        getNavController().popBackStack()
-//                    }
-//                }
-//            }
-//        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                userDetailViewModel.stateUi.map { it.isLoading }.distinctUntilChanged().collect {
+                    if (it) showLoading() else hideLoading()
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                userDetailViewModel.stateUi.map { it.user }.distinctUntilChanged().collect {
+                    it?.let {
+                        showUserDetail(it)
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                userDetailViewModel.stateUi.map { it.needOut }.distinctUntilChanged().collect {
+                    if (it) getNavController().popBackStack()
+                }
+            }
+        }
     }
 
     override fun initViewBinding(): View {
@@ -62,68 +67,40 @@ class UserDetailFragment : BaseFragment() {
     }
 
     override fun initListener() {
-//        showActionBar(getString(R.string.user_management_fragment_name))
-//        binding.btnSaveUserDetail.setOnClickListener {
-//            handleSaveUser()
-//        }
-//        binding.edtDateOfBirthUserDetail.setOnClickListener {
-//            showDatePickerDialog(it as EditText)
-//        }
+        showActionBar(getString(R.string.user_management_fragment_name))
+        binding.btnSaveUserDetail.setOnClickListener {
+            if (binding.btnSaveUserDetail.text.toString().contains("Bỏ")) {
+                activeUser()
+            } else {
+                blockUser()
+            }
+        }
     }
 
-//    private fun handleSaveUser() {
-//        val name = binding.edtNameUserDetail.text.toString()
-//        val userName = binding.edtUserNameUserDetail.text.toString()
-//        val address = binding.edtAddressUserDetail.text.toString()
-//        val email = binding.edtEmailUserDetail.text.toString()
-//        val identifierCode = binding.edtIdentifierCodeUserDetail.text.toString()
-//        val dateOfBirth = binding.edtDateOfBirthUserDetail.text.toString()
-//        val phone = binding.edtPhoneUserDetail.text.toString()
-//
-//        userDetailViewModel.updateNewUserDetail(
-//            _name = name,
-//            _userName = userName,
-//            _address = address,
-//            _email = email,
-//            _identifierCode = identifierCode,
-//            _dateOfBirth = dateOfBirth,
-//            _phone = phone
-//        )
-//        userDetailViewModel.updateUser()
-//    }
-
-//    private fun showUserDetail(userDetail: UserDetail) {
-//        binding.llContainerUserDetail.visibility = View.VISIBLE
-//        binding.edtDateOfBirthUserDetail.inputType = InputType.TYPE_NULL
-//        binding.edtNameUserDetail.setText(userDetail.name)
-//        binding.edtUserNameUserDetail.setText(userDetail.username)
-//        binding.edtAddressUserDetail.setText(userDetail.address)
-//        binding.edtEmailUserDetail.setText(userDetail.email)
-//        binding.edtIdentifierCodeUserDetail.setText(userDetail.personalCode)
-//        binding.edtDateOfBirthUserDetail.setText(userDetail.birthday)
-//        binding.edtPhoneUserDetail.setText(userDetail.phoneNumber)
-//    }
-
-    private fun showDatePickerDialog(editText: EditText) {
-        val datePickerDialog = DatePickerDialog(
-            context!!,
-            { view: DatePicker, year: Int, monthOfYear: Int, dayOfMonth: Int ->
-                // Xử lý khi ngày được chọn
-                calendar.set(Calendar.YEAR, year)
-                calendar.set(Calendar.MONTH, monthOfYear)
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                updateEditText(editText)
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
-        datePickerDialog.show()
+    private fun activeUser() {
+        userDetailViewModel.activeUser()
     }
 
-    private fun updateEditText(editText: EditText) {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        editText.setText(dateFormat.format(calendar.time))
+    private fun blockUser() {
+        userDetailViewModel.blockUser()
+    }
+
+    private fun showUserDetail(user: User) {
+        binding.llContainerUserDetail.visibility = View.VISIBLE
+        binding.edtDateOfBirthUserDetail.inputType = InputType.TYPE_NULL
+        binding.edtNameUserDetail.setText(user.account.name)
+        binding.edtUserNameUserDetail.setText(user.account.username)
+        binding.edtAddressUserDetail.setText(user.account.address)
+        binding.edtEmailUserDetail.setText(user.account.email)
+        binding.edtIdentifierCodeUserDetail.setText(user.account.personalCode)
+        binding.edtDateOfBirthUserDetail.setText(user.account.birthday)
+        binding.edtPhoneUserDetail.setText(user.account.phoneNumber)
+
+        if (user.account.status == Account.ACTIVE_STATUS) {
+            binding.btnSaveUserDetail.text = "Chặn người dùng"
+        } else {
+            binding.btnSaveUserDetail.text = "Bỏ chặn người dùng"
+        }
     }
 
 }

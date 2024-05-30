@@ -5,7 +5,7 @@ import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentParkinglotSettingBinding
 import com.example.parkingqr.ui.base.BaseFragment
 
-class ParkingLotSettingFragment: BaseFragment() {
+class ParkingLotSettingFragment : BaseFragment() {
     private lateinit var binding: FragmentParkinglotSettingBinding
     override fun observeViewModel() {
 
@@ -18,8 +18,11 @@ class ParkingLotSettingFragment: BaseFragment() {
 
     override fun initListener() {
         showActionBar(getString(R.string.parking_lot_setting_fragment_name))
-        binding.crdBillingTypeParkingLotSetting.setOnClickListener{
+        binding.crdBillingTypeParkingLotSetting.setOnClickListener {
             getNavController().navigate(R.id.billingTypeListFragment)
+        }
+        binding.crdParkingLotInfoParkingLotSetting.setOnClickListener {
+            getNavController().navigate(R.id.parkingLotDetailHomeFragment)
         }
     }
 }

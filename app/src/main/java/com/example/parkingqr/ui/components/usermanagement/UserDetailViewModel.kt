@@ -3,6 +3,7 @@ package com.example.parkingqr.ui.components.usermanagement
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
 import com.example.parkingqr.data.repo.user.UserRepository
+import com.example.parkingqr.domain.model.user.User
 import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,91 +14,115 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserDetailViewModel @Inject constructor(private val repository: UserRepository): BaseViewModel() {
+class UserDetailViewModel @Inject constructor(private val repository: UserRepository) :
+    BaseViewModel() {
 
     private val _stateUi = MutableStateFlow(
         UserDetailState()
     )
     val stateUi: StateFlow<UserDetailState> = _stateUi.asStateFlow()
 
-//    fun getUserById(id: String) {
-//        viewModelScope.launch {
-//            repository.getUserById(id).collect { state ->
-//                when (state) {
-//                    is State.Loading -> {
-//                        _stateUi.update {
-//                            it.copy(isLoading = true)
-//                        }
-//                    }
-//                    is State.Success -> {
-//                        _stateUi.update {
-//                            it.copy(
-//                                userDetail = state.data,
-//                                isLoading = false
-//                            )
-//                        }
-//                    }
-//                    is State.Failed -> {
-//                        _stateUi.update {
-//                            it.copy(
-//                                isLoading = false,
-//                                error = state.message
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    fun updateUser() {
-//        viewModelScope.launch {
-//            repository.updateUser(_stateUi.value.userDetail!!).collect { state ->
-//                when (state) {
-//                    is State.Loading -> {
-//                        _stateUi.update {
-//                            it.copy(isLoading = true)
-//                        }
-//                    }
-//                    is State.Success -> {
-//                        _stateUi.update {
-//                            it.copy(
-//                                message = "Cập nhật người dùng thành công",
-//                                isSaved = true,
-//                                isLoading = false
-//                            )
-//                        }
-//                    }
-//                    is State.Failed -> {
-//                        _stateUi.update {
-//                            it.copy(
-//                                isLoading = false,
-//                                error = state.message
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
+    fun getUserById(id: String) {
+        viewModelScope.launch {
+            repository.getUserById(id).collect { state ->
+                when (state) {
+                    is State.Loading -> {
+                        _stateUi.update {
+                            it.copy(isLoading = true)
+                        }
+                    }
 
+                    is State.Success -> {
+                        _stateUi.update {
+                            it.copy(
+                                user = state.data,
+                                isLoading = false
+                            )
+                        }
+                    }
 
-//    fun updateNewUserDetail(_name: String, _userName: String, _address: String, _email: String, _identifierCode: String, _dateOfBirth: String, _phone: String){
-//       _stateUi.update {
-//           it.copy(
-//               userDetail = it.userDetail?.apply {
-//                   name = _name
-//                   username = _userName
-//                   address = _address
-//                   email = _email
-//                   personalCode = _identifierCode
-//                   birthday = _dateOfBirth
-//                   phoneNumber = _phone
-//               }
-//           )
-//       }
-//    }
+                    is State.Failed -> {
+                        _stateUi.update {
+                            it.copy(
+                                isLoading = false,
+                                error = state.message
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 
+    fun blockUser() {
+        viewModelScope.launch {
+            stateUi.value.user?.id?.let { id ->
+                repository.blockUser(id).collect { state ->
+                    when (state) {
+                        is State.Loading -> {
+                            _stateUi.update {
+                                it.copy(isLoading = true)
+                            }
+                        }
+
+                        is State.Success -> {
+                            _stateUi.update {
+                                it.copy(
+                                    message = "Chặn tài khoản thành công",
+                                    isLoading = false,
+                                    needOut = true
+                                )
+                            }
+                        }
+
+                        is State.Failed -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = state.message
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun activeUser() {
+        viewModelScope.launch {
+            stateUi.value.user?.id?.let { id ->
+                repository.activeUser(id).collect { state ->
+                    when (state) {
+                        is State.Loading -> {
+                            _stateUi.update {
+                                it.copy(isLoading = true)
+                            }
+                        }
+
+                        is State.Success -> {
+                            _stateUi.update {
+                                it.copy(
+                                    message = "Bỏ chặn tài khoản thành công ",
+                                    isLoading = false,
+                                    needOut = true
+                                )
+                            }
+                        }
+
+                        is State.Failed -> {
+                            _stateUi.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = state.message
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     fun showError() {
         _stateUi.update {
@@ -106,7 +131,8 @@ class UserDetailViewModel @Inject constructor(private val repository: UserReposi
             )
         }
     }
-    fun showMessage(){
+
+    fun showMessage() {
         _stateUi.update {
             it.copy(
                 message = ""
@@ -118,7 +144,7 @@ class UserDetailViewModel @Inject constructor(private val repository: UserReposi
         val isLoading: Boolean = false,
         val error: String = "",
         val message: String = "",
-//        val userDetail: UserDetail? = null,
-        val isSaved: Boolean = false,
+        val user: User? = null,
+        val needOut: Boolean = false,
     )
 }

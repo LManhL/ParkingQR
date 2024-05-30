@@ -23,6 +23,7 @@ class UserRepositoryImpl @Inject constructor(
                 is State.Loading -> State.loading()
                 is State.Success -> State.success(state.data.map { it.mapToAccount() }
                     .toMutableList())
+
                 is State.Failed -> State.failed(state.message)
             }
         }
@@ -56,6 +57,7 @@ class UserRepositoryImpl @Inject constructor(
                 is State.Loading -> State.loading()
                 is State.Success -> State.success(state.data.map { it.mapToAccount() }
                     .toMutableList())
+
                 is State.Failed -> State.failed(state.message)
             }
         }
@@ -185,5 +187,19 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun activeUser(id: String): Flow<State<Boolean>> {
         return userRemoteData.activeUser(id)
+    }
+
+    override fun getAllUser(): Flow<State<List<User>>> {
+        return userRemoteData.getAllUser().map { state ->
+            when (state) {
+                is State.Loading -> State.loading()
+                is State.Success -> State.success(state.data.map { it.mapToUser() })
+                is State.Failed -> State.failed(state.message)
+            }
+        }
+    }
+
+    override fun updateUser(user: User): Flow<State<Boolean>> {
+        return userRemoteData.updateUser(user.mapToUserFirebase())
     }
 }

@@ -2,6 +2,7 @@ package com.example.parkingqr.ui.components.userprofile
 
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class UserProfileFragment : BaseFragment() {
     private lateinit var binding: FragmentMyProfileBinding
-    private val userProfileViewModel: UserProfileViewModel by viewModels()
+    private val userProfileViewModel: UserProfileViewModel by hiltNavGraphViewModels(R.id.myprofileFragment)
 
     override fun observeViewModel() {
         lifecycleScope.launch {
@@ -60,6 +61,10 @@ class UserProfileFragment : BaseFragment() {
         }
         binding.tvConnectBankAccountMyProfile.setOnClickListener {
             getNavController().navigate(R.id.connectBankAccountFragment)
+            hideBottomNavigation()
+        }
+        binding.tvEditMyProfile.setOnClickListener {
+            getNavController().navigate(R.id.userProfileDetail)
             hideBottomNavigation()
         }
         userProfileViewModel.getUserInformation()

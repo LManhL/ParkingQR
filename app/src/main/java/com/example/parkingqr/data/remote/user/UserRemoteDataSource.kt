@@ -9,11 +9,14 @@ import com.example.parkingqr.data.remote.dto.user.ParkingAttendantFirebase
 import com.example.parkingqr.data.remote.dto.user.ParkingLotManagerFirebase
 import com.example.parkingqr.data.remote.dto.user.UserFirebase
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.snapshots
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -300,4 +303,25 @@ class UserRemoteDataSource @Inject constructor(val context: Context) : BaseRemot
         }.catch {
             emit(State.failed(it.message.toString()))
         }.flowOn(Dispatchers.IO)
+
+    override fun getAllUser(): Flow<State<List<UserFirebase>>> = flow {
+        emit(State.loading())
+        db.collection(Params.USER_PATH_COLLECTION).snapshots().map { querySnapshots ->
+            val res = mutableListOf<UserFirebase>()
+            querySnapshots.forEach {
+                res.add(it.toObject(UserFirebase::class.java))
+            }
+            emit(State.success(res.toList()))
+        }.collect()
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    override fun updateUser(user: UserFirebase): Flow<State<Boolean>> = flow {
+        emit(State.loading())
+        db.collection(Params.USER_PATH_COLLECTION).document(user.id.toString()).set(user).await()
+        emit(State.success(true))
+    }.catch {
+        emit(State.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
 }

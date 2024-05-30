@@ -32,7 +32,10 @@ interface UserRemoteData {
         parkingLotManagerId: String,
         parkingLotId: String
     ): Flow<State<Boolean>>
+
     fun blockUser(id: String): Flow<State<Boolean>>
     fun activeUser(id: String): Flow<State<Boolean>>
     fun getUserById(userId: String): Flow<State<UserFirebase>>
+    fun getAllUser(): Flow<State<List<UserFirebase>>>
+    fun updateUser(user: UserFirebase): Flow<State<Boolean>>
 }

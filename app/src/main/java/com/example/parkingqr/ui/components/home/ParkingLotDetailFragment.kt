@@ -1,8 +1,10 @@
 package com.example.parkingqr.ui.components.home
 
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
@@ -39,6 +41,7 @@ class ParkingLotDetailFragment : BaseFragment(), OnMapReadyCallback {
         adapter = ImageParkingLotDetailAdapter(mutableListOf())
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -60,7 +63,7 @@ class ParkingLotDetailFragment : BaseFragment(), OnMapReadyCallback {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.map { it.isDeletedParkingLot }.distinctUntilChanged().collect {
-                    if(it){
+                    if (it) {
                         getNavController().popBackStack()
                         viewModel.resetIsDeletedPara()
                     }
@@ -93,6 +96,7 @@ class ParkingLotDetailFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun showParkingLot(parkingLot: ParkingLot) {
         binding.apply {
             edtNameParkingLotDetailHome.setText(parkingLot.name)
@@ -104,10 +108,17 @@ class ParkingLotDetailFragment : BaseFragment(), OnMapReadyCallback {
             edtPhoneParkingLotDetailHome.setText(parkingLot.phoneNumber)
             when (parkingLot.status) {
                 ParkingLot.ParkingLotStatus.PENDING_STATUS -> {
+                    binding.btnCreateParkingLotDetailHome.visibility = View.VISIBLE
                     tvStatusParkingLotDetailHome.text = "Đang chờ phê duyệt"
                 }
-                ParkingLot.ParkingLotStatus.ACCEPTED_STATUS -> {}
+
+                ParkingLot.ParkingLotStatus.ACCEPTED_STATUS -> {
+                    tvStatusParkingLotDetailHome.text = "Đã phê duyệt"
+                    binding.btnCreateParkingLotDetailHome.visibility = View.GONE
+                }
+
                 ParkingLot.ParkingLotStatus.DECLINED_STATUS -> {
+                    binding.btnCreateParkingLotDetailHome.visibility = View.VISIBLE
                     tvStatusParkingLotDetailHome.text = "Từ chối phê duyệt"
                 }
             }
@@ -116,6 +127,7 @@ class ParkingLotDetailFragment : BaseFragment(), OnMapReadyCallback {
         getLocation(parkingLot)
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun getLocation(parkingLot: ParkingLot) {
         if (ActivityCompat.checkSelfPermission(
                 requireActivity(),

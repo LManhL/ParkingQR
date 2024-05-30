@@ -63,6 +63,7 @@
                 android:background="@drawable/arrow_point_to_right" />
 
             <TextView
+                android:id="@+id/tvEditMyProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

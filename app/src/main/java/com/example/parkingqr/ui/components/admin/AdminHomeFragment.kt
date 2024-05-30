@@ -33,6 +33,9 @@ class AdminHomeFragment : BaseFragment() {
         binding.crdParkingLotMangeAdminHome.setOnClickListener {
             getNavController().navigate(R.id.parkingLotListFragment)
         }
+        binding.crdUserMangeAdminHome.setOnClickListener {
+            getNavController().navigate(R.id.userManagementFragment)
+        }
 
     }
 

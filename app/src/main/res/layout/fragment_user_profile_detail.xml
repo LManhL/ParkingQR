@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/llContainerUserDetail"
+    android:id="@+id/llContainerUserProfileDetail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/padding_10">
@@ -17,6 +17,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/tvStatusProfileDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/source_sans_pro_semibold"
+                android:gravity="center"
+                android:text="Hoạt động"
+                android:textColor="@color/icon_color"
+                android:textSize="@dimen/font_size_large" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -41,13 +50,12 @@
                         android:textSize="@dimen/font_size_16" />
 
                     <EditText
-                        android:id="@+id/edtNameUserDetail"
+                        android:id="@+id/edtNameUserProfileDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_edit_text_white"
-                        android:enabled="false"
                         android:fontFamily="@font/source_sans_pro"
-                        android:hint="Chưa có thông tin"
+                        android:hint="Nhập họ và tên"
                         android:inputType="textPersonName"
                         android:maxLines="2"
                         android:padding="@dimen/padding_10"
@@ -73,13 +81,12 @@
                         android:textSize="@dimen/font_size_16" />
 
                     <EditText
-                        android:id="@+id/edtEmailUserDetail"
+                        android:id="@+id/edtEmailUserProfileDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_edit_text_white"
-                        android:enabled="false"
                         android:fontFamily="@font/source_sans_pro"
-                        android:hint="Chưa có thông tin"
+                        android:hint="Nhập email"
                         android:inputType="textEmailAddress"
                         android:maxLines="2"
                         android:padding="@dimen/padding_10"
@@ -105,13 +112,12 @@
                         android:textSize="@dimen/font_size_16" />
 
                     <EditText
-                        android:id="@+id/edtPhoneUserDetail"
+                        android:id="@+id/edtPhoneUserProfileDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_edit_text_white"
-                        android:enabled="false"
                         android:fontFamily="@font/source_sans_pro"
-                        android:hint="Chưa có thông tin"
+                        android:hint="Nhập số điện thoại"
                         android:inputType="number"
                         android:maxLines="2"
                         android:padding="@dimen/padding_10"
@@ -137,13 +143,12 @@
                         android:textSize="@dimen/font_size_16" />
 
                     <EditText
-                        android:id="@+id/edtUserNameUserDetail"
+                        android:id="@+id/edtUserNameUserProfileDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_edit_text_white"
-                        android:enabled="false"
                         android:fontFamily="@font/source_sans_pro"
-                        android:hint="Chưa có thông tin"
+                        android:hint="Nhập tên tài khoản"
                         android:inputType="text"
                         android:maxLines="2"
                         android:padding="@dimen/padding_10"
@@ -169,13 +174,12 @@
                         android:textSize="@dimen/font_size_16" />
 
                     <EditText
-                        android:id="@+id/edtIdentifierCodeUserDetail"
+                        android:id="@+id/edtIdentifierCodeUserProfileDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_edit_text_white"
-                        android:enabled="false"
                         android:fontFamily="@font/source_sans_pro"
-                        android:hint="Chưa có thông tin"
+                        android:hint="Nhập căn cước công dân"
                         android:inputType="text"
                         android:maxLines="2"
                         android:padding="@dimen/padding_10"
@@ -201,13 +205,12 @@
                         android:textSize="@dimen/font_size_16" />
 
                     <EditText
-                        android:id="@+id/edtAddressUserDetail"
+                        android:id="@+id/edtAddressUserProfileDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_edit_text_white"
-                        android:enabled="false"
                         android:fontFamily="@font/source_sans_pro"
-                        android:hint="Chưa có thông tin"
+                        android:hint="Nhập địa chỉ"
                         android:inputType="text"
                         android:maxLines="2"
                         android:padding="@dimen/padding_10"
@@ -233,13 +236,12 @@
                         android:textSize="@dimen/font_size_16" />
 
                     <EditText
-                        android:id="@+id/edtDateOfBirthUserDetail"
+                        android:id="@+id/edtDateOfBirthUserProfileDetail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_edit_text_white"
-                        android:enabled="false"
                         android:fontFamily="@font/source_sans_pro"
-                        android:hint="Chưa có thông tin"
+                        android:hint="Chọn ngày sinh"
                         android:inputType="none"
                         android:maxLines="2"
                         android:padding="@dimen/padding_10"
@@ -249,12 +251,12 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/btnSaveUserDetail"
+                android:id="@+id/btnSaveUserProfileDetail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin_20"
-                android:background="#0C15AA"
-                android:text="Chặn ngươi dùng"
+                android:background="@drawable/rounded_button_icon_color"
+                android:text="Cập nhật thông tin"
                 android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent" />
         </LinearLayout>
