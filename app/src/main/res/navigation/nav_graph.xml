@@ -127,17 +127,17 @@
         tools:layout="@layout/fragment_billing_type_list" />
     <fragment
         android:id="@+id/registerMonthlyInvoiceFragment"
-        android:name="com.example.parkingqr.ui.components.location.RegisterMonthlyInvoiceFragment"
+        android:name="com.example.parkingqr.ui.components.registermonthlyticket.RegisterMonthlyInvoiceFragment"
         android:label="@string/register_monthly_invoice_fragment_name"
         tools:layout="@layout/fragment_register_monthly_invoice" />
     <fragment
         android:id="@+id/chooseVehicleMonthlyTicket"
-        android:name="com.example.parkingqr.ui.components.location.ChooseVehicleMonthlyTicketFragment"
+        android:name="com.example.parkingqr.ui.components.registermonthlyticket.ChooseVehicleMonthlyTicketFragment"
         android:label="@string/choose_vehicle_monthly_ticket_fragment_name"
         tools:layout="@layout/fragment_choose_vehicle_monthly_ticket" />
     <fragment
         android:id="@+id/selectQRCodeTypeFragment"
-        android:name="com.example.parkingqr.ui.components.qrcode.SelectQRCodeTypeFragment"
+        android:name="com.example.parkingqr.ui.components.qrcode.UserMonthlyTicketListFragment"
         android:label="@string/select_qr_code_type_fragment_name"
         tools:layout="@layout/fragment_select_qr_code_type" />
     <fragment
@@ -148,7 +148,7 @@
 
     <fragment
         android:id="@+id/chooseBankAccountFragment"
-        android:name="com.example.parkingqr.ui.components.location.ChooseBankAccountFragment"
+        android:name="com.example.parkingqr.ui.components.registermonthlyticket.ChooseBankAccountFragment"
         android:label="@string/connect_bank_account_fragment_name"
         tools:layout="@layout/fragment_connect_bank_account" />
     <fragment
@@ -163,7 +163,7 @@
         tools:layout="@layout/fragment_select_bank_account" />
     <fragment
         android:id="@+id/adminHomeFragment"
-        android:name="com.example.parkingqr.ui.components.admin.AdminHomeFragment"
+        android:name="com.example.parkingqr.ui.components.parkinglotmanagement.AdminHomeFragment"
         android:label="@string/admin_home_fragment_name"
         tools:layout="@layout/fragment_admin_home" />
 
@@ -181,12 +181,12 @@
 
     <fragment
         android:id="@+id/parkingLotListFragment"
-        android:name="com.example.parkingqr.ui.components.admin.ParkingLotListFragment"
+        android:name="com.example.parkingqr.ui.components.parkinglotmanagement.ParkingLotListFragment"
         android:label="@string/admin_home_fragment_name"
         tools:layout="@layout/fragment_parking_lot_list" />
     <fragment
         android:id="@+id/parkingLotDetailFragment"
-        android:name="com.example.parkingqr.ui.components.admin.ParkingLotDetailFragment"
+        android:name="com.example.parkingqr.ui.components.parkinglotmanagement.ParkingLotDetailFragment"
         android:label="@string/admin_home_fragment_name"
         tools:layout="@layout/fragment_parking_lot_detail" />
     <fragment

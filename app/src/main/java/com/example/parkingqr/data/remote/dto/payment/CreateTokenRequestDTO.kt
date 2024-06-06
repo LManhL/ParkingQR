@@ -1,4 +1,4 @@
-package com.example.parkingqr.data.remote.payment.dto
+package com.example.parkingqr.data.remote.dto.payment
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

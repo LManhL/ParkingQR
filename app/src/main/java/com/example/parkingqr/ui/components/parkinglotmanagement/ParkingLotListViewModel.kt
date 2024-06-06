@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.admin
+package com.example.parkingqr.ui.components.parkinglotmanagement
 
 import androidx.lifecycle.viewModelScope
 import com.example.parkingqr.data.remote.State
@@ -10,7 +10,6 @@ import com.example.parkingqr.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject

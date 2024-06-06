@@ -1,11 +1,10 @@
-package com.example.parkingqr.ui.components.location
+package com.example.parkingqr.ui.components.registermonthlyticket
 
 import android.view.View
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentChooseVehicleMonthlyTicketBinding

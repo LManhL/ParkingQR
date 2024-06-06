@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class SelectQRCodeTypeFragment : BaseFragment() {
+class UserMonthlyTicketListFragment : BaseFragment() {
     private lateinit var binding: FragmentSelectQrCodeTypeBinding
     private val viewModel: UserQRCodeListViewModel by hiltNavGraphViewModels(
         R.id.userQRCodeListFragment

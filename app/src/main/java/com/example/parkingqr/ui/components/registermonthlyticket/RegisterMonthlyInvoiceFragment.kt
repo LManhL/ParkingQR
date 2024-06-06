@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.location
+package com.example.parkingqr.ui.components.registermonthlyticket
 
 import android.os.Bundle
 import android.view.View
@@ -14,8 +14,8 @@ import com.example.parkingqr.domain.model.payment.BankAccount
 import com.example.parkingqr.ui.base.BaseFragment
 import com.example.parkingqr.ui.components.MainActivity
 import com.example.parkingqr.ui.components.dialog.PaymentSuccessDialog
+import com.example.parkingqr.ui.components.location.BottomSheetPlaceDetailFragment
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 

@@ -6,7 +6,9 @@ import com.example.parkingqr.data.repo.auth.AuthRepository
 import com.example.parkingqr.data.repo.user.UserRepository
 import com.example.parkingqr.domain.model.user.*
 import com.example.parkingqr.ui.base.BaseViewModel
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +30,19 @@ class LoginViewModel @Inject constructor(
 
     private var loginJob: Job? = null
 
+    init {
+        val user = Firebase.auth.currentUser
+        user?.let { curUser ->
+            _stateUi.update {
+                it.copy(
+                    isLoading = true,
+                    userAuth = curUser
+                )
+            }
+            findAccountThenLogin(curUser.email.toString())
+        }
+    }
+
     fun doLogin(email: String, password: String) {
         loginJob?.cancel()
         loginJob = viewModelScope.launch {
@@ -38,6 +53,7 @@ class LoginViewModel @Inject constructor(
                             it.copy(isLoading = true)
                         }
                     }
+
                     is State.Success -> {
 
                         if (state.data != null) {
@@ -56,6 +72,7 @@ class LoginViewModel @Inject constructor(
                             }
                         }
                     }
+
                     is State.Failed -> {
                         _stateUi.update {
                             it.copy(
@@ -92,6 +109,7 @@ class LoginViewModel @Inject constructor(
                             }
                         }
                     }
+
                     is State.Failed -> {
                         _stateUi.update {
                             it.copy(

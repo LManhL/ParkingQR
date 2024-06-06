@@ -1,8 +1,8 @@
 package com.example.parkingqr.data.remote.payment
 
-import com.example.parkingqr.data.remote.payment.dto.BankAccountResponseDTO
-import com.example.parkingqr.data.remote.payment.dto.CreateTokenResponseDTO
-import com.example.parkingqr.data.remote.payment.dto.PayByTokenResponseDTO
+import com.example.parkingqr.data.remote.dto.payment.BankAccountResponseDTO
+import com.example.parkingqr.data.remote.dto.payment.CreateTokenResponseDTO
+import com.example.parkingqr.data.remote.dto.payment.PayByTokenResponseDTO
 import retrofit2.Response
 
 interface PaymentRemoteData {

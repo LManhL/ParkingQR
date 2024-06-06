@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.admin
+package com.example.parkingqr.ui.components.parkinglotmanagement
 
 import android.content.pm.PackageManager
 import android.os.Bundle

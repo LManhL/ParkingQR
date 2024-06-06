@@ -1,7 +1,5 @@
-package com.example.parkingqr.ui.components.admin
+package com.example.parkingqr.ui.components.parkinglotmanagement
 
-import android.graphics.Bitmap
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

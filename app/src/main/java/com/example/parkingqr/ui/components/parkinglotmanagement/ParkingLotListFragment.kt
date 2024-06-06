@@ -1,8 +1,7 @@
-package com.example.parkingqr.ui.components.admin
+package com.example.parkingqr.ui.components.parkinglotmanagement
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -12,7 +11,6 @@ import com.example.parkingqr.R
 import com.example.parkingqr.databinding.FragmentParkingLotListBinding
 import com.example.parkingqr.domain.model.parkinglot.ParkingLot
 import com.example.parkingqr.ui.base.BaseFragment
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch

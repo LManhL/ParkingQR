@@ -1,6 +1,11 @@
 package com.example.parkingqr.data.remote.payment
 
-import com.example.parkingqr.data.remote.payment.dto.*
+import com.example.parkingqr.data.remote.dto.payment.BankAccountResponseDTO
+import com.example.parkingqr.data.remote.dto.payment.CreateTokenRequestDTO
+import com.example.parkingqr.data.remote.dto.payment.CreateTokenResponseDTO
+import com.example.parkingqr.data.remote.dto.payment.GetBankAccountListRequest
+import com.example.parkingqr.data.remote.dto.payment.PayByTokenRequestDTO
+import com.example.parkingqr.data.remote.dto.payment.PayByTokenResponseDTO
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

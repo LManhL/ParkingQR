@@ -1,4 +1,4 @@
-package com.example.parkingqr.ui.components.location
+package com.example.parkingqr.ui.components.registermonthlyticket
 
 import android.os.Bundle
 import android.view.View

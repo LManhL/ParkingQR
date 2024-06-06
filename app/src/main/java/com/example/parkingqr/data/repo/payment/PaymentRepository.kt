@@ -1,7 +1,6 @@
 package com.example.parkingqr.data.repo.payment
 
 import com.example.parkingqr.data.remote.State
-import com.example.parkingqr.data.remote.payment.dto.BankAccountResponseDTO
 import com.example.parkingqr.domain.model.payment.BankAccount
 import com.example.parkingqr.domain.model.payment.CreateTokenResponse
 import com.example.parkingqr.domain.model.payment.PayByTokenResponse

@@ -1,8 +1,8 @@
 package com.example.parkingqr.data.mapper
 
-import com.example.parkingqr.data.remote.payment.dto.BankAccountResponseDTO
-import com.example.parkingqr.data.remote.payment.dto.CreateTokenResponseDTO
-import com.example.parkingqr.data.remote.payment.dto.PayByTokenResponseDTO
+import com.example.parkingqr.data.remote.dto.payment.BankAccountResponseDTO
+import com.example.parkingqr.data.remote.dto.payment.CreateTokenResponseDTO
+import com.example.parkingqr.data.remote.dto.payment.PayByTokenResponseDTO
 import com.example.parkingqr.domain.model.payment.BankAccount
 import com.example.parkingqr.domain.model.payment.CreateTokenResponse
 import com.example.parkingqr.domain.model.payment.PayByTokenResponse
