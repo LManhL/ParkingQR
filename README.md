@@ -70,4 +70,4 @@ Make sure you have the following tools installed on your system:
 git clone https://github.com/LManhL/ParkingQR.git
 
 ## App preview
-![Frame 38 (1) (1)](https://github.com/LManhL/ParkingQR/assets/95266634/5c4d1c42-9822-4bfc-913e-053239f138dd)
+![Frame 38 (2) (1)](https://github.com/user-attachments/assets/3866876f-5b55-43f3-8de9-3a2873136cbb)
